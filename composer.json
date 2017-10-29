@@ -8,5 +8,10 @@
             "email": "office@hive.wien"
         }
     ],
-    "require": {}
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Marble\\Admin\\": "src/"
+        }
+    }
 }
