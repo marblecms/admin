@@ -9,9 +9,9 @@ $groupConfigWithAuth = $groupConfig = [
 $groupConfigWithAuth["middleware"][] = "auth";
 
 Route::group($groupConfig, function () {
-    Route::get('login', "Auth\AuthController@getLogin");
-    Route::get('logout', "Auth\AuthController@getLogout");
-    Route::post('login', "Auth\AuthController@postLogin");
+    Route::get('login', 'Auth\LoginController@showLoginForm');
+    Route::post('login', 'Auth\LoginController@login');
+    Route::post('logout', 'Auth\LoginController@logout');
 });
 
 Route::group($groupConfig, function () {

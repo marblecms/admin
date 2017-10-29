@@ -1,11 +1,11 @@
  <div class="main-box">
     <header class="main-box-header clearfix">
         <h2>
-            <div class="pull-left">{{trans('admin.children')}}</div>
+            <div class="pull-left">{{trans('admin::admin.children')}}</div>
             @if($node->class->allowChildren)
                 <div class="pull-right">
                     <a href="{{url("admin/node/add/" . $node->id)}}" class="btn btn-info btn-xs">
-                        {{trans('admin.add_children')}}
+                        {{trans('admin::admin.add_children')}}
                     </a>
                 </div>
             @endif
@@ -58,7 +58,7 @@
                     });
                 </script>
             @else
-                <center><i>{{trans('admin.no_children')}}</i></center>
+                <center><i>{{trans('admin::admin.no_children')}}</i></center>
                 <br />
             @endif
         </div>
