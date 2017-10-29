@@ -21,6 +21,7 @@ class LoginController extends Controller
     use AuthenticatesUsers;
 
     protected $redirectTo = '/admin/dashboard';
+    protected $loginPath = '/admin/login';
 
     /**
      * Create a new controller instance.

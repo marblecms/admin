@@ -17,7 +17,7 @@ class CreateNodeClassesTable extends Migration
             $table->increments('id');
             $table->integer('groupId');
             $table->string('name');
-            $table->string('namedIdenfitier');
+            $table->string('namedIdentifier');
             $table->string('icon');
             $table->tinyInteger('allowChildren');
             $table->tinyInteger('listChildren');
@@ -25,7 +25,8 @@ class CreateNodeClassesTable extends Migration
             $table->tinyInteger('showInTree');
             $table->tinyInteger('tabs');
             $table->text('allowedChildClasses');
-            $table->timestamps();
+            $table->timestamp('createdAt')->nullable();
+            $table->timestamp('updatedAt')->nullable();
         });
     }
 

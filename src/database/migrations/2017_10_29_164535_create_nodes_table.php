@@ -18,7 +18,8 @@ class CreateNodesTable extends Migration
             $table->integer('classId');
             $table->integer('parentId');
             $table->integer('sortOrder');
-            $table->timestamps();
+            $table->timestamp('createdAt')->nullable();
+            $table->timestamp('updatedAt')->nullable();
         });
     }
 

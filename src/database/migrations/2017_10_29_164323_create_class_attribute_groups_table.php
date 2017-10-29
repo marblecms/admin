@@ -18,7 +18,7 @@ class CreateClassAttributeGroupsTable extends Migration
             $table->string('name');
             $table->integer('classId');
             $table->integer('sortOrder');
-            $table->string('template');
+            $table->string('template')->nullable();
         });
     }
 

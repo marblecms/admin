@@ -1,0 +1,2 @@
+INSERT INTO `user_groups` (`id`, `name`, `allowedClasses`, `createUser`, `createClass`, `deleteGroup`, `deleteClass`, `deleteUser`, `editUser`, `editClass`, `editGroup`, `createGroup`, `listGroup`, `listUser`, `listClass`, `entryNodeId`) VALUES
+(0, 'System', 'a:1:{i:0;s:3:\"all\";}', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, -1);

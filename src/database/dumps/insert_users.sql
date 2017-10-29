@@ -1,0 +1,2 @@
+INSERT INTO `users` (`id`, `name`, `email`, `password`, `rememberToken`, `groupId`) VALUES
+(1, 'Admin', 'admin@marble', '$2y$10$u3IKncF75sCLq3h6CJOA5.SMz/AYN9XEaLlx.wLxmV9UqRhK78Syq', 'OAppFkmpMnmCZ39iQOpAqmHTNlwJwe5dniOkhjNcZPZgQAr5GcgYAYXQcKiI', 1);

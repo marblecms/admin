@@ -16,7 +16,7 @@ class CreateClassAttributesTable extends Migration
         Schema::create('class_attributes', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
-            $table->string('namedIdenfitier');
+            $table->string('namedIdentifier');
             $table->text('configuration');
             $table->integer('classId');
             $table->integer('attributeId');

@@ -7,7 +7,7 @@ use Marble\Admin\App\Models\User;
 use Marble\Admin\App\Models\NodeClass;
 
 class DashboardController extends Controller
-{
+{   
     public function view()
     {
         return view('admin::dashboard.view', [

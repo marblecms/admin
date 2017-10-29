@@ -1,0 +1,1 @@
+INSERT INTO `node_class_groups` (`id`, `name`) VALUES (1, 'All'), (2, 'System'), (3, 'Content');
