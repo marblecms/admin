@@ -3,10 +3,10 @@
 @section('content')
 
     <h1>
-    	{{trans("admin.usergroups")}}
+    	{{trans("admin::admin.usergroups")}}
         @if(Marble\Admin\App\Helpers\PermissionHelper::allowed("createGroup"))
             <div class="pull-right">
-                <a href="{{ url("admin/usergroup/add") }}" class="btn btn-xs btn-success">{{trans("admin.add_usergroup")}}</a>
+                <a href="{{ url("admin/usergroup/add") }}" class="btn btn-xs btn-success">{{trans("admin::admin.add_usergroup")}}</a>
             </div>
         @endif
     </h1>
@@ -15,7 +15,7 @@
     <div class="main-box">
         <header class="main-box-header clearfix">
             <h2>
-                {{trans("admin.usergroups")}}
+                {{trans("admin::admin.usergroups")}}
             </h2>
         </header>
         <div class="main-box-body clearfix">        
@@ -40,10 +40,10 @@
                                 <td class="text-right">
                                     <div class="btn-group">
                                         @if(Marble\Admin\App\Helpers\PermissionHelper::allowed("editGroup"))
-                                            <a href="{{ url("admin/usergroup/edit/" . $group->id) }}" class="btn btn-info btn-xs">{{trans("admin.edit")}}</a>
+                                            <a href="{{ url("admin/usergroup/edit/" . $group->id) }}" class="btn btn-info btn-xs">{{trans("admin::admin.edit")}}</a>
                                         @endif
                                         @if($group->id != 0 and Marble\Admin\App\Helpers\PermissionHelper::allowed("deleteGroup"))
-                                            <a href="{{ url("admin/usergroup/delete/" . $group->id) }}" onclick="return confirm('{{trans("admin.are_you_sure")}}');" class="btn btn-xs btn-danger">{{trans("admin.delete")}}</a>
+                                            <a href="{{ url("admin/usergroup/delete/" . $group->id) }}" onclick="return confirm('{{trans("admin::admin.are_you_sure")}}');" class="btn btn-xs btn-danger">{{trans("admin::admin.delete")}}</a>
                                         @endif
                                     </div>
                                 </td>

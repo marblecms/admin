@@ -2,7 +2,7 @@
 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
 <html xmlns='http://www.w3.org/1999/xhtml' xml:lang='de' lang='de'>
     <head>
-		<title>Administration</title>
+		<title>{{trans("admin::admin.title")}}</title>
 		<meta http-equiv='Content-type' content='text/html; charset=utf-8' />
         <link rel='stylesheet' href='{{ URL::asset('vendor/admin/css/bootstrap.min.css') }}'/>
         <link rel='stylesheet' href='{{ URL::asset('vendor/admin/css/bootstrap.datepicker.css') }}'/>
@@ -58,7 +58,7 @@
                                 <a class="btn" href="{{url("admin/dashboard")}}">
                                     <i class="fa fa-dashboard">
                                     </i>
-                                    <span>{{trans('admin.dashboard')}}</span>
+                                    <span>{{trans('admin::admin.dashboard')}}</span>
                                 </a>
                             </li>
                             @if(Marble\Admin\App\Helpers\PermissionHelper::allowed("listClass"))
@@ -66,7 +66,7 @@
                                     <a class="btn" href="{{url("admin/nodeclass/all")}}">
                                         <i class="fa fa-folder">
                                         </i>
-                                        <span>{{trans('admin.classes')}}</span>
+                                        <span>{{trans('admin::admin.classes')}}</span>
                                     </a>
                                 </li>
                             @endif
@@ -75,7 +75,7 @@
                                     <a class="btn" href="{{url("admin/user/all")}}">
                                         <i class="fa fa-user">
                                         </i>
-                                        <span>{{trans('admin.users')}}</span>
+                                        <span>{{trans('admin::admin.users')}}</span>
                                     </a>
                                 </li>
                             @endif
@@ -84,7 +84,7 @@
                                     <a class="btn" href="{{url("admin/usergroup/all")}}">
                                         <i class="fa fa-users">
                                         </i>
-                                        <span>{{trans('admin.usergroups')}}</span>
+                                        <span>{{trans('admin::admin.usergroups')}}</span>
                                     </a>
                                 </li>
                             @endif
@@ -93,7 +93,7 @@
                     <div class="nav-no-collapse pull-right" id="header-nav">
                         <ul class="nav navbar-nav pull-right">
                             <li class="autocomplete-container">
-                                <input type="text" class="form-control" id="search-field" placeholder="{{trans('admin.search_placeholder')}}" />
+                                <input type="text" class="form-control" id="search-field" placeholder="{{trans('admin::admin.search_placeholder')}}" />
                                 <ul class="list-group">
                                 </ul>
                             </li>
@@ -148,7 +148,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title">{{trans("admin.select_object")}}</h4>
+                        <h4 class="modal-title">{{trans("admin::admin.select_object")}}</h4>
                     </div>
                     <div class="modal-body">
                         <div class="collapse navbar-collapse navbar-ex1-collapse" id="sidebar-nav" style="background:#2c3e50">
@@ -156,7 +156,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-danger" data-dismiss="modal">{{trans("admin.cancel")}}</button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">{{trans("admin::admin.cancel")}}</button>
                     </div>
                 </div>
             </div>
@@ -167,14 +167,14 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title">{{trans("admin.create_object")}}</h4>
+                        <h4 class="modal-title">{{trans("admin::admin.create_object")}}</h4>
                     </div>
                     <div class="modal-body">
                            <iframe data-src="{{url("admin/node/addiframe")}}" width="100%" style="height:600px" frameborder="0" ></iframe>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-danger" data-dismiss="modal">{{trans("admin.cancel")}}</button>
-                        <button type="button" class="btn save-created-object btn-success disabled" data-dismiss="modal">{{trans("admin.save")}}</button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">{{trans("admin::admin.cancel")}}</button>
+                        <button type="button" class="btn save-created-object btn-success disabled" data-dismiss="modal">{{trans("admin::admin.save")}}</button>
                     </div>
                 </div>
             </div>
@@ -186,7 +186,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title">{{trans("admin.edit_image")}}</h4>
+                        <h4 class="modal-title">{{trans("admin::admin.edit_image")}}</h4>
                     </div>
                     <div class="modal-body">
                         <div id="image-editor">
@@ -197,8 +197,8 @@
                         
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-danger" data-dismiss="modal">{{trans("admin.cancel")}}</button>
-                        <button type="button" class="btn save-image btn-success" data-dismiss="modal">{{trans("admin.save")}}</button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">{{trans("admin::admin.cancel")}}</button>
+                        <button type="button" class="btn save-image btn-success" data-dismiss="modal">{{trans("admin::admin.save")}}</button>
                     </div>
                 </div>
             </div>

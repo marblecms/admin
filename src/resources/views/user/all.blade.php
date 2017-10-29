@@ -6,7 +6,7 @@
     	Benutzer
         @if(Marble\Admin\App\Helpers\PermissionHelper::allowed("createUser"))
             <div class="pull-right">
-                <a href="{{ url("admin/user/add") }}" class="btn btn-xs btn-success">{{trans("admin.add_user")}}</a>
+                <a href="{{ url("admin/user/add") }}" class="btn btn-xs btn-success">{{trans("admin::admin.add_user")}}</a>
             </div>
         @endif
     </h1>
@@ -15,7 +15,7 @@
     <div class="main-box">
         <header class="main-box-header clearfix">
             <h2>
-                {{trans("admin.users")}}
+                {{trans("admin::admin.users")}}
             </h2>
         </header>
         <div class="main-box-body clearfix">        
@@ -23,7 +23,7 @@
                 <table class="table table-striped">
                     <thead>
                         <tr>
-                            <th><a href="#"><span>{{trans("admin.name")}}</span></a></th>
+                            <th><a href="#"><span>{{trans("admin::admin.name")}}</span></a></th>
                             <th class="text-right"><span>&nbsp;</span></th>
                         </tr>
                     </thead>
@@ -41,11 +41,11 @@
                                 <td class="text-right">
                                     <div class="btn-group">
                                         @if(Marble\Admin\App\Helpers\PermissionHelper::allowed("editUser"))
-                                            <a href="{{ url("admin/user/edit/" . $user->id) }}" class="btn btn-info btn-xs">{{trans("admin.edit")}}</a>
+                                            <a href="{{ url("admin/user/edit/" . $user->id) }}" class="btn btn-info btn-xs">{{trans("admin::admin.edit")}}</a>
                                         @endif
 
                                         @if(Marble\Admin\App\Helpers\PermissionHelper::allowed("deleteUser"))
-                                            <a href="{{ url("admin/user/delete/" . $user->id) }}" onclick="return confirm('{{trans("admin.are_you_sure")}}');" class="btn btn-xs btn-danger">{{trans("admin.delete")}}</a>
+                                            <a href="{{ url("admin/user/delete/" . $user->id) }}" onclick="return confirm('{{trans("admin::admin.are_you_sure")}}');" class="btn btn-xs btn-danger">{{trans("admin::admin.delete")}}</a>
                                         @endif
                                     </div>
                                 </td>

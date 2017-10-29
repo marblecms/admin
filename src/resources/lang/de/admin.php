@@ -1,7 +1,7 @@
 <?php
 
 return [
-
+    'title' => 'Administration',
     'children' => 'Kinder',
     'add_children' => 'Unterobjekt einfügen',
     'add_user' => 'Benutzer hinzufügen',

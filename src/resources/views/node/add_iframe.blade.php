@@ -31,7 +31,7 @@
                         <div class="clearfix"></div>
                         
                         <input type="hidden" name="parentId" class="attribute-object-relation-input" value="" />
-                        <a href="javascript:;" class="btn btn-default btn-xs attribute-object-relation-add">{{trans("admin.select_object")}}</a>
+                        <a href="javascript:;" class="btn btn-default btn-xs attribute-object-relation-add">{{trans("admin::admin.select_object")}}</a>
 
                     </div>
                     <script>
@@ -78,7 +78,7 @@
         
 
                 <div class="form-group">
-                    <input type="submit" class="btn btn-success" value="{{trans("admin.save")}}" />
+                    <input type="submit" class="btn btn-success" value="{{trans("admin::admin.save")}}" />
                 </div>
             </form>
         </div>

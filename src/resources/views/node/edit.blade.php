@@ -35,15 +35,15 @@
                 <ul class="menu-items">
                     @if($node->parentId != 0)
                         <li>
-                            <a href="{{url("admin/node/delete/" . $node->id) }}" onclick="return confirm('{{trans("admin.are_you_sure")}}');" class="clearfix">
-                                <i class="fa fa-trash-o fa-lg"></i> {{trans("admin.delete_node")}}
+                            <a href="{{url("admin/node/delete/" . $node->id) }}" onclick="return confirm('{{trans("admin::admin.are_you_sure")}}');" class="clearfix">
+                                <i class="fa fa-trash-o fa-lg"></i> {{trans("admin::admin.delete_node")}}
                             </a>
                         </li>
                     @endif
                     @if($node->class->allowChildren)
                         <li>
                             <a href="{{url("admin/node/add/" . $node->id)}}" class="clearfix">
-                                <i class="fa fa-plus fa-lg"></i> {{trans("admin.add_children")}}
+                                <i class="fa fa-plus fa-lg"></i> {{trans("admin::admin.add_children")}}
                             </a>
                         </li>
                     @endif
@@ -138,8 +138,8 @@
 
 
             <div class="form-group pull-right">
-                <a href="{{url("/admin/dashboard")}}" class="btn btn-primary">{{trans("admin.cancel")}}</a>
-                <input type="submit" class="btn btn-success" value="{{trans("admin.save")}}" />
+                <a href="{{url("/admin/dashboard")}}" class="btn btn-primary">{{trans("admin::admin.cancel")}}</a>
+                <input type="submit" class="btn btn-success" value="{{trans("admin::admin.save")}}" />
             </div>
             <div class="clearfix"></div>
             <br /><br /><br />

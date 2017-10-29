@@ -26,7 +26,7 @@
 
 
                 <div class="form-group">
-                    <label>{{trans("admin.name")}}</label>
+                    <label>{{trans("admin::admin.name")}}</label>
                     
                     <input type="text" class="form-control" name="name" value="{{$group->name}}" />
                 </div>
@@ -34,7 +34,7 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label>{{trans("admin.classes")}}</label>
+                            <label>{{trans("admin::admin.classes")}}</label>
                             <br />
                             <div class="pull-left">
                                 <div class="onoffswitch onoffswitch-success">
@@ -47,7 +47,7 @@
                                 </div>
                             </div>
                             <div class="pull-left" style="padding-top:5px;margin-right: 40px;">
-                                <label>{{trans("admin.create")}}</label>
+                                <label>{{trans("admin::admin.create")}}</label>
                             </div>
                             <div class="clearfix"></div>
                             <div class="pull-left">
@@ -61,7 +61,7 @@
                                 </div>
                             </div>
                             <div class="pull-left" style="padding-top:5px;margin-right: 40px;">
-                                <label>{{trans("admin.edit")}}</label>
+                                <label>{{trans("admin::admin.edit")}}</label>
                             </div>
                             <div class="clearfix"></div>
                             <div class="pull-left">
@@ -75,7 +75,7 @@
                                 </div>
                             </div>
                             <div class="pull-left" style="padding-top:5px;margin-right: 40px;">
-                                <label>{{trans("admin.delete")}}</label>
+                                <label>{{trans("admin::admin.delete")}}</label>
                             </div>
                             <div class="clearfix"></div>
                             <div class="pull-left">
@@ -89,14 +89,14 @@
                                 </div>
                             </div>
                             <div class="pull-left" style="padding-top:5px;margin-right: 40px;">
-                                <label>{{trans("admin.list")}}</label>
+                                <label>{{trans("admin::admin.list")}}</label>
                             </div>
                             <div class="clearfix"></div>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label>{{trans("admin.users")}}</label>
+                            <label>{{trans("admin::admin.users")}}</label>
                             <br />
                             <div class="pull-left">
                                 <div class="onoffswitch onoffswitch-success">
@@ -109,7 +109,7 @@
                                 </div>
                             </div>
                             <div class="pull-left" style="padding-top:5px;margin-right: 40px;">
-                                <label>{{trans("admin.create")}}</label>
+                                <label>{{trans("admin::admin.create")}}</label>
                             </div>
                             <div class="clearfix"></div>
                             <div class="pull-left">
@@ -123,7 +123,7 @@
                                 </div>
                             </div>
                             <div class="pull-left" style="padding-top:5px;margin-right: 40px;">
-                                <label>{{trans("admin.edit")}}</label>
+                                <label>{{trans("admin::admin.edit")}}</label>
                             </div>
                             <div class="clearfix"></div>
                             <div class="pull-left">
@@ -137,7 +137,7 @@
                                 </div>
                             </div>
                             <div class="pull-left" style="padding-top:5px;margin-right: 40px;">
-                                <label>{{trans("admin.delete")}}</label>
+                                <label>{{trans("admin::admin.delete")}}</label>
                             </div>
                             <div class="clearfix"></div>
                             <div class="pull-left">
@@ -151,14 +151,14 @@
                                 </div>
                             </div>
                             <div class="pull-left" style="padding-top:5px;margin-right: 40px;">
-                                <label>{{trans("admin.list")}}</label>
+                                <label>{{trans("admin::admin.list")}}</label>
                             </div>
                             <div class="clearfix"></div>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label>{{trans("admin.usergroups")}}</label>
+                            <label>{{trans("admin::admin.usergroups")}}</label>
                             <br />
                             <div class="pull-left">
                                 <div class="onoffswitch onoffswitch-success">
@@ -171,7 +171,7 @@
                                 </div>
                             </div>
                             <div class="pull-left" style="padding-top:5px;margin-right: 40px;">
-                                <label>{{trans("admin.create")}}</label>
+                                <label>{{trans("admin::admin.create")}}</label>
                             </div>
                             <div class="clearfix"></div>
                             <div class="pull-left">
@@ -185,7 +185,7 @@
                                 </div>
                             </div>
                             <div class="pull-left" style="padding-top:5px;margin-right: 40px;">
-                                <label>{{trans("admin.edit")}}</label>
+                                <label>{{trans("admin::admin.edit")}}</label>
                             </div>
                             <div class="clearfix"></div>
                             <div class="pull-left">
@@ -199,7 +199,7 @@
                                 </div>
                             </div>
                             <div class="pull-left" style="padding-top:5px;margin-right: 40px;">
-                                <label>{{trans("admin.delete")}}</label>
+                                <label>{{trans("admin::admin.delete")}}</label>
                             </div>
                             <div class="clearfix"></div>
                             <div class="pull-left">
@@ -213,7 +213,7 @@
                                 </div>
                             </div>
                             <div class="pull-left" style="padding-top:5px;margin-right: 40px;">
-                                <label>{{trans("admin.list")}}</label>
+                                <label>{{trans("admin::admin.list")}}</label>
                             </div>
                             <div class="clearfix"></div>
                             </div>
@@ -221,14 +221,14 @@
                     </div>
 
                     <div class="form-group">
-                        <label>{{trans("admin.entrypoint")}}</label>
+                        <label>{{trans("admin::admin.entrypoint")}}</label>
                         
                         <div class="attribute-container" id="object-relation-entry-node-id">
                             <div class="attribute-object-relation-view"></div>
                             <div class="clearfix"></div>
                             
                             <input type="hidden" name="entryNodeId" class="attribute-object-relation-input" value="{{$group->entryNodeId}}" />
-                            <a href="javascript:;" class="btn btn-default btn-xs attribute-object-relation-add">{{trans("admin.select_object")}}</a>
+                            <a href="javascript:;" class="btn btn-default btn-xs attribute-object-relation-add">{{trans("admin::admin.select_object")}}</a>
 
                         </div>
                         <script>
@@ -250,7 +250,7 @@
 
             
                     <div class="form-group">
-                        <label>{{trans("admin.allowed_classes")}}</label>
+                        <label>{{trans("admin::admin.allowed_classes")}}</label>
                         <select multiple name="allowed_classes[]" class="form-control" size="10">
                             <option value="all" {{ (in_array("all",$group->allowedClasses) || !count($group->allowedClasses) ? 'selected="selected"' : '')}} >- Alle -</option>
                             @foreach($groupedNodeClasses as $nodeClasses)
@@ -270,8 +270,8 @@
             </div>
 
         <div class="form-group pull-right">
-            <a href="{{url("/admin/usergroup/list")}}" class="btn btn-primary">{{trans("admin.cancel")}}</a>
-            <input type="submit" class="btn btn-success" value="{{trans("admin.save")}}" />
+            <a href="{{url("/admin/usergroup/list")}}" class="btn btn-primary">{{trans("admin::admin.cancel")}}</a>
+            <input type="submit" class="btn btn-success" value="{{trans("admin::admin.save")}}" />
         </div>
         <div class="clearfix"></div>
 

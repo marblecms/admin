@@ -5,7 +5,7 @@
     <div class="main-box clearfix profile-box-menu">
         <div class="main-box-body clearfix">
             <div class="profile-box-header gray-bg clearfix" style="padding:0 15px 15px">
-                <h2>{{trans("admin.attributegroups")}}</h2>
+                <h2>{{trans("admin::admin.attributegroups")}}</h2>
                 <div class="job-position">
                     {{$nodeClass->name}}
                 </div>
@@ -30,7 +30,7 @@
                 <ul class="menu-items">
                     <li>
                         <a data-modal-id="add-attribute-group-modal" href="javascript:$('#add-attribute-group-modal').modal('show')" class="clearfix" class="add-attribute-group">
-                            <i class="fa fa-plus fa-lg"></i> {{trans("admin.add_group")}}
+                            <i class="fa fa-plus fa-lg"></i> {{trans("admin::admin.add_group")}}
                         </a>
                     </li>
                 </ul>
@@ -104,18 +104,18 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title">{{trans("admin.add_group")}}...</h4>
+                        <h4 class="modal-title">{{trans("admin::admin.add_group")}}...</h4>
                     </div>
                     <div class="modal-body">
                         {!! csrf_field() !!}
                         <div class="form-group">
-                            <label>{{trans("admin.name")}}</label>
+                            <label>{{trans("admin::admin.name")}}</label>
                             <input type="text" class="form-control" name="name" />
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-danger" data-dismiss="modal">{{trans("admin.cancel")}}</button>
-                        <button type="submit" class="btn btn-success">{{trans("admin.save")}}</button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">{{trans("admin::admin.cancel")}}</button>
+                        <button type="submit" class="btn btn-success">{{trans("admin::admin.save")}}</button>
                     </div>
                 </div><!-- /.modal-content -->
             </div><!-- /.modal-dialog -->
@@ -128,16 +128,16 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title">{{trans("admin.edit_attributegroup")}}</h4>
+                        <h4 class="modal-title">{{trans("admin::admin.edit_attributegroup")}}</h4>
                     </div>
                     <div class="modal-body">
                         {!! csrf_field() !!}
                         <div class="form-group">
-                            <label>{{trans("admin.name")}}</label>
+                            <label>{{trans("admin::admin.name")}}</label>
                             <input type="text" class="form-control" name="name" data-field-id="name" />
                         </div>
                         <div class="form-group">
-                            <label>{{trans("admin.template")}}</label>
+                            <label>{{trans("admin::admin.template")}}</label>
                             <select class="form-control" name="template" data-field-id="template">
                                 <option value="">default</option>
                                 @foreach($attributeGroupTemplates as $template)
@@ -148,8 +148,8 @@
                         <input type="hidden" name="id" data-field-id="id" />
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-danger" data-dismiss="modal">{{trans("admin.cancel")}}</button>
-                        <button type="submit" class="btn btn-success">{{trans("admin.save")}}</button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">{{trans("admin::admin.cancel")}}</button>
+                        <button type="submit" class="btn btn-success">{{trans("admin::admin.save")}}</button>
                     </div>
                 </div><!-- /.modal-content -->
             </div><!-- /.modal-dialog -->
@@ -182,21 +182,21 @@
                         <div class="main-box-body clearfix">
                             @if($attribute->namedIdentifier != "name")
                                 <div style="position: absolute; top: 10px; right: 10px">
-                                    <a href="{{url("admin/nodeclass/attributes/delete/" . $nodeClass->id . "/" . $attribute->id)}}" class="btn btn-xs btn-danger">{{trans("admin.delete")}}</a>
+                                    <a href="{{url("admin/nodeclass/attributes/delete/" . $nodeClass->id . "/" . $attribute->id)}}" class="btn btn-xs btn-danger">{{trans("admin::admin.delete")}}</a>
                                 </div>
                                 
 
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label>{{trans("admin.name")}}</label>
+                                            <label>{{trans("admin::admin.name")}}</label>
                                             <input type="text" name="name[{{$attribute->id}}]" value="{{$attribute->name}}" class="form-control"/>
                                             
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label>{{trans("admin.identifier")}}</label>
+                                            <label>{{trans("admin::admin.identifier")}}</label>
                                             <input type="text" name="namedIdentifier[{{$attribute->id}}]" value="{{$attribute->namedIdentifier}}" class="form-control"/>
                                         </div>
                                     </div>
@@ -211,27 +211,27 @@
                                 <div class="col-md-3">
                                     <div class="form-group">
                                         <label>
-                                            <input type="checkbox" name="translate[{{$attribute->id}}]" value="1" {{ $attribute->translate ? 'checked="checked"' : '' }} /> &nbsp; {{trans("admin.translateable")}}?
+                                            <input type="checkbox" name="translate[{{$attribute->id}}]" value="1" {{ $attribute->translate ? 'checked="checked"' : '' }} /> &nbsp; {{trans("admin::admin.translateable")}}?
                                         </label>
                                     </div>
                                 </div>
                                 <div class="col-md-3">
                                     <div class="form-group">
                                         <label>
-                                            <input type="checkbox" name="locked[{{$attribute->id}}]" value="1" {{ $attribute->locked ? 'checked="checked"' : '' }} /> &nbsp; {{trans("admin.locked")}}?
+                                            <input type="checkbox" name="locked[{{$attribute->id}}]" value="1" {{ $attribute->locked ? 'checked="checked"' : '' }} /> &nbsp; {{trans("admin::admin.locked")}}?
                                         </label>
                                     </div>
                                 </div>
                                 <div class="col-md-3">
                                     <div class="form-group">
                                         <label>
-                                            <input type="checkbox" name="showName[{{$attribute->id}}]" value="1" {{ $attribute->showName ? 'checked="checked"' : '' }} /> &nbsp; {{trans("admin.show_name")}}?
+                                            <input type="checkbox" name="showName[{{$attribute->id}}]" value="1" {{ $attribute->showName ? 'checked="checked"' : '' }} /> &nbsp; {{trans("admin::admin.show_name")}}?
                                         </label>
                                     </div>
                                 </div>
                                 <div class="col-md-3">
                                     <select name="groupId[{{$attribute->id}}]" class="form-control">
-                                        <option {{ $attribute->group_id == 0 ? "selected" : "" }}value="0">{{trans("admin.no_group")}}</option>
+                                        <option {{ $attribute->group_id == 0 ? "selected" : "" }}value="0">{{trans("admin::admin.no_group")}}</option>
                                         @foreach($classAttributeGroups as $classAttributeGroup)
                                             <option {{ $attribute->groupId == $classAttributeGroup->id ? "selected" : "" }} value="{{$classAttributeGroup->id}}">{{$classAttributeGroup->name}}</option>
                                         @endforeach
@@ -270,8 +270,8 @@
             </header>
             <div class="main-box-body clearfix">
                 <div class="form-group">
-                    <a class="btn btn-danger" href="{{url("admin/dashboard")}}">{{trans("admin.cancel")}}</a>
-                    <input type="submit" class="btn btn-success" value="{{trans("admin.save")}}" />
+                    <a class="btn btn-danger" href="{{url("admin/dashboard")}}">{{trans("admin::admin.cancel")}}</a>
+                    <input type="submit" class="btn btn-success" value="{{trans("admin::admin.save")}}" />
                 </div>
             </div>
         </div>

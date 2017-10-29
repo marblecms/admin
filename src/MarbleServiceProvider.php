@@ -18,6 +18,10 @@ class MarbleServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/public/assets/' => public_path('vendor/admin'),
         ], 'public');
+        
+        $this->loadTranslationsFrom(__DIR__.'/resources/lang/', 'admin');
+
+        $this->loadViewsFrom(__DIR__.'/resources/views', 'admin');
     }
 
     /**
@@ -27,8 +31,6 @@ class MarbleServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->loadViewsFrom(__DIR__.'/resources/views', 'admin');
-
         foreach (glob(app_path().'/Helpers/*.php') as $filename) {
             require_once $filename;
         }

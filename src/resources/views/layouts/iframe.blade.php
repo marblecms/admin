@@ -44,7 +44,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title">{{trans("admin.select_object")}}</h4>
+                        <h4 class="modal-title">{{trans("admin::admin.select_object")}}</h4>
                     </div>
                     <div class="modal-body">
                         <div class="collapse navbar-collapse navbar-ex1-collapse" id="sidebar-nav" style="background:#2c3e50">
@@ -52,7 +52,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-danger" data-dismiss="modal">{{trans("admin.cancel")}}</button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">{{trans("admin::admin.cancel")}}</button>
                     </div>
                 </div>
             </div>
