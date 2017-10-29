@@ -4,7 +4,7 @@
     <h1>Dashboard</h1>
 
     <div class="row">
-    	@if( \App\PermissionHelper::allowed("listClass") )
+    	@if( \Marble\Admin\App\Helpers\PermissionHelper::allowed("listClass") )
             <div class="col-md-6">
                 <div class="main-box">
                     <header class="main-box-header clearfix">
@@ -23,7 +23,7 @@
                                     @foreach($nodeClasses as $nodeClass)
                                         <tr>
                                             <td>
-                                                @if(App\PermissionHelper::allowed("editClass"))
+                                                @if(Marble\Admin\App\Helpers\PermissionHelper::allowed("editClass"))
                                                     <a href="{{ url("admin/nodeclass/attributes/edit/" . $nodeClass->id) }}">{{$nodeClass->name}}</a>
                                                 @else
                                                     {{$nodeClass->name}}
@@ -31,10 +31,10 @@
                                             </td>
                                             <td class="text-right">
                                                 <div class="btn-group">
-                                                    @if(App\PermissionHelper::allowed("editClass"))
+                                                    @if(Marble\Admin\App\Helpers\PermissionHelper::allowed("editClass"))
                                                         <a href="{{ url("admin/nodeclass/edit/" . $nodeClass->id) }}" class="btn btn-info btn-xs">{{trans("admin.edit")}}</a>
                                                     @endif
-                                                    @if(App\PermissionHelper::allowed("deleteClass"))
+                                                    @if(Marble\Admin\App\Helpers\PermissionHelper::allowed("deleteClass"))
                                                         <a href="{{ url("admin/nodeclass/delete/" . $nodeClass->id) }}" onclick="return confirm('{{trans("admin.are_you_sure")}}');" class="btn btn-xs btn-danger">{{trans("admin.delete")}}</a>
                                                     @endif
                                                 </div>
@@ -48,7 +48,7 @@
                 </div>
             </div>
         @endif
-    	@if( \App\PermissionHelper::allowed("listUser") )
+    	@if( \Marble\Admin\App\Helpers\PermissionHelper::allowed("listUser") )
             <div class="col-md-6">
                 <div class="main-box">
                     <header class="main-box-header clearfix">
@@ -68,7 +68,7 @@
                                         <tr>
                                             <td>
 
-                                                @if(App\PermissionHelper::allowed("editUser"))
+                                                @if(Marble\Admin\App\Helpers\PermissionHelper::allowed("editUser"))
                                                     <a href="{{ url("admin/user/edit/" . $user->id) }}">{{$user->name}}</a>
                                                 @else
                                                     {{$user->name}}
@@ -76,11 +76,11 @@
                                             </td>
                                             <td class="text-right">
                                                 <div class="btn-group">
-                                                    @if(App\PermissionHelper::allowed("editUser"))
+                                                    @if(Marble\Admin\App\Helpers\PermissionHelper::allowed("editUser"))
                                                         <a href="{{ url("admin/user/edit/" . $user->id) }}" class="btn btn-info btn-xs">{{trans("admin.edit")}}</a>
                                                     @endif
 
-                                                    @if(App\PermissionHelper::allowed("deleteUser"))
+                                                    @if(Marble\Admin\App\Helpers\PermissionHelper::allowed("deleteUser"))
                                                         <a href="{{ url("admin/user/delete/" . $user->id) }}" onclick="return confirm('{{trans("admin.are_you_sure")}}');" class="btn btn-xs btn-danger">{{trans("admin.delete")}}</a>
                                                     @endif
                                                 </div>

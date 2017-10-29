@@ -1,14 +1,14 @@
 @extends( $isIframe ? 'admin::layouts.iframe' : 'admin::layouts.app')
 
 @section('javascript-head')
-    <script type="text/javascript" src="{{ URL::asset('assets/admin/js/attributes/attributes.js') }}"></script>
+    <script type="text/javascript" src="{{ URL::asset('vendor/admin/js/attributes/attributes.js') }}"></script>
 @endsection
 
 
 
 @section('javascript')
-    <script type="text/javascript" src="{{ URL::asset('assets/admin/js/language-switch.js') }}"></script>
-    <script type="text/javascript" src="{{ URL::asset('assets/admin/js/attributes/attributes-init.js') }}"></script>
+    <script type="text/javascript" src="{{ URL::asset('vendor/admin/js/language-switch.js') }}"></script>
+    <script type="text/javascript" src="{{ URL::asset('vendor/admin/js/attributes/attributes-init.js') }}"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDMKB3SFb6lbkWJ_XVE77XexLozs3IEI4E&callback=initMap&libraries=places" async defer></script>
     
     

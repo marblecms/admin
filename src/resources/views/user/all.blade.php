@@ -4,7 +4,7 @@
 
     <h1>
     	Benutzer
-        @if(App\PermissionHelper::allowed("createUser"))
+        @if(Marble\Admin\App\Helpers\PermissionHelper::allowed("createUser"))
             <div class="pull-right">
                 <a href="{{ url("admin/user/add") }}" class="btn btn-xs btn-success">{{trans("admin.add_user")}}</a>
             </div>
@@ -32,7 +32,7 @@
                             <tr>
                                 <td>
 
-                                    @if(App\PermissionHelper::allowed("editUser"))
+                                    @if(Marble\Admin\App\Helpers\PermissionHelper::allowed("editUser"))
                                         <a href="{{ url("admin/user/edit/" . $user->id) }}">{{$user->name}}</a>
                                     @else
                                         {{$user->name}}
@@ -40,11 +40,11 @@
                                 </td>
                                 <td class="text-right">
                                     <div class="btn-group">
-                                        @if(App\PermissionHelper::allowed("editUser"))
+                                        @if(Marble\Admin\App\Helpers\PermissionHelper::allowed("editUser"))
                                             <a href="{{ url("admin/user/edit/" . $user->id) }}" class="btn btn-info btn-xs">{{trans("admin.edit")}}</a>
                                         @endif
 
-                                        @if(App\PermissionHelper::allowed("deleteUser"))
+                                        @if(Marble\Admin\App\Helpers\PermissionHelper::allowed("deleteUser"))
                                             <a href="{{ url("admin/user/delete/" . $user->id) }}" onclick="return confirm('{{trans("admin.are_you_sure")}}');" class="btn btn-xs btn-danger">{{trans("admin.delete")}}</a>
                                         @endif
                                     </div>

@@ -1,0 +1,1 @@
+<textarea class="form-control rich-text-editor" rows="{{$attribute->classAttribute->configuration["rows"]}}" name="attributes[{{$attribute->id}}][{{$locale}}]">{{$attribute->value[$locale]}}</textarea>

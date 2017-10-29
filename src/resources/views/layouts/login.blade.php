@@ -4,27 +4,27 @@
     <head>
 		<title>Administration</title>
 		<meta http-equiv='Content-type' content='text/html; charset=utf-8' />
-        <link rel='stylesheet' href='{{ URL::asset('assets/admin/css/bootstrap.min.css') }}'/>
-        <link rel='stylesheet' href='{{ URL::asset('assets/admin/css/bootstrap.datepicker.css') }}'/>
-        <link rel='stylesheet' href='{{ URL::asset('assets/admin/css/font-awesome.css') }}'/>
-        <link rel='stylesheet' href='{{ URL::asset('assets/admin/css/layout.min.css') }}'/>
-        <link rel='stylesheet' href='{{ URL::asset('assets/admin/css/elements.min.css') }}'/>
-        <link rel='stylesheet' href='{{ URL::asset('assets/admin/css/morris.css') }}'/>
-        <link rel='stylesheet' href='{{ URL::asset('assets/admin/css/jquery-ui.css') }}'/>
-        <link rel='stylesheet' href='{{ URL::asset('assets/admin/css/custom.css') }}'/>
+        <link rel='stylesheet' href='{{ URL::asset('vendor/admin/css/bootstrap.min.css') }}'/>
+        <link rel='stylesheet' href='{{ URL::asset('vendor/admin/css/bootstrap.datepicker.css') }}'/>
+        <link rel='stylesheet' href='{{ URL::asset('vendor/admin/css/font-awesome.css') }}'/>
+        <link rel='stylesheet' href='{{ URL::asset('vendor/admin/css/layout.min.css') }}'/>
+        <link rel='stylesheet' href='{{ URL::asset('vendor/admin/css/elements.min.css') }}'/>
+        <link rel='stylesheet' href='{{ URL::asset('vendor/admin/css/morris.css') }}'/>
+        <link rel='stylesheet' href='{{ URL::asset('vendor/admin/css/jquery-ui.css') }}'/>
+        <link rel='stylesheet' href='{{ URL::asset('vendor/admin/css/custom.css') }}'/>
         <meta name="csrf-token" content="{{ csrf_token() }}">
         
 
         <link href='//fonts.googleapis.com/css?family=Open+Sans:400,600,700,300|Titillium+Web:200,300,400' rel='stylesheet' type='text/css'>
 
-        <script type="text/javascript" src="{{ URL::asset('assets/admin/js/jquery.js') }}"></script>
+        <script type="text/javascript" src="{{ URL::asset('vendor/admin/js/jquery.js') }}"></script>
 	</head>
     <body class="theme-blue-gradient">
         
         <header class="navbar" id="header-navbar">
             <div class="container">
                 <a href="index.html" id="logo" class="navbar-brand">
-                    <img src="{{URL::asset('assets/admin/images/logo.png')}}" alt="" class="normal-logo logo-white">
+                    <img src="{{URL::asset('vendor/admin/images/logo.png')}}" alt="" class="normal-logo logo-white">
                 </a>
                 <div class="clearfix"></div>
             </div>
@@ -45,8 +45,8 @@
         </div>
         
 
-        <script type="text/javascript" src="{{ URL::asset('assets/admin/js/bootstrap.min.js') }}"></script>
-        <script type="text/javascript" src="{{ URL::asset('assets/admin/js/scripts.js') }}"></script>
+        <script type="text/javascript" src="{{ URL::asset('vendor/admin/js/bootstrap.min.js') }}"></script>
+        <script type="text/javascript" src="{{ URL::asset('vendor/admin/js/scripts.js') }}"></script>
         
 	</body>
 </html>

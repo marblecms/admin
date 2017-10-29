@@ -33,7 +33,7 @@ class NodeClassAttribute extends Model
         $attribute = Attribute::find($this->classAttribute->attributeId);
 
         $classNameParts = explode('_', $attribute->namedIdentifier);
-        $className = '\App\Attributes\\';
+        $className = '\Marble\Admin\App\Attributes\\';
 
         foreach ($classNameParts as $classNamePart) {
             $className .= ucfirst($classNamePart);

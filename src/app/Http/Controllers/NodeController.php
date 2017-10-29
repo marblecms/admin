@@ -9,7 +9,7 @@ use Marble\Admin\App\Models\ClassAttribute;
 use Marble\Admin\App\Models\UserGroup;
 use Marble\Admin\App\Models\Language;
 use Marble\Admin\App\Models\NodeTranslation;
-use App\NodeHelper;
+use Marble\Admin\App\Helpers\NodeHelper;
 use Auth;
 use Cache;
 use App\Http\Controllers\Controller;

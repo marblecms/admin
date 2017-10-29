@@ -22,7 +22,7 @@
                        @foreach($groupedNodeClasses as $nodeClasses)
                            <option disabled="disabled">{{$nodeClasses->group->name}}</option>
                            @foreach($nodeClasses->items as $nodeClass)
-                               @if( \App\PermissionHelper::allowedClass($nodeClass->id) && (in_array("all",$parentNode->class->allowedChildClasses) || in_array($nodeClass->id, $parentNode->class->allowedChildClasses) ) )
+                               @if( \Marble\Admin\App\Helpers\PermissionHelper::allowedClass($nodeClass->id) && (in_array("all",$parentNode->class->allowedChildClasses) || in_array($nodeClass->id, $parentNode->class->allowedChildClasses) ) )
                                    <option value="{{$nodeClass->id}}">&nbsp; &nbsp; &nbsp; {{$nodeClass->name}}</option>
                                @endif
                            @endforeach

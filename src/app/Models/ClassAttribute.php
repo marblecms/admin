@@ -17,7 +17,7 @@ class ClassAttribute extends Model
     public function getClassAttribute()
     {
         $classNameParts = explode('_', $this->type->namedIdentifier);
-        $className = '\App\Attributes\\';
+        $className = '\Marble\Admin\App\Attributes\\';
 
         foreach ($classNameParts as $classNamePart) {
             $className .= ucfirst($classNamePart);

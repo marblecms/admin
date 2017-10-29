@@ -4,7 +4,7 @@
 
     <h1>
     	{{trans("admin.usergroups")}}
-        @if(App\PermissionHelper::allowed("createGroup"))
+        @if(Marble\Admin\App\Helpers\PermissionHelper::allowed("createGroup"))
             <div class="pull-right">
                 <a href="{{ url("admin/usergroup/add") }}" class="btn btn-xs btn-success">{{trans("admin.add_usergroup")}}</a>
             </div>
@@ -31,7 +31,7 @@
                         @foreach($groups as $group)
                             <tr>
                                 <td>
-                                    @if(App\PermissionHelper::allowed("editGroup"))
+                                    @if(Marble\Admin\App\Helpers\PermissionHelper::allowed("editGroup"))
                                         <a href="{{ url("admin/usergroup/edit/" . $group->id) }}">{{$group->name}}</a>
                                     @else
                                         {{$group->name}}
@@ -39,10 +39,10 @@
                                 </td>
                                 <td class="text-right">
                                     <div class="btn-group">
-                                        @if(App\PermissionHelper::allowed("editGroup"))
+                                        @if(Marble\Admin\App\Helpers\PermissionHelper::allowed("editGroup"))
                                             <a href="{{ url("admin/usergroup/edit/" . $group->id) }}" class="btn btn-info btn-xs">{{trans("admin.edit")}}</a>
                                         @endif
-                                        @if($group->id != 0 and App\PermissionHelper::allowed("deleteGroup"))
+                                        @if($group->id != 0 and Marble\Admin\App\Helpers\PermissionHelper::allowed("deleteGroup"))
                                             <a href="{{ url("admin/usergroup/delete/" . $group->id) }}" onclick="return confirm('{{trans("admin.are_you_sure")}}');" class="btn btn-xs btn-danger">{{trans("admin.delete")}}</a>
                                         @endif
                                     </div>

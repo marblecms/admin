@@ -23,7 +23,7 @@
                 </thead>
                 <tbody id="sortable-children"> 
                     @foreach($childNodes as $childNode) 
-                        @continue( ! \App\PermissionHelper::allowedClass($childNode->class->id))
+                        @continue( ! \Marble\Admin\App\Helpers\PermissionHelper::allowedClass($childNode->class->id))
                         <tr data-node-id="{{$childNode->id}}">
                             <td>
                                 <a href="{{ url("admin/node/edit/" . $childNode->id) }}"><i class="fa fa-{{$childNode->class->icon}}" ></i> {{$childNode->name}}</a>

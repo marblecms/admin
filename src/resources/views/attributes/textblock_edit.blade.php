@@ -1,0 +1,1 @@
+<textarea class="form-control" name="attributes[{{$attribute->id}}][{{$locale}}]">{{$attribute->value[$locale]}}</textarea>

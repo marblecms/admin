@@ -4,7 +4,7 @@
 
     <h1>
     	{{trans("admin.classes")}}
-        @if(App\PermissionHelper::allowed("createClass"))
+        @if(Marble\Admin\App\Helpers\PermissionHelper::allowed("createClass"))
             <div class="pull-right">
                 <a href="javascript:$('#import-class-modal').modal('show')" data-modal-id="import-class-modal" class="btn btn-xs btn-info">{{trans("admin.import_class")}}</a>
                 <a href="{{ url("admin/nodeclass/groups/add") }}" class="btn btn-xs btn-success">{{trans("admin.add_classgroup")}}</a>
@@ -50,10 +50,10 @@
                     <b>{{$groupedNodeClass->group->name}}</b>
                 </h2>
                 <div class="pull-right">
-                    @if(App\PermissionHelper::allowed("editClass"))
+                    @if(Marble\Admin\App\Helpers\PermissionHelper::allowed("editClass"))
                         <a href="{{ url("admin/nodeclass/groups/edit/" . $groupedNodeClass->group->id) }}" class="btn btn-xs btn-info">{{trans("admin.edit")}}</a>
                     @endif
-                    @if(App\PermissionHelper::allowed("deleteClass") && $groupedNodeClass->group->id !== 0)
+                    @if(Marble\Admin\App\Helpers\PermissionHelper::allowed("deleteClass") && $groupedNodeClass->group->id !== 0)
                         <a href="{{ url("admin/nodeclass/groups/delete/" . $groupedNodeClass->group->id) }}" onclick="return confirm('{{trans("admin.are_you_sure")}}');" class="btn btn-xs btn-danger">{{trans("admin.delete")}}</a>
                     @endif
                 </div>
@@ -72,7 +72,7 @@
                             @foreach($groupedNodeClass->items as $nodeClass)
                                 <tr class="reveal-button-group">
                                     <td>
-                                        @if(App\PermissionHelper::allowed("editClass"))
+                                        @if(Marble\Admin\App\Helpers\PermissionHelper::allowed("editClass"))
                                             <a href="{{ url("admin/nodeclass/edit/" . $nodeClass->id) }}">{{$nodeClass->name}}</a>
                                         @else
                                             {{$nodeClass->name}}
@@ -80,12 +80,12 @@
                                     </td>
                                     <td class="text-right">
                                         <div class="btn-group">
-                                            @if(App\PermissionHelper::allowed("editClass"))
+                                            @if(Marble\Admin\App\Helpers\PermissionHelper::allowed("editClass"))
                                                 <a href="{{ url("admin/nodeclass/attributes/edit/" . $nodeClass->id) }}" class="btn btn-primary btn-xs">{{trans("admin.edit_attributes")}}</a>
                                                 <a href="{{ url("admin/nodeclass/edit/" . $nodeClass->id) }}" class="btn btn-info btn-xs">{{trans("admin.edit")}}</a>
                                             @endif
                                             <a href="{{ url("admin/nodeclass/export/" . $nodeClass->id) }}" class="btn btn-default btn-xs" download>{{trans("admin.export")}}</a>
-                                            @if(App\PermissionHelper::allowed("deleteClass"))
+                                            @if(Marble\Admin\App\Helpers\PermissionHelper::allowed("deleteClass"))
                                                 <a href="{{ url("admin/nodeclass/delete/" . $nodeClass->id) }}" onclick="return confirm('{{trans("admin.are_you_sure")}}');" class="btn btn-xs btn-danger">{{trans("admin.delete")}}</a>
                                             @endif
                                         </div>

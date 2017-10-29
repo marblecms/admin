@@ -2,7 +2,7 @@
 
 namespace Marble\Admin\App\Http\Controllers;
 
-use App\NodeHelper;
+use Marble\Admin\App\Helpers\NodeHelper;
 use Marble\Admin\App\Models\Node;
 use Marble\Admin\App\Models\NodeClass;
 use Marble\Admin\App\Models\ClassAttribute;

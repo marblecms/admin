@@ -3,7 +3,7 @@
 namespace Marble\Admin\App\Http\Controllers;
 
 use Marble\Admin\App\Models\UserGroup;
-use App\NodeHelper;
+use Marble\Admin\App\Helpers\NodeHelper;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 

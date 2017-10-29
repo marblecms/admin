@@ -68,7 +68,7 @@
                         @foreach($groupedNodeClasses as $nodeClasses)
                             <option disabled="disabled">{{$nodeClasses->group->name}}</option>
                             @foreach($nodeClasses->items as $nodeClass)
-                                @if( \App\PermissionHelper::allowedClass($nodeClass->id) )
+                                @if( \Marble\Admin\App\Helpers\PermissionHelper::allowedClass($nodeClass->id) )
                                     <option data-class-filter="{{$nodeClass->id}}" value="{{$nodeClass->id}}">&nbsp; &nbsp; &nbsp; {{$nodeClass->name}}</option>
                                 @endif
                             @endforeach

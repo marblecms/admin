@@ -4,28 +4,28 @@
     <head>
 		<title>Administration</title>
 		<meta http-equiv='Content-type' content='text/html; charset=utf-8' />
-        <link rel='stylesheet' href='{{ URL::asset('assets/admin/css/bootstrap.min.css') }}'/>
-        <link rel='stylesheet' href='{{ URL::asset('assets/admin/css/bootstrap.datepicker.css') }}'/>
-        <link rel='stylesheet' href='{{ URL::asset('assets/admin/css/font-awesome.css') }}'/>
-        <link rel='stylesheet' href='{{ URL::asset('assets/admin/css/layout.min.css') }}'/>
-        <link rel='stylesheet' href='{{ URL::asset('assets/admin/css/elements.min.css') }}'/>
-        <link rel='stylesheet' href='{{ URL::asset('assets/admin/css/morris.css') }}'/>
-        <link rel='stylesheet' href='{{ URL::asset('assets/admin/css/jquery-ui.css') }}'/>
-        <link rel='stylesheet' href='{{ URL::asset('assets/admin/css/cropper.css') }}'/>
-        <link rel='stylesheet' href='{{ URL::asset('assets/admin/css/custom.css') }}'/>
+        <link rel='stylesheet' href='{{ URL::asset('vendor/admin/css/bootstrap.min.css') }}'/>
+        <link rel='stylesheet' href='{{ URL::asset('vendor/admin/css/bootstrap.datepicker.css') }}'/>
+        <link rel='stylesheet' href='{{ URL::asset('vendor/admin/css/font-awesome.css') }}'/>
+        <link rel='stylesheet' href='{{ URL::asset('vendor/admin/css/layout.min.css') }}'/>
+        <link rel='stylesheet' href='{{ URL::asset('vendor/admin/css/elements.min.css') }}'/>
+        <link rel='stylesheet' href='{{ URL::asset('vendor/admin/css/morris.css') }}'/>
+        <link rel='stylesheet' href='{{ URL::asset('vendor/admin/css/jquery-ui.css') }}'/>
+        <link rel='stylesheet' href='{{ URL::asset('vendor/admin/css/cropper.css') }}'/>
+        <link rel='stylesheet' href='{{ URL::asset('vendor/admin/css/custom.css') }}'/>
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <link href='//fonts.googleapis.com/css?family=Open+Sans:400,600,700,300|Titillium+Web:200,300,400' rel='stylesheet' type='text/css'>
 
-        <script type="text/javascript" src="{{ URL::asset('assets/admin/js/jquery.js') }}"></script>
-        <script type="text/javascript" src="{{ URL::asset('assets/admin/js/jquery-ui.js') }}"></script>
+        <script type="text/javascript" src="{{ URL::asset('vendor/admin/js/jquery.js') }}"></script>
+        <script type="text/javascript" src="{{ URL::asset('vendor/admin/js/jquery-ui.js') }}"></script>
 
 
-        <script type="text/javascript" src="{{ URL::asset('assets/admin/js/object-browser.js') }}"></script>
-        <script type="text/javascript" src="{{ URL::asset('assets/admin/js/cropper.js') }}"></script>
-        <script type="text/javascript" src="{{ URL::asset('assets/admin/js/image-editor.js') }}"></script>
+        <script type="text/javascript" src="{{ URL::asset('vendor/admin/js/object-browser.js') }}"></script>
+        <script type="text/javascript" src="{{ URL::asset('vendor/admin/js/cropper.js') }}"></script>
+        <script type="text/javascript" src="{{ URL::asset('vendor/admin/js/image-editor.js') }}"></script>
 
-        <script type="text/javascript" src="{{ URL::asset('assets/admin/ckeditor/ckeditor.js') }}"></script>
+        <script type="text/javascript" src="{{ URL::asset('vendor/admin/ckeditor/ckeditor.js') }}"></script>
 
         @yield("javascript-head")
 
@@ -41,8 +41,8 @@
         
         <header class="navbar" id="header-navbar">
             <div class="container">
-                <a href="{{url("admin/node/edit/" . \App\PermissionHelper::entryNodeId())}}" id="logo" class="navbar-brand">
-                    <img src="{{URL::asset('assets/admin/images/logo.png')}}" alt="" class="normal-logo logo-white">
+                <a href="{{url("admin/node/edit/" . \Marble\Admin\App\Helpers\PermissionHelper::entryNodeId())}}" id="logo" class="navbar-brand">
+                    <img src="{{URL::asset('vendor/admin/images/logo.png')}}" alt="" class="normal-logo logo-white">
                 </a>
                 <div class="clearfix">
                     <button class="navbar-toggle" data-target=".navbar-ex1-collapse" data-toggle="collapse" type="button">
@@ -61,7 +61,7 @@
                                     <span>{{trans('admin.dashboard')}}</span>
                                 </a>
                             </li>
-                            @if(App\PermissionHelper::allowed("listClass"))
+                            @if(Marble\Admin\App\Helpers\PermissionHelper::allowed("listClass"))
                                 <li>
                                     <a class="btn" href="{{url("admin/nodeclass/all")}}">
                                         <i class="fa fa-folder">
@@ -70,7 +70,7 @@
                                     </a>
                                 </li>
                             @endif
-                            @if(App\PermissionHelper::allowed("listUser"))
+                            @if(Marble\Admin\App\Helpers\PermissionHelper::allowed("listUser"))
                                 <li>
                                     <a class="btn" href="{{url("admin/user/all")}}">
                                         <i class="fa fa-user">
@@ -79,7 +79,7 @@
                                     </a>
                                 </li>
                             @endif
-                            @if(App\PermissionHelper::allowed("listGroup"))
+                            @if(Marble\Admin\App\Helpers\PermissionHelper::allowed("listGroup"))
                                 <li>
                                     <a class="btn" href="{{url("admin/usergroup/all")}}">
                                         <i class="fa fa-users">
@@ -117,7 +117,7 @@
                             <div class="collapse navbar-collapse navbar-ex1-collapse" id="sidebar-nav">
 
 
-                                @include("admin::layouts.tree", array("nodes" => \App\TreeHelper::generate(), "isRoot" => true, "isModal" => false, "selectedNode" => isset($node) ? $node->id : -1))
+                                @include("admin::layouts.tree", array("nodes" => \Marble\Admin\App\Helpers\TreeHelper::generate(), "isRoot" => true, "isModal" => false, "selectedNode" => isset($node) ? $node->id : -1))
 
 
                             </div>
@@ -152,7 +152,7 @@
                     </div>
                     <div class="modal-body">
                         <div class="collapse navbar-collapse navbar-ex1-collapse" id="sidebar-nav" style="background:#2c3e50">
-                            @include("admin::layouts.tree", array("nodes" => \App\TreeHelper::generate(), "isRoot" => true, "isModal" => true, "selectedNode" => null))
+                            @include("admin::layouts.tree", array("nodes" => \Marble\Admin\App\Helpers\TreeHelper::generate(), "isRoot" => true, "isModal" => true, "selectedNode" => null))
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -204,9 +204,9 @@
             </div>
         </div>
 
-        <script type="text/javascript" src="{{ URL::asset('assets/admin/js/bootstrap.min.js') }}"></script>
-        <script type="text/javascript" src="{{ URL::asset('assets/admin/js/bootstrap.datepicker.js') }}"></script>
-        <script type="text/javascript" src="{{ URL::asset('assets/admin/js/scripts.js') }}"></script>
+        <script type="text/javascript" src="{{ URL::asset('vendor/admin/js/bootstrap.min.js') }}"></script>
+        <script type="text/javascript" src="{{ URL::asset('vendor/admin/js/bootstrap.datepicker.js') }}"></script>
+        <script type="text/javascript" src="{{ URL::asset('vendor/admin/js/scripts.js') }}"></script>
 
         @yield("javascript")
 
