@@ -7,7 +7,6 @@ use Config;
 
 class Node extends Model
 {
-    protected $table = 'node';
     private $_attributes = false;
     private $_classAttribute = false;
     public $timestamps = false;

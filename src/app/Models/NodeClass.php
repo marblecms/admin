@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class NodeClass extends Model
 {
-    protected $table = 'node_class';
+    protected $table = 'node_classes';
     public $timestamps = false;
 
     public function getAttributesAttribute()

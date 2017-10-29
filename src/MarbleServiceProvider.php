@@ -22,6 +22,8 @@ class MarbleServiceProvider extends ServiceProvider
         $this->loadTranslationsFrom(__DIR__.'/resources/lang/', 'admin');
 
         $this->loadViewsFrom(__DIR__.'/resources/views', 'admin');
+        
+        $this->loadMigrationsFrom(__DIR__.'/database/migrations/');
     }
 
     /**

@@ -8,7 +8,6 @@ use Cache;
 
 class NodeClassAttribute extends Model
 {
-    protected $table = 'node_class_attribute';
     public $timestamps = false;
 
     private $_class = false;

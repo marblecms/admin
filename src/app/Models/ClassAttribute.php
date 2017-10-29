@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class ClassAttribute extends Model
 {
-    protected $table = 'class_attribute';
     public $timestamps = false;
 
     public function getTypeAttribute()
