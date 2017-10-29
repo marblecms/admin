@@ -1,0 +1,12 @@
+{
+    "name": "marble/admin",
+    "description": "Marble CMS Admin Package",
+    "type": "project",
+    "authors": [
+        {
+            "name": "Phillip Dornauer",
+            "email": "office@hive.wien"
+        }
+    ],
+    "require": {}
+}
