@@ -1,6 +1,8 @@
 {
     "name": "marblecms/admin",
     "description": "Marble CMS Admin Package",
+    "keywords": ["cms", "laravel"],
+    "license": "MIT",
     "type": "project",
     "authors": [
         {
@@ -8,7 +10,9 @@
             "email": "office@hive.wien"
         }
     ],
-    "require": {},
+    "require": {
+        "laravel/framework": "5.4.*",
+    },
     "autoload": {
         "psr-4": {
             "Marble\\Admin\\": "src/"
