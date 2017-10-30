@@ -19,6 +19,11 @@ class MarbleServiceProvider extends ServiceProvider
             __DIR__.'/public/assets/' => public_path('vendor/admin'),
         ], 'public');
         
+
+        $this->mergeConfigFrom(
+            __DIR__.'/config/app.php', 'app'
+        );
+        
         $this->loadTranslationsFrom(__DIR__.'/resources/lang/', 'admin');
 
         $this->loadViewsFrom(__DIR__.'/resources/views', 'admin');

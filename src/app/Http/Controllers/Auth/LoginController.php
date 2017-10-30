@@ -2,6 +2,7 @@
 
 namespace Marble\Admin\App\Http\Controllers\Auth;
 
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 
@@ -21,6 +22,7 @@ class LoginController extends Controller
     use AuthenticatesUsers;
 
     protected $redirectTo = '/admin/dashboard';
+    protected $redirectPath = '/admin/dashboard';
     protected $loginPath = '/admin/login';
 
     /**
@@ -36,5 +38,11 @@ class LoginController extends Controller
     public function showLoginForm()
     {
         return view('admin::auth.login');
+    }
+    
+    protected function logout()
+    {
+        Auth::logout();
+        return redirect()->intended('admin/dashboard');
     }
 }

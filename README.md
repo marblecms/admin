@@ -21,7 +21,7 @@ Update the .env file. If it does not exist already, copy .env.example to .env an
 ### 2. Add Marble as a composer dependency
 
 
-    "marblecms/admin": "dev-master"
+    "marblecms/admin": "0.7.*"
 
 And run
 
@@ -33,15 +33,8 @@ Open *config/app.php* and add *Marble\Admin\MarbleServiceProvider::class* to you
 
 ### 4. Update Laravel Configurations
 
-Add the following configuration items to *config/app.php*:
-
-    'system_nodes_id' => 23,
-    'entry_node_id' => 1,
-    'uri_locale_prefix' => true,
-
 Change the Users Provider in *config/auth.php* to the following:
 
-    'driver' => 'eloquent',
     'model' => Marble\Admin\App\Models\User::class,
 
 Turn off the MySQL Strict mode in *config/database.php*:
