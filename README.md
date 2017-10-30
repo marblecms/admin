@@ -1,3 +1,7 @@
+<p align="center">
+    <img src="https://github.com/marblecms/admin/blob/master/docs/logo.png?raw=true" alt="Marble CMS Logo" />
+</p>
+
 # Marble CMS 
 
 Marble is a modular, object oriented CMS System for Laravel.
