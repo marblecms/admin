@@ -123,6 +123,36 @@
         </div>
     </div>
 
+    {{-- Focal Point Modal --}}
+    <div class="modal fade" id="focal-point-modal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">{{ trans('marble::admin.set_focal_point') }}</h4>
+                </div>
+                <div class="modal-body" style="text-align:center;background:#222;padding:20px">
+                    <div id="focal-point-container" style="position:relative;display:inline-block;cursor:crosshair">
+                        <img id="focal-point-image" src="" style="max-width:100%;max-height:60vh;display:block" />
+                        <div id="focal-point-crosshair" style="position:absolute;width:24px;height:24px;margin-left:-12px;margin-top:-12px;pointer-events:none">
+                            <div style="position:absolute;top:50%;left:0;right:0;height:2px;background:#fff;margin-top:-1px;box-shadow:0 0 3px rgba(0,0,0,.8)"></div>
+                            <div style="position:absolute;left:50%;top:0;bottom:0;width:2px;background:#fff;margin-left:-1px;box-shadow:0 0 3px rgba(0,0,0,.8)"></div>
+                            <div style="position:absolute;top:50%;left:50%;width:8px;height:8px;background:#e74c3c;border-radius:50%;margin:-4px 0 0 -4px;border:2px solid #fff"></div>
+                        </div>
+                    </div>
+                    <p style="color:#aaa;font-size:12px;margin-top:10px">{{ trans('marble::admin.focal_point_hint') }}</p>
+                </div>
+                <div class="modal-footer">
+                    <span id="focal-point-coords" style="color:#999;font-size:12px;margin-right:auto"></span>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">{{ trans('marble::admin.cancel') }}</button>
+                    <button type="button" class="btn btn-success" id="focal-point-save">
+                        @include('marble::components.famicon', ['name' => 'disk']) {{ trans('marble::admin.save') }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     {{-- Files --}}
     <div class="main-box">
         <header class="main-box-header clearfix">
@@ -154,8 +184,12 @@
                 <div class="media-library-grid">
                     @foreach($media as $item)
                         <div class="media-library-item">
-                            <div class="media-library-thumb">
+                            <div class="media-library-thumb" style="position:relative">
                                 <img src="{{ url('/image/160/120/' . $item->filename) }}" alt="{{ $item->original_filename }}" loading="lazy" />
+                                {{-- Focal point indicator dot --}}
+                                @if($item->focal_x !== 50 || $item->focal_y !== 50)
+                                    <div style="position:absolute;width:10px;height:10px;border-radius:50%;background:#e74c3c;border:2px solid #fff;box-shadow:0 0 3px rgba(0,0,0,.5);pointer-events:none;left:calc({{ $item->focal_x }}% - 5px);top:calc({{ $item->focal_y }}% - 5px)"></div>
+                                @endif
                             </div>
                             <div class="media-library-info">
                                 <div class="media-library-name" title="{{ $item->original_filename }}">{{ $item->original_filename }}</div>
@@ -165,6 +199,11 @@
                                 <a href="{{ url('/image/' . $item->filename) }}" target="_blank" class="btn btn-xs btn-default">
                                     @include('marble::components.famicon', ['name' => 'zoom'])
                                 </a>
+                                <button type="button" class="btn btn-xs btn-default"
+                                    title="{{ trans('marble::admin.set_focal_point') }}"
+                                    onclick="marbleOpenFocalPoint({{ $item->id }}, '{{ url('/image/' . $item->filename) }}', {{ $item->focal_x ?? 50 }}, {{ $item->focal_y ?? 50 }}, '{{ route('marble.media.focal-point', $item) }}')">
+                                    @include('marble::components.famicon', ['name' => 'target'])
+                                </button>
                                 <form method="POST" action="{{ route('marble.media.delete', $item) }}" style="display:inline" onsubmit="return confirm('{{ trans('marble::admin.are_you_sure') }}')">
                                     @csrf @method('DELETE')
                                     <button type="submit" class="btn btn-xs btn-danger">
@@ -185,6 +224,52 @@
 
 @section('javascript')
 <script>
+// Focal Point
+var _focalSaveUrl = null, _focalX = 50, _focalY = 50;
+
+function marbleOpenFocalPoint(id, imageUrl, fx, fy, saveUrl) {
+    _focalSaveUrl = saveUrl;
+    _focalX = fx; _focalY = fy;
+    var img = document.getElementById('focal-point-image');
+    img.src = imageUrl;
+    $('#focal-point-modal').modal('show');
+    img.onload = function() { marblePlaceCrosshair(_focalX, _focalY); };
+    if (img.complete) marblePlaceCrosshair(_focalX, _focalY);
+}
+
+function marblePlaceCrosshair(px, py) {
+    var img = document.getElementById('focal-point-image');
+    var ch  = document.getElementById('focal-point-crosshair');
+    ch.style.left = (px / 100 * img.offsetWidth)  + 'px';
+    ch.style.top  = (py / 100 * img.offsetHeight) + 'px';
+    document.getElementById('focal-point-coords').textContent = px + '% / ' + py + '%';
+}
+
+var _fpContainer = document.getElementById('focal-point-container');
+var _fpSaveBtn   = document.getElementById('focal-point-save');
+
+if (_fpContainer) {
+    _fpContainer.addEventListener('click', function(e) {
+        var img  = document.getElementById('focal-point-image');
+        var rect = img.getBoundingClientRect();
+        _focalX  = Math.max(0, Math.min(100, Math.round((e.clientX - rect.left) / img.offsetWidth  * 100)));
+        _focalY  = Math.max(0, Math.min(100, Math.round((e.clientY - rect.top)  / img.offsetHeight * 100)));
+        marblePlaceCrosshair(_focalX, _focalY);
+    });
+}
+
+if (_fpSaveBtn) {
+    _fpSaveBtn.addEventListener('click', function() {
+        $.post(_focalSaveUrl, {
+            _token: $('meta[name="csrf-token"]').attr('content'),
+            focal_x: _focalX, focal_y: _focalY
+        }).done(function() {
+            $('#focal-point-modal').modal('hide');
+            window.location.reload();
+        });
+    });
+}
+
 function marbleRenameFolder(id, currentName, url) {
     document.getElementById('rename-folder-input').value = currentName;
     document.getElementById('rename-folder-form').action = url;
@@ -216,6 +301,7 @@ function marbleRenameFolder(id, currentName, url) {
     });
     input.addEventListener('change', function(){
         if (this.files.length) uploadFile(this.files[0]);
+        this.value = '';
     });
 
     function uploadFile(file) {
@@ -223,12 +309,20 @@ function marbleRenameFolder(id, currentName, url) {
         fd.set('file', file);
         label.style.display = 'none';
         progress.style.display = 'block';
-        fetch(form.action, {
-            method: 'POST',
-            body: fd,
-            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
-        }).then(function(){ window.location.reload(); })
-          .catch(function(){ label.style.display = ''; progress.style.display = 'none'; alert('Upload failed.'); });
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', form.action, true);
+        xhr.setRequestHeader('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
+        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+        xhr.onload = function() {
+            window.location.reload();
+        };
+        xhr.onerror = function() {
+            label.style.display = '';
+            progress.style.display = 'none';
+            alert('Upload failed.');
+        };
+        xhr.send(fd);
     }
 })();
 </script>

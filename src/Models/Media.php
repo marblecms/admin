@@ -14,13 +14,17 @@ class Media extends Model
         'disk',
         'mime_type',
         'size',
+        'focal_x',
+        'focal_y',
         'transformations',
         'media_folder_id',
     ];
 
     protected $casts = [
         'transformations' => 'array',
-        'size' => 'integer',
+        'size'    => 'integer',
+        'focal_x' => 'integer',
+        'focal_y' => 'integer',
     ];
 
     public function folder(): BelongsTo

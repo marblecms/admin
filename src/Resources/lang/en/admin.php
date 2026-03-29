@@ -196,4 +196,24 @@ return [
     // Form redirect
     'form_success_redirect'      => 'Success Redirect',
     'form_success_redirect_hint' => 'Redirect the user to this page after successful form submission.',
+
+    // Redirect Manager
+    'redirect_manager' => 'Redirect Manager',
+    'redirects'        => 'Redirects',
+    'add_redirect'     => 'Add Redirect',
+    'source_path'      => 'Source Path',
+    'target_path'      => 'Target Path',
+    'status_code'      => 'Status Code',
+    'hits'             => 'Hits',
+    'active'           => 'Active',
+    'inactive'         => 'Inactive',
+    'no_redirects'     => 'No redirects configured yet.',
+    'redirect_saved'   => 'Redirect saved.',
+
+    // Focal point & root node
+    'set_focal_point' => 'Set Focal Point',
+    'focal_point_hint' => 'Click on the image to set the focal point. Crops will be centered around this point.',
+    'root_node' => 'Root Node',
+    'root_node_hint' => "Limit this user's tree to a specific node.",
+    'root_node_placeholder' => 'All content (no restriction)',
 ];

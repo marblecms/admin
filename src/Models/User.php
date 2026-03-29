@@ -15,6 +15,7 @@ class User extends Authenticatable
         'password',
         'user_group_id',
         'language',
+        'root_item_id',
     ];
 
     protected $hidden = [
@@ -40,11 +41,21 @@ class User extends Authenticatable
         return parent::can($ability, $arguments);
     }
 
+    public function rootItem(): BelongsTo
+    {
+        return $this->belongsTo(Item::class, 'root_item_id');
+    }
+
     /**
      * Get the entry item for this user (determines tree root).
+     * Per-user root_item_id takes priority over the user group setting.
      */
     public function entryItem(): ?Item
     {
+        if ($this->root_item_id) {
+            return $this->rootItem;
+        }
+
         return $this->userGroup?->entryItem;
     }
 

@@ -136,6 +136,7 @@ Route::prefix('media')->as('media.')->group(function () {
     Route::delete('{media}', [\Marble\Admin\Http\Controllers\MediaController::class, 'delete'])->name('delete');
     Route::get('json', [\Marble\Admin\Http\Controllers\MediaController::class, 'json'])->name('json');
     Route::get('transform/{media}', \Marble\Admin\Http\Controllers\MediaTransformController::class)->name('transform');
+    Route::post('{media}/focal-point', [\Marble\Admin\Http\Controllers\MediaController::class, 'saveFocalPoint'])->name('focal-point');
 });
 
 // API Token management (admin)
@@ -151,4 +152,13 @@ Route::prefix('package')->as('package.')->group(function () {
     Route::post('export', [\Marble\Admin\Http\Controllers\MarblePackageController::class, 'export'])->name('export.do');
     Route::get('import', [\Marble\Admin\Http\Controllers\MarblePackageController::class, 'importForm'])->name('import');
     Route::post('import', [\Marble\Admin\Http\Controllers\MarblePackageController::class, 'import'])->name('import.do');
+});
+
+
+// Redirect Manager
+Route::prefix('redirects')->as('redirect.')->group(function () {
+    Route::get('/', [\Marble\Admin\Http\Controllers\RedirectController::class, 'index'])->name('index');
+    Route::post('store', [\Marble\Admin\Http\Controllers\RedirectController::class, 'store'])->name('store');
+    Route::post('toggle/{redirect}', [\Marble\Admin\Http\Controllers\RedirectController::class, 'toggle'])->name('toggle');
+    Route::delete('delete/{redirect}', [\Marble\Admin\Http\Controllers\RedirectController::class, 'destroy'])->name('destroy');
 });

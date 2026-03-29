@@ -156,4 +156,24 @@ return [
     'password'            => 'Passwort',
     'remember_me'         => 'Angemeldet bleiben',
     'login'               => 'Anmelden',
+
+    // Redirect Manager
+    'redirect_manager' => 'Weiterleitungen',
+    'redirects'        => 'Weiterleitungen',
+    'add_redirect'     => 'Weiterleitung hinzufügen',
+    'source_path'      => 'Quellpfad',
+    'target_path'      => 'Zielpfad',
+    'status_code'      => 'Statuscode',
+    'hits'             => 'Aufrufe',
+    'active'           => 'Aktiv',
+    'inactive'         => 'Inaktiv',
+    'no_redirects'     => 'Noch keine Weiterleitungen konfiguriert.',
+    'redirect_saved'   => 'Weiterleitung gespeichert.',
+
+    // Focal point & root node
+    'set_focal_point' => 'Fokuspunkt setzen',
+    'focal_point_hint' => 'Klicke auf das Bild, um den Fokuspunkt zu setzen. Zuschnitte werden an diesem Punkt ausgerichtet.',
+    'root_node' => 'Stammknoten',
+    'root_node_hint' => 'Den Baum dieses Benutzers auf einen bestimmten Knoten beschränken.',
+    'root_node_placeholder' => 'Alle Inhalte (keine Einschränkung)',
 ];

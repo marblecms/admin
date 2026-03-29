@@ -156,4 +156,24 @@ return [
     'password'            => 'Heslo',
     'remember_me'         => 'Zapamätať',
     'login'               => 'Prihlásiť sa',
+
+    // Redirect Manager
+    'redirect_manager' => 'Správca presmerovaní',
+    'redirects'        => 'Presmerovania',
+    'add_redirect'     => 'Pridať presmerovanie',
+    'source_path'      => 'Zdrojová cesta',
+    'target_path'      => 'Cieľová cesta',
+    'status_code'      => 'Stavový kód',
+    'hits'             => 'Zobrazenia',
+    'active'           => 'Aktívne',
+    'inactive'         => 'Neaktívne',
+    'no_redirects'     => 'Zatiaľ nie sú nakonfigurované žiadne presmerovania.',
+    'redirect_saved'   => 'Presmerovanie uložené.',
+
+    // Focal point & root node
+    'set_focal_point' => 'Nastaviť fokusový bod',
+    'focal_point_hint' => 'Kliknutím na obrázok nastavte fokusový bod. Orezy budú centrované okolo tohto bodu.',
+    'root_node' => 'Koreňový uzol',
+    'root_node_hint' => 'Obmedziť strom tohto používateľa na konkrétny uzol.',
+    'root_node_placeholder' => 'Všetok obsah (bez obmedzenia)',
 ];

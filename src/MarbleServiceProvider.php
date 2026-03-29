@@ -47,6 +47,7 @@ class MarbleServiceProvider extends ServiceProvider
         $this->registerPolicies();
         $this->registerCommands();
         $this->registerComponents();
+        $this->app['router']->pushMiddlewareToGroup('web', \Marble\Admin\Http\Middleware\HandleMarbleRedirects::class);
     }
 
     protected function registerFieldTypes(): void
@@ -134,7 +135,7 @@ class MarbleServiceProvider extends ServiceProvider
                     ->where(['width' => '[0-9]+', 'height' => '[0-9]+', 'filename' => '.*'])
                     ->name('marble.image.resized');
                 Route::get('/image/{filename}', [\Marble\Admin\Http\Controllers\ImageController::class, 'show'])
-                    ->where('filename', '.*')
+                    ->where('filename', '[^/]+')
                     ->name('marble.image');
             });
     }

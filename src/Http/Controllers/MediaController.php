@@ -101,4 +101,27 @@ class MediaController extends Controller
             ])
         );
     }
+
+    public function saveFocalPoint(Request $request, Media $media)
+    {
+        $request->validate([
+            'focal_x' => 'required|integer|min:0|max:100',
+            'focal_y' => 'required|integer|min:0|max:100',
+        ]);
+
+        $media->update([
+            'focal_x' => $request->integer('focal_x'),
+            'focal_y' => $request->integer('focal_y'),
+        ]);
+
+        // Bust cached crops for this file
+        $cacheFiles = \Illuminate\Support\Facades\Storage::allFiles('cache');
+        foreach ($cacheFiles as $cached) {
+            if (str_ends_with($cached, '/' . $media->filename)) {
+                \Illuminate\Support\Facades\Storage::delete($cached);
+            }
+        }
+
+        return response()->json(['focal_x' => $media->focal_x, 'focal_y' => $media->focal_y]);
+    }
 }

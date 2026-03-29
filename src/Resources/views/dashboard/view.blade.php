@@ -140,9 +140,13 @@
                         @include('marble::components.famicon', ['name' => 'key'])
                         API Tokens
                     </a>
-                    <a href="{{ route('marble.package.export') }}" class="btn btn-default">
+                    <a href="{{ route('marble.package.export') }}" class="btn btn-default" style="margin-right:6px">
                         @include('marble::components.famicon', ['name' => 'box'])
                         Packages
+                    </a>
+                    <a href="{{ route('marble.redirect.index') }}" class="btn btn-default">
+                        @include('marble::components.famicon', ['name' => 'arrow_right'])
+                        {{ trans('marble::admin.redirects') }}
                     </a>
                 </div>
             </div>

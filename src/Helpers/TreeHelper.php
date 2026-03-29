@@ -71,6 +71,11 @@ class TreeHelper
     {
         $user = Auth::guard('marble')->user();
 
+        // Per-user root node takes highest priority
+        if ($user && $user->root_item_id) {
+            return $user->root_item_id;
+        }
+
         if ($user && $user->userGroup && $user->userGroup->entry_item_id) {
             return $user->userGroup->entry_item_id;
         }

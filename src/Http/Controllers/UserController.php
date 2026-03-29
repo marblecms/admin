@@ -40,6 +40,7 @@ class UserController extends Controller
             'email'         => $request->input('email'),
             'password'      => Hash::make($request->input('password')),
             'user_group_id' => $request->input('user_group_id'),
+            'root_item_id'  => $request->input('root_item_id') ?: null,
         ]);
 
         return redirect()->route('marble.user.edit', $user);
@@ -60,6 +61,7 @@ class UserController extends Controller
         $user->name = $request->input('name');
         $user->email = $request->input('email');
         $user->user_group_id = $request->input('user_group_id');
+        $user->root_item_id = $request->input('root_item_id') ?: null;
 
         if ($request->filled('password')) {
             $user->password = Hash::make($request->input('password'));
