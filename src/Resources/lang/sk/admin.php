@@ -183,6 +183,14 @@ return [
     'allowed_filetypes'      => 'Povolené typy súborov',
     'allowed_filetypes_hint' => 'nechajte prázdne pre všetky',
 
+    // Nav groups & user menu
+    'content'   => 'Obsah',
+    'structure' => 'Štruktúra',
+    'system'    => 'Systém',
+    'profile'   => 'Môj profil',
+    'logout'    => 'Odhlásiť sa',
+    'packages'  => 'Balíčky',
+
     // Object relation on_delete
     'on_delete'          => 'Pri vymazaní',
     'on_delete_detach'   => 'Odpojiť (nastaviť reláciu na null)',

@@ -183,6 +183,14 @@ return [
     'allowed_filetypes'      => 'Erlaubte Dateitypen',
     'allowed_filetypes_hint' => 'leer lassen für alle',
 
+    // Nav groups & user menu
+    'content'   => 'Inhalte',
+    'structure' => 'Struktur',
+    'system'    => 'System',
+    'profile'   => 'Mein Profil',
+    'logout'    => 'Abmelden',
+    'packages'  => 'Pakete',
+
     // Object relation on_delete
     'on_delete'          => 'Bei Löschen',
     'on_delete_detach'   => 'Trennen (Relation auf null setzen)',

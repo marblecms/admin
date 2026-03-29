@@ -112,47 +112,6 @@
 @section('content')
     <h1>Dashboard</h1>
 
-    {{-- Quick Actions --}}
-    <div class="row" style="margin-bottom:10px">
-        <div class="col-xs-12">
-            <div class="main-box">
-                <div class="main-box-body clearfix" style="padding:12px 15px">
-                    <a href="{{ route('marble.trash.index') }}" class="btn btn-default" style="margin-right:6px">
-                        @include('marble::components.famicon', ['name' => 'bin'])
-                        {{ trans('marble::admin.trash') }}
-                        @if($trashCount > 0)
-                            <span class="badge" style="background:#c0392b">{{ $trashCount }}</span>
-                        @endif
-                    </a>
-                    <a href="{{ route('marble.item.import-form') }}" class="btn btn-default" style="margin-right:6px">
-                        @include('marble::components.famicon', ['name' => 'page_white_paste'])
-                        {{ trans('marble::admin.import') }}
-                    </a>
-                    <a href="{{ route('marble.activity-log.index') }}" class="btn btn-default" style="margin-right:6px">
-                        @include('marble::components.famicon', ['name' => 'time'])
-                        {{ trans('marble::admin.activity_log') }}
-                    </a>
-                    <a href="{{ route('marble.webhook.index') }}" class="btn btn-default" style="margin-right:6px">
-                        @include('marble::components.famicon', ['name' => 'connect'])
-                        {{ trans('marble::admin.webhooks') }}
-                    </a>
-                    <a href="{{ route('marble.api-token.index') }}" class="btn btn-default" style="margin-right:6px">
-                        @include('marble::components.famicon', ['name' => 'key'])
-                        API Tokens
-                    </a>
-                    <a href="{{ route('marble.package.export') }}" class="btn btn-default" style="margin-right:6px">
-                        @include('marble::components.famicon', ['name' => 'box'])
-                        Packages
-                    </a>
-                    <a href="{{ route('marble.redirect.index') }}" class="btn btn-default">
-                        @include('marble::components.famicon', ['name' => 'arrow_right'])
-                        {{ trans('marble::admin.redirects') }}
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-
     {{-- Last Edited Items --}}
     <div class="main-box">
         <header class="main-box-header clearfix">

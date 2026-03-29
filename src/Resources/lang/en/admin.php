@@ -226,6 +226,14 @@ return [
     'allowed_filetypes'      => 'Allowed file types',
     'allowed_filetypes_hint' => 'leave empty to allow all',
 
+    // Nav groups & user menu
+    'content'   => 'Content',
+    'structure' => 'Structure',
+    'system'    => 'System',
+    'profile'   => 'My Profile',
+    'logout'    => 'Logout',
+    'packages'  => 'Packages',
+
     // Object relation on_delete
     'on_delete'          => 'On Delete',
     'on_delete_detach'   => 'Detach (set relation to null)',

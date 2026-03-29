@@ -38,37 +38,78 @@
         <div class="container">
             <a href="{{ url("{$prefix}/item/edit/{$entryItemId}") }}" id="logo" class="navbar-brand">Marble</a>
             <div class="clearfix">
+                @php
+                    $isContent   = request()->routeIs('marble.media.*', 'marble.trash.*', 'marble.redirect.*', 'marble.item.import*', 'marble.package.*');
+                    $isStructure = request()->routeIs('marble.blueprint.*', 'marble.site.*');
+                    $isUsers     = request()->routeIs('marble.user.*', 'marble.user-group.*');
+                    $isSystem    = request()->routeIs('marble.activity-log.*', 'marble.webhook.*', 'marble.api-token.*');
+                    $isDashboard = request()->routeIs('marble.dashboard');
+                @endphp
                 <div class="nav-no-collapse navbar-left pull-left hidden-sm hidden-xs">
                     <ul class="nav navbar-nav pull-left">
-                        <li>
+                        <li class="{{ $isDashboard ? 'active' : '' }}">
                             <a class="btn" href="{{ url("{$prefix}/dashboard") }}">
                                 @include('marble::components.famicon', ['name' => 'house'])
                                 <span>{{ trans('marble::admin.dashboard') }}</span>
                             </a>
                         </li>
-                        <li>
-                            <a class="btn" href="{{ route('marble.blueprint.index') }}">
+
+                        {{-- Content --}}
+                        <li class="dropdown {{ $isContent ? 'active' : '' }}">
+                            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                                @include('marble::components.famicon', ['name' => 'folder_page'])
+                                <span>{{ trans('marble::admin.content') }}</span>
+                                <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a href="{{ route('marble.media.index') }}">@include('marble::components.famicon', ['name' => 'pictures']) {{ trans('marble::admin.media_library') }}</a></li>
+                                <li><a href="{{ route('marble.trash.index') }}">@include('marble::components.famicon', ['name' => 'bin']) {{ trans('marble::admin.trash') }}</a></li>
+                                <li><a href="{{ route('marble.redirect.index') }}">@include('marble::components.famicon', ['name' => 'arrow_right']) {{ trans('marble::admin.redirects') }}</a></li>
+                                <li role="separator" class="divider"></li>
+                                <li><a href="{{ route('marble.item.import-form') }}">@include('marble::components.famicon', ['name' => 'page_white_paste']) {{ trans('marble::admin.import') }}</a></li>
+                                <li><a href="{{ route('marble.package.import') }}">@include('marble::components.famicon', ['name' => 'box']) {{ trans('marble::admin.packages') }}</a></li>
+                            </ul>
+                        </li>
+
+                        {{-- Structure --}}
+                        <li class="dropdown {{ $isStructure ? 'active' : '' }}">
+                            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
                                 @include('marble::components.famicon', ['name' => 'brick'])
-                                <span>{{ trans('marble::admin.classes') }}</span>
+                                <span>{{ trans('marble::admin.structure') }}</span>
+                                <span class="caret"></span>
                             </a>
+                            <ul class="dropdown-menu">
+                                <li><a href="{{ route('marble.blueprint.index') }}">@include('marble::components.famicon', ['name' => 'brick']) {{ trans('marble::admin.classes') }}</a></li>
+                                <li><a href="{{ route('marble.site.index') }}">@include('marble::components.famicon', ['name' => 'application_xp']) {{ trans('marble::admin.sites') }}</a></li>
+                            </ul>
                         </li>
-                        <li>
-                            <a class="btn" href="{{ route('marble.site.index') }}">
-                                @include('marble::components.famicon', ['name' => 'application_xp'])
-                                <span>{{ trans('marble::admin.sites') }}</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a class="btn" href="{{ route('marble.user.index') }}">
+
+                        {{-- Users --}}
+                        <li class="dropdown {{ $isUsers ? 'active' : '' }}">
+                            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
                                 @include('marble::components.famicon', ['name' => 'status_online'])
                                 <span>{{ trans('marble::admin.users') }}</span>
+                                <span class="caret"></span>
                             </a>
+                            <ul class="dropdown-menu">
+                                <li><a href="{{ route('marble.user.index') }}">@include('marble::components.famicon', ['name' => 'status_online']) {{ trans('marble::admin.users') }}</a></li>
+                                <li><a href="{{ route('marble.user-group.index') }}">@include('marble::components.famicon', ['name' => 'group']) {{ trans('marble::admin.usergroups') }}</a></li>
+                            </ul>
                         </li>
-                        <li>
-                            <a class="btn" href="{{ route('marble.media.index') }}">
-                                @include('marble::components.famicon', ['name' => 'pictures'])
-                                <span>{{ trans('marble::admin.media_library') }}</span>
+
+                        {{-- System --}}
+                        <li class="dropdown {{ $isSystem ? 'active' : '' }}">
+                            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                                @include('marble::components.famicon', ['name' => 'server'])
+                                <span>{{ trans('marble::admin.system') }}</span>
+                                <span class="caret"></span>
                             </a>
+                            <ul class="dropdown-menu">
+                                <li><a href="{{ route('marble.activity-log.index') }}">@include('marble::components.famicon', ['name' => 'time']) {{ trans('marble::admin.activity_log') }}</a></li>
+                                <li><a href="{{ route('marble.webhook.index') }}">@include('marble::components.famicon', ['name' => 'connect']) {{ trans('marble::admin.webhooks') }}</a></li>
+                                <li><a href="{{ route('marble.api-token.index') }}">@include('marble::components.famicon', ['name' => 'key']) API Tokens</a></li>
+                                <li><a href="{{ route('marble.package.export') }}">@include('marble::components.famicon', ['name' => 'box']) {{ trans('marble::admin.packages') }}</a></li>
+                            </ul>
                         </li>
                     </ul>
                 </div>
@@ -78,12 +119,6 @@
                             <input type="text" class="form-control" id="search-field" placeholder="{{ trans('marble::admin.search_placeholder') }}" />
                             <ul class="list-group"></ul>
                         </li>
-                        {{-- User info --}}
-                        <li id="header-user-info">
-                            <span class="user-name">{{ $currentUser->name }}</span>
-                            <span class="user-role">{{ $currentUser->userGroup?->name ?? 'Admin' }}</span>
-                        </li>
-
                         {{-- Language switcher --}}
                         @php $adminLanguages = \Marble\Admin\Models\Language::all(); @endphp
                         <li class="dropdown">
@@ -106,10 +141,20 @@
                                 @endforeach
                             </ul>
                         </li>
-                        <li class="hidden-xxs">
-                            <a class="btn" href="{{ url("{$prefix}/logout") }}" title="Logout">
-                                @include('marble::components.famicon', ['name' => 'disconnect'])
+
+                        {{-- User dropdown --}}
+                        <li class="dropdown">
+                            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#" style="padding-top:8px;padding-bottom:8px">
+                                @include('marble::components.famicon', ['name' => 'user'])
+                                <span style="margin-left:4px">{{ $currentUser->name }}</span>
+                                <small class="text-muted" style="margin-left:4px">{{ $currentUser->userGroup?->name ?? 'Admin' }}</small>
+                                <span class="caret" style="margin-left:4px"></span>
                             </a>
+                            <ul class="dropdown-menu dropdown-menu-right">
+                                <li><a href="{{ url("{$prefix}/user/edit/{$currentUser->id}") }}">@include('marble::components.famicon', ['name' => 'user_edit']) {{ trans('marble::admin.profile') }}</a></li>
+                                <li role="separator" class="divider"></li>
+                                <li><a href="{{ url("{$prefix}/logout") }}">@include('marble::components.famicon', ['name' => 'disconnect']) {{ trans('marble::admin.logout') }}</a></li>
+                            </ul>
                         </li>
                     </ul>
                 </div>
