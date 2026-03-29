@@ -4,6 +4,7 @@ namespace Marble\Admin;
 
 use Marble\Admin\Facades\Marble;
 use Marble\Admin\Models\Item;
+use Marble\Admin\Models\ItemUrlAlias;
 use Marble\Admin\Models\Language;
 use Marble\Admin\Models\Site;
 
@@ -89,6 +90,16 @@ class MarbleRouter
             if ($compareSlug === $path) {
                 return $item;
             }
+        }
+
+        // Fall back to URL aliases
+        $alias = ItemUrlAlias::where('alias', ltrim($path, '/'))
+            ->where('language_id', $languageId)
+            ->with('item.blueprint')
+            ->first();
+
+        if ($alias && $alias->item?->isPublished()) {
+            return $alias->item;
         }
 
         return null;

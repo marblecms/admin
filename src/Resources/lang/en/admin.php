@@ -225,4 +225,17 @@ return [
     // File field type
     'allowed_filetypes'      => 'Allowed file types',
     'allowed_filetypes_hint' => 'leave empty to allow all',
+
+    // Object relation on_delete
+    'on_delete'          => 'On Delete',
+    'on_delete_detach'   => 'Detach (set relation to null)',
+    'on_delete_restrict' => 'Restrict (block deletion)',
+    'on_delete_cascade'  => 'Cascade (delete this item too)',
+    'on_delete_hint'     => 'What should happen to this relation when the related item is deleted?',
+    'delete_restricted'  => 'Cannot delete: referenced by :items which restricts deletion.',
+
+    // URL Aliases
+    'url_aliases'   => 'URL Aliases',
+    'add_alias'     => '+ Add Alias',
+    'aliases_saved' => 'URL aliases saved.',
 ];

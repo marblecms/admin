@@ -63,6 +63,7 @@ class ItemController extends Controller
             'usedBy'        => $item->usedBy(),
             'submissions'   => $submissions,
             'breadcrumb'    => \Marble\Admin\Facades\Marble::breadcrumb($item),
+            'aliases'       => \Marble\Admin\Models\ItemUrlAlias::where('item_id', $item->id)->with('language')->get(),
         ]);
     }
 
@@ -188,13 +189,102 @@ class ItemController extends Controller
         $this->authorize('delete', $item);
         $parentId = $item->parent_id;
 
+        // Collect all item IDs being deleted (item + descendants)
+        $deletingIds = Item::where('path', 'like', $item->path . '%')
+            ->pluck('id')
+            ->push($item->id)
+            ->unique();
+
+        // Check for restrict relations pointing at any of these items
+        $restrictingItems = $this->findRestrictingRelations($deletingIds);
+        if ($restrictingItems->isNotEmpty()) {
+            return redirect()->back()->withErrors([
+                'delete' => trans('marble::admin.delete_restricted', [
+                    'items' => $restrictingItems->map(fn($i) => '"' . $i->name() . '"')->implode(', '),
+                ]),
+            ]);
+        }
+
+        // Handle cascade & detach for relations pointing at these items
+        $this->handleRelationsOnDelete($deletingIds);
+
         app(ActivityLogService::class)->log('item.deleted', $item, ['blueprint' => $item->blueprint->identifier]);
 
-        // Soft-delete the item and all descendants (restorable from Trash)
         Item::where('path', 'like', $item->path . '/%')->delete();
         $item->delete();
 
         return redirect()->route('marble.item.edit', $parentId);
+    }
+
+    private function findRestrictingRelations(\Illuminate\Support\Collection $deletingIds): \Illuminate\Support\Collection
+    {
+        return \Marble\Admin\Models\ItemValue::whereIn('value', $deletingIds->map(fn($id) => (string) $id))
+            ->whereHas('blueprintField', fn($q) => $q->where('field_type_id',
+                \Marble\Admin\Models\FieldType::where('identifier', 'object_relation')->value('id')
+            ))
+            ->get()
+            ->filter(function ($iv) use ($deletingIds) {
+                $config = $iv->blueprintField->configuration ?? [];
+                $behavior = $config['on_delete'] ?? 'detach';
+                return $behavior === 'restrict' && !$deletingIds->contains($iv->item_id);
+            })
+            ->map(fn($iv) => $iv->item)
+            ->unique('id')
+            ->values();
+    }
+
+    private function handleRelationsOnDelete(\Illuminate\Support\Collection $deletingIds): void
+    {
+        $objectRelationTypeId = \Marble\Admin\Models\FieldType::where('identifier', 'object_relation')->value('id');
+
+        \Marble\Admin\Models\ItemValue::whereIn('value', $deletingIds->map(fn($id) => (string) $id))
+            ->whereHas('blueprintField', fn($q) => $q->where('field_type_id', $objectRelationTypeId))
+            ->get()
+            ->each(function ($iv) use ($deletingIds) {
+                if ($deletingIds->contains($iv->item_id)) return; // being deleted anyway
+                $config = $iv->blueprintField->configuration ?? [];
+                $behavior = $config['on_delete'] ?? 'detach';
+
+                if ($behavior === 'detach') {
+                    $iv->update(['value' => null]);
+                } elseif ($behavior === 'cascade') {
+                    $ownerItem = $iv->item;
+                    if ($ownerItem) {
+                        Item::where('path', 'like', $ownerItem->path . '/%')->delete();
+                        $ownerItem->delete();
+                    }
+                }
+            });
+    }
+
+    public function saveAliases(Request $request, Item $item)
+    {
+        $this->authorize('update', $item);
+
+        // Delete removed aliases (those not in the submitted list)
+        $keepIds = collect($request->input('aliases', []))->pluck('id')->filter()->values();
+        \Marble\Admin\Models\ItemUrlAlias::where('item_id', $item->id)
+            ->when($keepIds->isNotEmpty(), fn($q) => $q->whereNotIn('id', $keepIds))
+            ->delete();
+
+        // Upsert submitted aliases
+        foreach ($request->input('aliases', []) as $row) {
+            $alias = trim($row['alias'] ?? '', '/');
+            $langId = (int) ($row['language_id'] ?? 0);
+            if (!$alias || !$langId) continue;
+
+            if (!empty($row['id'])) {
+                \Marble\Admin\Models\ItemUrlAlias::where('id', $row['id'])
+                    ->where('item_id', $item->id)
+                    ->update(['alias' => $alias, 'language_id' => $langId]);
+            } else {
+                \Marble\Admin\Models\ItemUrlAlias::firstOrCreate(
+                    ['item_id' => $item->id, 'alias' => $alias, 'language_id' => $langId]
+                );
+            }
+        }
+
+        return redirect()->route('marble.item.edit', $item)->with('success', trans('marble::admin.aliases_saved'));
     }
 
     public function acquireLock(Item $item)

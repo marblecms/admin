@@ -182,4 +182,17 @@ return [
     // File field type
     'allowed_filetypes'      => 'Erlaubte Dateitypen',
     'allowed_filetypes_hint' => 'leer lassen für alle',
+
+    // Object relation on_delete
+    'on_delete'          => 'Bei Löschen',
+    'on_delete_detach'   => 'Trennen (Relation auf null setzen)',
+    'on_delete_restrict' => 'Einschränken (Löschen blockieren)',
+    'on_delete_cascade'  => 'Kaskade (diesen Eintrag ebenfalls löschen)',
+    'on_delete_hint'     => 'Was soll mit dieser Relation passieren, wenn das verknüpfte Element gelöscht wird?',
+    'delete_restricted'  => 'Löschen nicht möglich: referenziert von :items, was das Löschen einschränkt.',
+
+    // URL Aliases
+    'url_aliases'   => 'URL-Aliase',
+    'add_alias'     => '+ Alias hinzufügen',
+    'aliases_saved' => 'URL-Aliase gespeichert.',
 ];

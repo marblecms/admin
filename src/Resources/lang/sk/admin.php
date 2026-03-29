@@ -182,4 +182,17 @@ return [
     // File field type
     'allowed_filetypes'      => 'Povolené typy súborov',
     'allowed_filetypes_hint' => 'nechajte prázdne pre všetky',
+
+    // Object relation on_delete
+    'on_delete'          => 'Pri vymazaní',
+    'on_delete_detach'   => 'Odpojiť (nastaviť reláciu na null)',
+    'on_delete_restrict' => 'Obmedziť (zablokovať vymazanie)',
+    'on_delete_cascade'  => 'Kaskáda (vymazať aj tento prvok)',
+    'on_delete_hint'     => 'Čo sa má stať s touto reláciou, keď sa prepojený prvok vymaže?',
+    'delete_restricted'  => 'Vymazanie nie je možné: odkazuje naň :items, čo zabraňuje vymazaniu.',
+
+    // URL Aliases
+    'url_aliases'   => 'URL aliasy',
+    'add_alias'     => '+ Pridať alias',
+    'aliases_saved' => 'URL aliasy uložené.',
 ];

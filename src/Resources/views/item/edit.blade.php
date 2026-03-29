@@ -57,6 +57,26 @@
             }
         });
 
+        // URL Alias — add new row
+        $(function() {
+            var aliasIndex = {{ $aliases->count() }};
+            var languages = @json($languages->map(fn($l) => ['id' => $l->id, 'code' => strtoupper($l->code)]));
+
+            $('#add-alias-btn').on('click', function() {
+                var opts = languages.map(function(l) {
+                    return '<option value="' + l.id + '">' + l.code + '</option>';
+                }).join('');
+                var row = '<div class="alias-row" style="display:flex;gap:6px;margin-bottom:6px;align-items:center">'
+                    + '<input type="hidden" name="aliases[' + aliasIndex + '][id]" value="" />'
+                    + '<input type="text" name="aliases[' + aliasIndex + '][alias]" placeholder="/kampagne" class="form-control input-sm" style="flex:1" />'
+                    + '<select name="aliases[' + aliasIndex + '][language_id]" class="form-control input-sm" style="width:60px">' + opts + '</select>'
+                    + '<a href="javascript:;" onclick="this.closest(\'.alias-row\').remove()" style="color:#c0392b;font-size:16px;line-height:1">&times;</a>'
+                    + '</div>';
+                $('#aliases-list').append(row);
+                aliasIndex++;
+            });
+        });
+
         @if(config('marble.autosave', false))
         // Autosave
         var autosaveDelay = {{ config('marble.autosave_interval', 30) * 1000 }};
@@ -90,6 +110,14 @@
 @endsection
 
 @section('sidebar')
+
+    {{-- Flash messages --}}
+    @if(session('success'))
+        <div class="alert alert-success" style="margin-bottom:10px">{{ session('success') }}</div>
+    @endif
+    @if($errors->has('delete'))
+        <div class="alert alert-danger" style="margin-bottom:10px">{{ $errors->first('delete') }}</div>
+    @endif
 
     {{-- Lock warning --}}
     @if($lockedByOther)
@@ -201,6 +229,47 @@
                         </li>
                     @endif
                 </ul>
+            </div>
+        </div>
+    </div>
+
+    {{-- URL Aliases --}}
+    <div class="main-box clearfix profile-box-menu">
+        <div class="main-box-body clearfix">
+            <div class="profile-box-header gray-bg clearfix" style="padding:0 15px 15px">
+                <h2>{{ trans('marble::admin.url_aliases') }}</h2>
+            </div>
+            <div class="profile-box-content clearfix" style="padding:12px 15px">
+                <form method="POST" action="{{ route('marble.item.aliases.save', $item) }}" id="aliases-form">
+                    @csrf
+                    <div id="aliases-list">
+                        @foreach($aliases as $alias)
+                        <div class="alias-row" style="display:flex;gap:6px;margin-bottom:6px;align-items:center">
+                            <input type="hidden" name="aliases[{{ $loop->index }}][id]" value="{{ $alias->id }}" />
+                            <input type="text"
+                                   name="aliases[{{ $loop->index }}][alias]"
+                                   value="{{ $alias->alias }}"
+                                   placeholder="/kampagne"
+                                   class="form-control input-sm"
+                                   style="flex:1" />
+                            <select name="aliases[{{ $loop->index }}][language_id]" class="form-control input-sm" style="width:60px">
+                                @foreach($languages as $lang)
+                                    <option value="{{ $lang->id }}" {{ $alias->language_id == $lang->id ? 'selected' : '' }}>{{ strtoupper($lang->code) }}</option>
+                                @endforeach
+                            </select>
+                            <a href="javascript:;" onclick="this.closest('.alias-row').remove()" style="color:#c0392b;font-size:16px;line-height:1">&times;</a>
+                        </div>
+                        @endforeach
+                    </div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px">
+                        <button type="button" id="add-alias-btn" class="btn btn-xs btn-info">
+                            {{ trans('marble::admin.add_alias') }}
+                        </button>
+                        <button type="submit" class="btn btn-xs btn-success">
+                            @include('marble::components.famicon', ['name' => 'disk']) {{ trans('marble::admin.save') }}
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

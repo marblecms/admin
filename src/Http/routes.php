@@ -23,6 +23,8 @@ Route::prefix('item')->as('item.')->group(function () {
     Route::post('sort', [\Marble\Admin\Http\Controllers\ItemController::class, 'sort'])->name('sort');
     Route::get('search.json', [\Marble\Admin\Http\Controllers\ItemController::class, 'searchJson'])->name('search');
     Route::post('ajax-field/{itemValue}/{language}', [\Marble\Admin\Http\Controllers\ItemController::class, 'ajaxField'])->name('ajax-field');
+    // URL Aliases
+    Route::post('aliases/{item}', [\Marble\Admin\Http\Controllers\ItemController::class, 'saveAliases'])->name('aliases.save');
     // Content locking
     Route::post('lock/{item}', [\Marble\Admin\Http\Controllers\ItemController::class, 'acquireLock'])->name('lock');
     Route::delete('lock/{item}', [\Marble\Admin\Http\Controllers\ItemController::class, 'releaseLock'])->name('unlock');

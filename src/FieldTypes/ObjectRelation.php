@@ -25,8 +25,18 @@ class ObjectRelation extends BaseFieldType
         return Item::find((int) $raw);
     }
 
+    public function configComponent(): ?string
+    {
+        return 'marble::field-types.object_relation-config';
+    }
+
     public function scripts(): array
     {
         return ['object-relation-edit.js'];
+    }
+
+    public function onDeleteBehavior(array $configuration): string
+    {
+        return $configuration['on_delete'] ?? 'detach';
     }
 }
