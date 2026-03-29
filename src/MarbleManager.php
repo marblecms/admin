@@ -243,11 +243,11 @@ class MarbleManager
      * Get the navigation tree starting from a root item.
      * Only returns published items with show_in_nav = true and show_in_tree = true on their blueprint.
      * If rootItemId is omitted, uses the current site's root_item_id.
-     * e.g. Marble::nav()         → from current site's root
-     *      Marble::nav(1)        → full tree from item 1
-     *      Marble::nav(1, 2)     → max 2 levels deep
+     * e.g. Marble::navigation()         → from current site's root
+     *      Marble::navigation(1)        → full tree from item 1
+     *      Marble::navigation(1, 2)     → max 2 levels deep
      */
-    public function nav(?int $rootItemId = null, int $depth = 99): Collection
+    public function navigation(?int $rootItemId = null, int $depth = 99): Collection
     {
         if ($rootItemId === null) {
             $rootItemId = $this->currentSite()?->root_item_id

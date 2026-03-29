@@ -14,9 +14,14 @@ A Laravel CMS package built around a flexible Blueprint + Field Type system. Def
 
 ## Installation
 
+Use the [demo repository](https://github.com/marblecms/demo) as your starting point — it comes pre-configured with Docker, routing, and Blade templates.
+
 ```bash
-composer require marble/admin
-php artisan marble:install
+git clone --recurse-submodules https://github.com/marblecms/demo
+cd demo
+cp .env.example .env
+docker compose up -d
+docker compose exec app php artisan marble:install
 ```
 
 `marble:install` runs migrations, seeds the initial tree (Root → Content → Startpage, About Us, Our Customers, Contact), registers built-in field types, and publishes admin assets.
@@ -75,8 +80,9 @@ $item->value('title', 'de');     // specific locale
 $item->value('title', 2);        // by language ID
 
 // Navigation helpers
-Marble::nav(1);           // full tree from root
-Marble::nav(1, 2);        // max 2 levels deep
+Marble::navigation();        // full tree from current site's root
+Marble::navigation(1);       // full tree from item 1
+Marble::navigation(1, 2);    // max 2 levels deep
 Marble::breadcrumb($item);
 
 // URL generation
