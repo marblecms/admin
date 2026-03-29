@@ -110,10 +110,12 @@ return [
     'edit_site'           => 'Edit Site',
     'no_sites'            => 'No sites configured yet.',
     'domain'              => 'Domain',
-    'domain_hint'         => 'Hostname without protocol, e.g. example.com',
-    'root_item'           => 'Root Item',
-    'root_item_hint'      => 'The top-level item for this site\'s content tree.',
-    'default_language'    => 'Default Language',
+    'domain_hint'           => 'Hostname without protocol, e.g. example.com — leave empty for the default site.',
+    'root_item'             => 'Root Item',
+    'root_item_hint'        => 'The top-level item for this site\'s content tree. Visiting / will render this item.',
+    'default_language'      => 'Default Language',
+    'is_default_site'       => 'Default site',
+    'is_default_site_hint'  => 'Used as fallback when no domain matches the incoming request (e.g. localhost, IP access).',
     'language'            => 'Language',
 
     // Field validation
@@ -135,6 +137,7 @@ return [
     'webhook_secret_hint' => 'If set, requests are signed with X-Marble-Signature (HMAC SHA256).',
     'active'              => 'Active',
     'inactive'            => 'Inactive',
+    'default'             => 'Default',
     'optional'            => 'optional',
     'status'              => 'Status',
 
@@ -216,4 +219,10 @@ return [
     'root_node' => 'Root Node',
     'root_node_hint' => "Limit this user's tree to a specific node.",
     'root_node_placeholder' => 'All content (no restriction)',
+
+    'remove' => 'Remove',
+
+    // File field type
+    'allowed_filetypes'      => 'Allowed file types',
+    'allowed_filetypes_hint' => 'leave empty to allow all',
 ];

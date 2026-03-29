@@ -165,11 +165,11 @@
                 <form id="media-upload-form" action="{{ route('marble.media.upload') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <input type="hidden" name="folder_id" value="{{ $currentFolder?->id }}">
-                    <input type="file" name="file" id="media-file-input" style="display:none" accept="image/*" />
+                    <input type="file" name="file" id="media-file-input" style="display:none" />
                 </form>
                 <span id="drop-zone-label" style="color:#999;font-size:13px">
                     @include('marble::components.famicon', ['name' => 'image'])
-                    Drop image here or <a href="javascript:;" onclick="document.getElementById('media-file-input').click()">browse</a>
+                    Drop file here or <a href="javascript:;" onclick="document.getElementById('media-file-input').click()">browse</a>
                 </span>
                 <div id="drop-zone-progress" style="display:none;margin-top:10px">
                     <div class="progress" style="margin-bottom:0">
@@ -185,25 +185,43 @@
                     @foreach($media as $item)
                         <div class="media-library-item">
                             <div class="media-library-thumb" style="position:relative">
-                                <img src="{{ url('/image/160/120/' . $item->filename) }}" alt="{{ $item->original_filename }}" loading="lazy" />
-                                {{-- Focal point indicator dot --}}
-                                @if($item->focal_x !== 50 || $item->focal_y !== 50)
-                                    <div style="position:absolute;width:10px;height:10px;border-radius:50%;background:#e74c3c;border:2px solid #fff;box-shadow:0 0 3px rgba(0,0,0,.5);pointer-events:none;left:calc({{ $item->focal_x }}% - 5px);top:calc({{ $item->focal_y }}% - 5px)"></div>
+                                @if($item->isImage())
+                                    <img src="{{ url('/image/160/120/' . $item->filename) }}" alt="{{ $item->original_filename }}" loading="lazy" />
+                                    {{-- Focal point indicator dot --}}
+                                    @if($item->focal_x !== 50 || $item->focal_y !== 50)
+                                        <div style="position:absolute;width:10px;height:10px;border-radius:50%;background:#e74c3c;border:2px solid #fff;box-shadow:0 0 3px rgba(0,0,0,.5);pointer-events:none;left:calc({{ $item->focal_x }}% - 5px);top:calc({{ $item->focal_y }}% - 5px)"></div>
+                                    @endif
+                                @else
+                                    <div style="display:flex;align-items:center;justify-content:center;height:100%;background:#f0f4f8;flex-direction:column;gap:4px">
+                                        @include('marble::components.famicon', ['name' => 'attachment'])
+                                        <span style="font-size:10px;color:#999;text-transform:uppercase;letter-spacing:.5px">{{ strtoupper(pathinfo($item->original_filename, PATHINFO_EXTENSION)) }}</span>
+                                    </div>
                                 @endif
                             </div>
                             <div class="media-library-info">
                                 <div class="media-library-name" title="{{ $item->original_filename }}">{{ $item->original_filename }}</div>
-                                <div class="media-library-meta">{{ number_format($item->size / 1024, 1) }} KB</div>
+                                <div class="media-library-meta">
+                                    {{ number_format($item->size / 1024, 1) }} KB
+                                    @if($item->width && $item->height)
+                                        &nbsp;&middot;&nbsp;{{ $item->width }}&times;{{ $item->height }}
+                                    @endif
+                                </div>
                             </div>
                             <div class="media-library-actions">
-                                <a href="{{ url('/image/' . $item->filename) }}" target="_blank" class="btn btn-xs btn-default">
+                                <button type="button" class="btn btn-xs btn-default" title="Copy URL"
+                                    onclick="marbleCopyUrl('{{ $item->isImage() ? url('/image/' . $item->filename) : url('/file/' . $item->filename) }}')">
+                                    @include('marble::components.famicon', ['name' => 'link'])
+                                </button>
+                                <a href="{{ $item->isImage() ? url('/image/' . $item->filename) : url('/file/' . $item->filename) }}" target="_blank" class="btn btn-xs btn-default">
                                     @include('marble::components.famicon', ['name' => 'zoom'])
                                 </a>
+                                @if($item->isImage())
                                 <button type="button" class="btn btn-xs btn-default"
                                     title="{{ trans('marble::admin.set_focal_point') }}"
                                     onclick="marbleOpenFocalPoint({{ $item->id }}, '{{ url('/image/' . $item->filename) }}', {{ $item->focal_x ?? 50 }}, {{ $item->focal_y ?? 50 }}, '{{ route('marble.media.focal-point', $item) }}')">
                                     @include('marble::components.famicon', ['name' => 'target'])
                                 </button>
+                                @endif
                                 <form method="POST" action="{{ route('marble.media.delete', $item) }}" style="display:inline" onsubmit="return confirm('{{ trans('marble::admin.are_you_sure') }}')">
                                     @csrf @method('DELETE')
                                     <button type="submit" class="btn btn-xs btn-danger">
@@ -224,6 +242,17 @@
 
 @section('javascript')
 <script>
+function marbleCopyUrl(url) {
+    navigator.clipboard.writeText(url).then(function() {
+        var btn = event.currentTarget;
+        var orig = btn.innerHTML;
+        btn.innerHTML = '✓';
+        btn.classList.add('btn-success');
+        btn.classList.remove('btn-default');
+        setTimeout(function(){ btn.innerHTML = orig; btn.classList.remove('btn-success'); btn.classList.add('btn-default'); }, 1500);
+    });
+}
+
 // Focal Point
 var _focalSaveUrl = null, _focalX = 50, _focalY = 50;
 

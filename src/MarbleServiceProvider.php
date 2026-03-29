@@ -47,6 +47,7 @@ class MarbleServiceProvider extends ServiceProvider
         $this->registerPolicies();
         $this->registerCommands();
         $this->registerComponents();
+        $this->app['router']->pushMiddlewareToGroup('web', \Marble\Admin\Http\Middleware\DetectMarbleSite::class);
         $this->app['router']->pushMiddlewareToGroup('web', \Marble\Admin\Http\Middleware\HandleMarbleRedirects::class);
     }
 
@@ -69,6 +70,8 @@ class MarbleServiceProvider extends ServiceProvider
             FieldTypes\ObjectRelationList::class,
             FieldTypes\KeyValueStore::class,
             FieldTypes\Repeater::class,
+            FieldTypes\File::class,
+            FieldTypes\Files::class,
         ];
 
         foreach ($builtInTypes as $typeClass) {
@@ -120,15 +123,7 @@ class MarbleServiceProvider extends ServiceProvider
                 Route::get('resolve', [\Marble\Admin\Http\Controllers\Api\ItemApiController::class, 'resolve'])->name('resolve');
             });
 
-        // Auto-routing: catch-all frontend route (opt-in via config)
-        if (config('marble.auto_routing', false)) {
-            Route::middleware(['web'])
-                ->group(function () {
-                    Route::marble();
-                });
-        }
-
-        // Image serving routes (public, no auth)
+        // Image/file serving routes — must be registered BEFORE any catch-all
         Route::middleware(['web'])
             ->group(function () {
                 Route::get('/image/{width}/{height}/{filename}', [\Marble\Admin\Http\Controllers\ImageController::class, 'showResized'])
@@ -137,7 +132,18 @@ class MarbleServiceProvider extends ServiceProvider
                 Route::get('/image/{filename}', [\Marble\Admin\Http\Controllers\ImageController::class, 'show'])
                     ->where('filename', '[^/]+')
                     ->name('marble.image');
+                Route::get('/file/{filename}', [\Marble\Admin\Http\Controllers\FileController::class, 'show'])
+                    ->where('filename', '[^/]+')
+                    ->name('marble.file');
             });
+
+        // Auto-routing: catch-all frontend route (opt-in via config)
+        if (config('marble.auto_routing', false)) {
+            Route::middleware(['web'])
+                ->group(function () {
+                    Route::marble();
+                });
+        }
     }
 
     protected function registerViews(): void

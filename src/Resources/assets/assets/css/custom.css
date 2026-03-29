@@ -13,7 +13,7 @@ h1, h2, h3, h4, h5, h6,
 
 /* --- Page background: classic XP desktop blue-gray --- */
 body {
-    background-color: #A8C0D8 !important;
+    background-color: #DDE9F8 !important;
     font-size: 12px !important;
     color: #222;
 }
@@ -100,23 +100,16 @@ h6 { font-size: 11px !important; font-weight: bold !important; text-shadow: none
     margin: 6px 12px !important;
 }
 
-/* Logo — dark navy with web 2.0 gloss shine */
+/* Logo — matches header-navbar gradient */
 #logo {
-    background: linear-gradient(to bottom,
-        #3872C8 0%,
-        #2258A8 30%,
-        #163C80 48%,
-        #0D2860 52%,
-        #0A2248 78%,
-        #071840 100%
-    ) !important;
-    color: #FFFFFF !important;
+    background: linear-gradient(to bottom, #DDE9F8 0%, #C4D8F2 100%) !important;
+    color: #15428B !important;
     font-size: 15px !important;
     font-weight: bold !important;
     letter-spacing: 1px !important;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.7), 0 -1px 0 rgba(0,0,0,0.4) !important;
-    border-right: 1px solid #060F28 !important;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.18), inset -1px 0 0 rgba(0,0,0,0.25) !important;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.7) !important;
+    border-right: 1px solid #8DB2E3 !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.6) !important;
     padding: 0 20px !important;
     height: 62px !important;
     display: flex !important;
@@ -182,7 +175,7 @@ h6 { font-size: 11px !important; font-weight: bold !important; text-shadow: none
     line-height: 36px !important;
     padding: 0 12px 0 8px !important;
     border: none !important;
-    border-bottom: 1px solid #e7ebee !important;
+    border-bottom: 1px dotted #e7ebee !important;
     border-radius: 0 !important;
     box-shadow: none !important;
     white-space: nowrap !important;
@@ -218,9 +211,9 @@ h6 { font-size: 11px !important; font-weight: bold !important; text-shadow: none
 #sidebar-nav .nav li .submenu li.active > a:hover,
 #sidebar-nav .nav li .submenu li.active > a:focus,
 #sidebar-nav .nav li .submenu li.open > a:hover {
-    background: #e7ebee !important;
-    background-color: #e7ebee !important;
-    color: #344644 !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    color: #1565C0 !important;
     text-decoration: none !important;
 }
 
@@ -233,8 +226,8 @@ h6 { font-size: 11px !important; font-weight: bold !important; text-shadow: none
 #sidebar-nav .nav li .submenu > li.active > a,
 #sidebar-nav .nav li .submenu > li.active > a:hover,
 #sidebar-nav .nav li .submenu > li.active > a:focus {
-    background: #dde9f8 !important;
-    background-color: #dde9f8 !important;
+    background: transparent !important;
+    background-color: transparent !important;
     color: #15428B !important;
     font-weight: bold !important;
 }
@@ -714,7 +707,7 @@ label {
 
 #sidebar-nav .active > a{
     border-left: 4px solid #3498db !important;
-    background-color: #1a1d22 !important;
+    background-color: transparent !important;
 }
 
 #header-navbar .nav>li>a:hover, #header-navbar .nav>li>a:focus, #header-navbar .nav .open>a, #header-navbar .nav .open>a:hover, #header-navbar .nav .open>a:focus{
@@ -723,7 +716,7 @@ label {
 }
 
 #sidebar-nav .nav li .submenu>li>a:hover, #sidebar-nav .nav li .submenu>li>a.active{
-    background: #121418 !important;
+    background: transparent !important;
 }
 
 #sidebar-nav .nav li .submenu{
@@ -818,6 +811,10 @@ label {
     box-shadow: none !important;
     border-radius: 0 !important;
     text-align: left !important;
+}
+
+.profile-box-menu .profile-box-content .menu-items li.active > a {
+    font-weight: bold !important;
 }
 
 .profile-box-menu .profile-box-content .menu-items li:hover,

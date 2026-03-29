@@ -48,18 +48,26 @@ class SiteController extends Controller
     {
         $data = $request->validate([
             'name'                => 'required|string|max:255',
-            'domain'              => 'required|string|max:255',
+            'domain'              => 'nullable|string|max:255',
             'root_item_id'        => 'nullable|exists:items,id',
             'default_language_id' => 'nullable|exists:languages,id',
             'active'              => 'nullable|boolean',
+            'is_default'          => 'nullable|boolean',
         ]);
 
-        $data['active'] = $request->boolean('active');
+        $data['active']     = $request->boolean('active');
+        $data['is_default'] = $request->boolean('is_default');
+        $data['domain']     = $data['domain'] ?: null;
 
         if ($site) {
             $site->update($data);
         } else {
-            Site::create($data);
+            $site = Site::create($data);
+        }
+
+        // Enforce only one default
+        if ($data['is_default']) {
+            $site->setAsDefault();
         }
 
         return redirect()->route('marble.site.index');

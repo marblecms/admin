@@ -41,7 +41,7 @@
                 @foreach($item->blueprint->fields as $field)
                     <tr>
                         <td>{{ $field->name }}</td>
-                        <td>{{ is_string($item->value($field->identifier)) ? $item->value($field->identifier) : json_encode($item->value($field->identifier)) }}</td>
+                        <td>@include($field->fieldTypeInstance()->frontendComponent(), ['value' => $item->value($field->identifier), 'field' => $field, 'item' => $item])</td>
                     </tr>
                 @endforeach
             </table>

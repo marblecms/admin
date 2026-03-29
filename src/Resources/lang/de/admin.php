@@ -176,4 +176,10 @@ return [
     'root_node' => 'Stammknoten',
     'root_node_hint' => 'Den Baum dieses Benutzers auf einen bestimmten Knoten beschränken.',
     'root_node_placeholder' => 'Alle Inhalte (keine Einschränkung)',
+
+    'remove' => 'Entfernen',
+
+    // File field type
+    'allowed_filetypes'      => 'Erlaubte Dateitypen',
+    'allowed_filetypes_hint' => 'leer lassen für alle',
 ];

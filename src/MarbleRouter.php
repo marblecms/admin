@@ -61,7 +61,7 @@ class MarbleRouter
         if ($site && $site->root_item_id) {
             $rootItem = $site->rootItem;
             if ($rootItem) {
-                $query->where('path', 'like', $rootItem->path . '/%')
+                $query->where('path', 'like', $rootItem->path . '%')
                       ->orWhere('id', $rootItem->id);
             }
         }

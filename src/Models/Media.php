@@ -14,6 +14,8 @@ class Media extends Model
         'disk',
         'mime_type',
         'size',
+        'width',
+        'height',
         'focal_x',
         'focal_y',
         'transformations',
@@ -23,9 +25,16 @@ class Media extends Model
     protected $casts = [
         'transformations' => 'array',
         'size'    => 'integer',
+        'width'   => 'integer',
+        'height'  => 'integer',
         'focal_x' => 'integer',
         'focal_y' => 'integer',
     ];
+
+    public function isImage(): bool
+    {
+        return str_starts_with($this->mime_type ?? '', 'image/');
+    }
 
     public function folder(): BelongsTo
     {

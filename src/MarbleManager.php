@@ -170,7 +170,7 @@ class MarbleManager
             $fullPath = ($prefix ? rtrim($prefix, '/') : '') . '/' . ltrim($path, '/');
             $item = $this->resolveOrFail($fullPath);
             return $handler($item);
-        })->where('path', '.*');
+        })->where('path', '^(?!image(/|$)|file(/|$)|admin(/|$)).*$');
     }
 
     /**
@@ -242,11 +242,18 @@ class MarbleManager
     /**
      * Get the navigation tree starting from a root item.
      * Only returns published items with show_in_nav = true and show_in_tree = true on their blueprint.
-     * e.g. Marble::nav(1)        → full tree from root
+     * If rootItemId is omitted, uses the current site's root_item_id.
+     * e.g. Marble::nav()         → from current site's root
+     *      Marble::nav(1)        → full tree from item 1
      *      Marble::nav(1, 2)     → max 2 levels deep
      */
-    public function nav(int $rootItemId, int $depth = 99): Collection
+    public function nav(?int $rootItemId = null, int $depth = 99): Collection
     {
+        if ($rootItemId === null) {
+            $rootItemId = $this->currentSite()?->root_item_id
+                ?? config('marble.entry_item_id', 1);
+        }
+
         return $this->buildNavTree($rootItemId, $depth, 1);
     }
 

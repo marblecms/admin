@@ -29,7 +29,16 @@
                         @foreach($sites as $site)
                             <tr>
                                 <td>{{ $site->name }}</td>
-                                <td><code>{{ $site->domain }}</code></td>
+                                <td>
+                                    @if($site->domain)
+                                        <code>{{ $site->domain }}</code>
+                                    @else
+                                        <span class="text-muted">—</span>
+                                    @endif
+                                    @if($site->is_default)
+                                        <span class="label label-primary" style="margin-left:4px">{{ trans('marble::admin.default') }}</span>
+                                    @endif
+                                </td>
                                 <td>{{ $site->rootItem?->name() ?? '—' }}</td>
                                 <td>{{ $site->defaultLanguage?->name ?? '—' }}</td>
                                 <td>

@@ -23,7 +23,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label>{{ trans('marble::admin.domain') }}</label>
-                            <input type="text" name="domain" value="{{ old('domain', $site?->domain) }}" class="form-control" required placeholder="example.com" />
+                            <input type="text" name="domain" value="{{ old('domain', $site?->domain) }}" class="form-control" placeholder="example.com" />
                             <p class="help-block">{{ trans('marble::admin.domain_hint') }}</p>
                         </div>
                     </div>
@@ -66,6 +66,14 @@
                         <input type="checkbox" name="active" value="1" {{ old('active', $site?->active ?? true) ? 'checked' : '' }} />
                         {{ trans('marble::admin.active') }}
                     </label>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="is_default" value="1" {{ old('is_default', $site?->is_default ?? false) ? 'checked' : '' }} />
+                        {{ trans('marble::admin.is_default_site') }}
+                    </label>
+                    <p class="help-block">{{ trans('marble::admin.is_default_site_hint') }}</p>
                 </div>
             </div>
         </div>

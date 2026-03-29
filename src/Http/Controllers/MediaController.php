@@ -56,7 +56,7 @@ class MediaController extends Controller
     public function upload(Request $request)
     {
         $request->validate([
-            'file' => 'required|file|mimes:jpeg,jpg,png,gif,webp,svg|max:20480',
+            'file' => 'required|file|max:51200',
         ]);
 
         $file     = $request->file('file');
@@ -64,12 +64,24 @@ class MediaController extends Controller
 
         Storage::put($filename, file_get_contents($file));
 
+        $width = null;
+        $height = null;
+        if (str_starts_with($file->getMimeType(), 'image/') && $file->getMimeType() !== 'image/svg+xml') {
+            $size = @getimagesize($file->getRealPath());
+            if ($size) {
+                $width  = $size[0];
+                $height = $size[1];
+            }
+        }
+
         $media = Media::create([
             'filename'          => $filename,
             'original_filename' => $file->getClientOriginalName(),
             'disk'              => 'public',
             'mime_type'         => $file->getMimeType(),
             'size'              => $file->getSize(),
+            'width'             => $width,
+            'height'            => $height,
             'media_folder_id'   => $request->input('folder_id') ?: null,
         ]);
 
@@ -96,8 +108,10 @@ class MediaController extends Controller
                 'original_filename' => $m->original_filename,
                 'mime_type'         => $m->mime_type,
                 'size'              => $m->size,
-                'url'               => url('/image/' . $m->filename),
-                'thumbnail'         => url('/image/120/90/' . $m->filename),
+                'width'             => $m->width,
+                'height'            => $m->height,
+                'url'               => $m->isImage() ? url('/image/' . $m->filename) : url('/file/' . $m->filename),
+                'thumbnail'         => $m->isImage() ? url('/image/120/90/' . $m->filename) : null,
             ])
         );
     }

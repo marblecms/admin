@@ -9,9 +9,9 @@ class Site extends Model
 {
     protected $table = 'sites';
 
-    protected $fillable = ['name', 'domain', 'root_item_id', 'default_language_id', 'active'];
+    protected $fillable = ['name', 'domain', 'root_item_id', 'default_language_id', 'active', 'is_default'];
 
-    protected $casts = ['active' => 'boolean'];
+    protected $casts = ['active' => 'boolean', 'is_default' => 'boolean'];
 
     public function rootItem(): BelongsTo
     {
@@ -25,10 +25,26 @@ class Site extends Model
 
     /**
      * Resolve the site for the current HTTP request host.
+     * Falls back to the site marked is_default = true if no domain matches.
      */
     public static function current(): ?static
     {
         $host = request()->getHost();
-        return static::where('domain', $host)->where('active', true)->first();
+
+        return static::where('active', true)
+                     ->where('domain', $host)
+                     ->first()
+            ?? static::where('active', true)
+                     ->where('is_default', true)
+                     ->first();
+    }
+
+    /**
+     * Ensure only one site can be is_default at a time.
+     */
+    public function setAsDefault(): void
+    {
+        static::where('id', '!=', $this->id)->update(['is_default' => false]);
+        $this->update(['is_default' => true]);
     }
 }

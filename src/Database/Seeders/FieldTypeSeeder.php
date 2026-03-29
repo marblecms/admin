@@ -24,6 +24,8 @@ class FieldTypeSeeder extends Seeder
             ['name' => 'Key/Value Store', 'identifier' => 'keyvalue_store', 'class' => \Marble\Admin\FieldTypes\KeyValueStore::class],
             ['name' => 'Checkbox', 'identifier' => 'checkbox', 'class' => \Marble\Admin\FieldTypes\Checkbox::class],
             ['name' => 'Repeater', 'identifier' => 'repeater', 'class' => \Marble\Admin\FieldTypes\Repeater::class],
+            ['name' => 'File', 'identifier' => 'file', 'class' => \Marble\Admin\FieldTypes\File::class],
+            ['name' => 'Files', 'identifier' => 'files', 'class' => \Marble\Admin\FieldTypes\Files::class],
         ];
 
         foreach ($types as $type) {

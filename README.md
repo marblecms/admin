@@ -1,6 +1,8 @@
 # Marble CMS
 
-![Marble CMS](Screenshot.png)
+![Marble CMS](Screenshot-1.png)
+![Marble CMS](Screenshot-2.png)
+![Marble CMS](Screenshot-3.png)
 
 A Laravel CMS package built around a flexible Blueprint + Field Type system. Define your content types visually, manage a hierarchical content tree, and deliver content via Blade templates or a headless JSON API.
 
@@ -17,12 +19,12 @@ composer require marble/admin
 php artisan marble:install
 ```
 
-`marble:install` runs migrations, seeds the initial tree (Root → Content, Settings), registers built-in field types, and publishes admin assets.
+`marble:install` runs migrations, seeds the initial tree (Root → Content → Startpage, About Us, Our Customers, Contact), registers built-in field types, and publishes admin assets.
 
 Default login after install:
 
 ```
-Email:    admin@marble.test
+Email:    admin@admin
 Password: admin
 ```
 

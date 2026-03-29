@@ -26,8 +26,8 @@ class InstallCommand extends Command
         $this->newLine();
         $this->info('✓ Marble installed successfully.');
         $this->line('  Admin URL : /' . config('marble.route_prefix', 'admin'));
-        $this->line('  Email     : admin@marble.local');
-        $this->line('  Password  : password');
+        $this->line('  Email     : admin@admin');
+        $this->line('  Password  : admin');
 
         return self::SUCCESS;
     }

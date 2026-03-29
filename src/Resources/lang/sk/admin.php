@@ -176,4 +176,10 @@ return [
     'root_node' => 'Koreňový uzol',
     'root_node_hint' => 'Obmedziť strom tohto používateľa na konkrétny uzol.',
     'root_node_placeholder' => 'Všetok obsah (bez obmedzenia)',
+
+    'remove' => 'Odstrániť',
+
+    // File field type
+    'allowed_filetypes'      => 'Povolené typy súborov',
+    'allowed_filetypes_hint' => 'nechajte prázdne pre všetky',
 ];
