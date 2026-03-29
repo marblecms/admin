@@ -1,8 +1,10 @@
 # Marble CMS
 
-![Marble CMS](Screenshot-1.png)
-![Marble CMS](Screenshot-2.png)
-![Marble CMS](Screenshot-3.png)
+![Marble CMS](Screenshot1.png)
+![Marble CMS](Screenshot2.png)
+![Marble CMS](Screenshot3.png)
+![Marble CMS](Screenshot4.png)
+![Marble CMS](Screenshot5.png)
 
 A Laravel CMS package built around a flexible Blueprint + Field Type system. Define your content types visually, manage a hierarchical content tree, and deliver content via Blade templates or a headless JSON API.
 
