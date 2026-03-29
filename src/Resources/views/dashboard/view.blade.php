@@ -164,26 +164,26 @@
             @else
                 <table class="table table-hover" style="margin-bottom:0">
                     <tbody>
-                        @foreach($recentItems as $item)
-                            <tr onclick="window.location='{{ route('marble.item.edit', $item) }}'" style="cursor:pointer">
+                        @foreach($recentItems as $recentItem)
+                            <tr onclick="window.location='{{ route('marble.item.edit', $recentItem) }}'" style="cursor:pointer">
                                 <td style="width:24px;padding-right:0">
-                                    @if($item->blueprint?->icon)
-                                        @include('marble::components.famicon', ['name' => $item->blueprint->icon])
+                                    @if($recentItem->blueprint?->icon)
+                                        @include('marble::components.famicon', ['name' => $recentItem->blueprint->icon])
                                     @endif
                                 </td>
                                 <td>
-                                    {{ $item->name() ?: '—' }}
-                                    <small class="text-muted" style="margin-left:6px">{{ $item->blueprint?->name }}</small>
+                                    {{ $recentItem->name() ?: '—' }}
+                                    <small class="text-muted" style="margin-left:6px">{{ $recentItem->blueprint?->name }}</small>
                                 </td>
                                 <td style="width:80px">
-                                    @if($item->status === 'published')
+                                    @if($recentItem->status === 'published')
                                         <span class="label label-success">{{ trans('marble::admin.published') }}</span>
                                     @else
                                         <span class="label label-default">{{ trans('marble::admin.draft') }}</span>
                                     @endif
                                 </td>
                                 <td class="text-muted" style="width:140px;white-space:nowrap">
-                                    {{ $item->updated_at->diffForHumans() }}
+                                    {{ $recentItem->updated_at->diffForHumans() }}
                                 </td>
                             </tr>
                         @endforeach
