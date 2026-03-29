@@ -1,0 +1,1325 @@
+
+/* ============================================================
+   ExtJS 2.0 / Office 2003 Blue Theme
+   ============================================================ */
+
+/* --- Typography --- */
+body,
+h1, h2, h3, h4, h5, h6,
+.btn, td, th, label, input, select, textarea,
+.modal-title, .dropdown-menu, p, span, a, li {
+    font-family: Tahoma, Arial, Helvetica, sans-serif !important;
+}
+
+/* --- Page background: classic XP desktop blue-gray --- */
+body {
+    background-color: #A8C0D8 !important;
+    font-size: 12px !important;
+    color: #222;
+}
+
+/* Kill layout.min.css .nav>li>a { font-size: 0.875em } globally */
+.nav > li > a {
+    font-size: 12px !important;
+}
+
+#page-wrapper {
+    background: transparent;
+}
+
+/* --- Headings --- */
+h1 {
+    font-size: 20px !important;
+    font-weight: bold !important;
+    color: #15428B !important;
+    border-bottom: 1px solid #99BBE8 !important;
+    padding: 0 0 6px 0 !important;
+    margin-bottom: 12px !important;
+    margin-top: 8px !important;
+    text-shadow: none !important;
+}
+
+h2 { font-size: 17px !important; font-weight: bold !important; text-shadow: none !important; }
+h3 { font-size: 15px !important; font-weight: bold !important; text-shadow: none !important; }
+h4 { font-size: 13px !important; font-weight: bold !important; text-shadow: none !important; }
+h5 { font-size: 12px !important; font-weight: bold !important; text-shadow: none !important; }
+h6 { font-size: 11px !important; font-weight: bold !important; text-shadow: none !important; }
+
+/* ============================================================
+   TOP NAVBAR — ExtJS 3.0 x-panel-tbar toolbar style
+   ============================================================ */
+#header-navbar {
+    background: linear-gradient(to bottom, #DDE9F8 0%, #C4D8F2 100%) !important;
+    border-bottom: 1px solid #8DB2E3 !important;
+    box-shadow: 0 1px 3px rgba(0,30,100,.12) !important;
+    min-height: 62px !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+/* x-btn toolbar button style — blue-tinted default, not gray */
+#header-navbar .nav > li > a,
+#header-navbar .nav > li > a.btn {
+    background: linear-gradient(to bottom, #ECF3FD 0%, #D3E2F8 100%) !important;
+    border: 1px solid #8DB2E3 !important;
+    color: #15428B !important;
+    font-weight: normal !important;
+    font-size: 12px !important;
+    height: auto !important;
+    line-height: 30px !important;
+    padding: 4px 16px !important;
+    border-radius: 3px !important;
+    text-shadow: none !important;
+    margin: 4px 2px !important;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.75) inset !important;
+}
+
+/* x-btn hover */
+#header-navbar .nav > li > a:hover,
+#header-navbar .nav > li > a.btn:hover,
+#header-navbar .nav > li > a:focus {
+    background: linear-gradient(to bottom, #DAE9F8 0%, #C0D9F4 50%, #AECEF0 100%) !important;
+    border-color: #6593CF !important;
+    color: #15428B !important;
+}
+
+/* x-btn pressed */
+#header-navbar .nav > li > a:active,
+#header-navbar .nav > li > a.btn:active {
+    background: linear-gradient(to bottom, #B8CEEA 0%, #CCDFF5 100%) !important;
+    border-color: #5580B0 !important;
+    box-shadow: 0 1px 2px rgba(0,0,0,.15) inset !important;
+}
+
+#header-navbar .navbar-toggle {
+    border-color: #6593CF;
+    background: transparent;
+}
+
+.nav-no-collapse.navbar-left {
+    margin: 6px 12px !important;
+}
+
+/* Logo — dark navy with web 2.0 gloss shine */
+#logo {
+    background: linear-gradient(to bottom,
+        #3872C8 0%,
+        #2258A8 30%,
+        #163C80 48%,
+        #0D2860 52%,
+        #0A2248 78%,
+        #071840 100%
+    ) !important;
+    color: #FFFFFF !important;
+    font-size: 15px !important;
+    font-weight: bold !important;
+    letter-spacing: 1px !important;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.7), 0 -1px 0 rgba(0,0,0,0.4) !important;
+    border-right: 1px solid #060F28 !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.18), inset -1px 0 0 rgba(0,0,0,0.25) !important;
+    padding: 0 20px !important;
+    height: 62px !important;
+    display: flex !important;
+    align-items: center !important;
+    text-decoration: none !important;
+}
+
+/* Search field */
+#header-nav #search-field,
+#header-nav .form-control {
+    border: 1px solid #99BBE8 !important;
+    background: #FFFFFF !important;
+    color: #333 !important;
+    box-shadow: inset 0 1px 2px rgba(0,50,150,.08) !important;
+    font-size: 12px !important;
+}
+
+/* Logout icon */
+#header-nav .nav > li > a {
+    color: #15428B !important;
+}
+
+/* ============================================================
+   SIDEBAR / TREE — profile-box-menu .menu-items style
+   ============================================================ */
+
+/* Container */
+#col-left,
+#col-left-inner,
+.col-left-nano,
+.col-left-nano-content {
+    background: #FFFFFF !important;
+}
+
+/* Kill layout.min.css dark link colors */
+#col-left a,
+#col-left a:hover,
+#col-left a:focus,
+#col-left a:active {
+    color: #344644 !important;
+}
+
+#sidebar-nav,
+.collapse.navbar-collapse.navbar-ex1-collapse {
+    background: #FFFFFF !important;
+}
+
+.sidebar-tree {
+    background: #FFFFFF !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* ---- ALL TREE LINKS ---- */
+#sidebar-nav .nav li > a,
+#sidebar-nav .nav li > a:link,
+#sidebar-nav .nav li > a:visited {
+    display: block !important;
+    color: #344644 !important;
+    font-size: 12px !important;
+    font-weight: normal !important;
+    height: 36px !important;
+    line-height: 36px !important;
+    padding: 0 12px 0 8px !important;
+    border: none !important;
+    border-bottom: 1px solid #e7ebee !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    text-shadow: none !important;
+    background: #FFFFFF !important;
+    -webkit-transition: background-color 0.15s ease-in-out !important;
+    transition: background-color 0.15s ease-in-out !important;
+}
+
+/* ---- HOVER — same as .menu-items ---- */
+#col-left a:hover,
+#col-left a:focus,
+#col-left a:active,
+#sidebar-nav a:hover,
+#sidebar-nav a:focus,
+#sidebar-nav a:active,
+#sidebar-nav .nav li > a:hover,
+#sidebar-nav .nav li > a:focus,
+#sidebar-nav .nav li > a:active,
+#sidebar-nav .nav-pills > li > a:hover,
+#sidebar-nav .nav-pills > li > a:focus,
+#sidebar-nav .nav-pills > li.active > a:hover,
+#sidebar-nav .nav-pills > li.active > a:focus,
+#sidebar-nav .nav li.active > a:hover,
+#sidebar-nav .nav li.active > a:focus,
+#sidebar-nav .nav li.open > a:hover,
+#sidebar-nav .nav li.open > a:focus,
+#sidebar-nav .nav li .submenu li > a:hover,
+#sidebar-nav .nav li .submenu li > a:focus,
+#sidebar-nav .nav li .submenu li > a:active,
+#sidebar-nav .nav li .submenu li.active > a:hover,
+#sidebar-nav .nav li .submenu li.active > a:focus,
+#sidebar-nav .nav li .submenu li.open > a:hover {
+    background: #e7ebee !important;
+    background-color: #e7ebee !important;
+    color: #344644 !important;
+    text-decoration: none !important;
+}
+
+/* ---- SELECTED ---- */
+#sidebar-nav .active > a,
+#sidebar-nav li.active > a,
+#sidebar-nav .nav > li.active > a,
+#sidebar-nav .nav > li.active > a:hover,
+#sidebar-nav .nav > li.active > a:focus,
+#sidebar-nav .nav li .submenu > li.active > a,
+#sidebar-nav .nav li .submenu > li.active > a:hover,
+#sidebar-nav .nav li .submenu > li.active > a:focus {
+    background: #dde9f8 !important;
+    background-color: #dde9f8 !important;
+    color: #15428B !important;
+    font-weight: bold !important;
+}
+
+/* ---- EXPAND/COLLAPSE GIF ---- */
+#sidebar-nav .tree-expand-icon {
+    vertical-align: middle !important;
+    margin-right: 4px !important;
+    position: relative !important;
+    top: -1px !important;
+    cursor: pointer !important;
+}
+
+/* ---- SUBMENU: indent per level, no connectors ---- */
+#sidebar-nav .nav li .submenu {
+    background: #FFFFFF !important;
+    padding: 0 !important;
+    margin-left: 20px !important;
+    border-left: none !important;
+}
+
+
+/* ============================================================
+   PANELS — .main-box with blue gradient headers
+   ============================================================ */
+.main-box {
+    background: #FFFFFF !important;
+    border: 1px solid #99BBE8 !important;
+    border-radius: 3px !important;
+    box-shadow: 0 1px 4px rgba(0,30,90,.2), inset 0 0 0 1px rgba(255,255,255,.6) !important;
+    margin-bottom: 14px !important;
+}
+
+.main-box-header {
+    background: linear-gradient(to bottom, #DDE9F8 0%, #C4D8F2 100%) !important;
+    border-bottom: 1px solid #99BBE8 !important;
+    border-radius: 2px 2px 0 0 !important;
+    padding: 5px 10px !important;
+    min-height: 0 !important;
+}
+
+.main-box-header h2 {
+    color: #15428B !important;
+    font-size: 12px !important;
+    font-weight: bold !important;
+    text-shadow: none !important;
+    margin: 0 !important;
+    padding: 3px 0 !important;
+    line-height: 1.4 !important;
+}
+
+.main-box-body {
+    background: #FFFFFF !important;
+    padding: 12px !important;
+}
+
+/* No padding when the body directly contains a table or menu list */
+.main-box-body:has(> table),
+.main-box-body:has(> .table-responsive),
+.main-box-body:has(> ul.menu-items) {
+    padding: 0 !important;
+}
+
+/* Profile boxes (item sidebar, field groups) */
+.profile-box-menu .profile-box-header {
+    padding: 0 20px 12px !important;
+    color: #fff !important;
+    border-radius: 0 !important;
+    position: static !important;
+    width: 100% !important;
+}
+
+.profile-box-menu .main-box-body {
+    padding: 0 !important;
+    overflow: hidden !important;
+}
+
+.profile-box-header.green-bg,
+.profile-box-header.gray-bg {
+    background: linear-gradient(to bottom, #DDE9F8 0%, #C4D8F2 100%) !important;
+}
+
+.profile-box-menu .profile-box-header {
+    margin-bottom: 0 !important;
+}
+
+.profile-box-menu .profile-box-content {
+    margin-top: 0 !important;
+}
+
+.profile-box-menu .profile-box-header h2,
+.profile-box-menu .profile-box-header .job-position {
+    margin-bottom: 0 !important;
+}
+
+.profile-box-header h2 {
+    color: #15428B !important;
+    font-size: 12px !important;
+    text-shadow: none !important;
+}
+
+.profile-box-header .job-position {
+    color: #15428B !important;
+    font-size: 12px !important;
+    opacity: 0.75;
+}
+
+/* ============================================================
+   TABLE / GRID — alternating blue rows, blue header
+   ============================================================ */
+.table > thead > tr > th {
+    background: linear-gradient(to bottom, #D8E8F8 0%, #BDD1EC 100%) !important;
+    color: #15428B !important;
+    font-weight: bold !important;
+    font-size: 12px !important;
+    border-bottom: 2px solid #99BBE8 !important;
+    padding: 5px 8px !important;
+    white-space: nowrap;
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: #EEF4FB !important;
+}
+
+.table-striped > tbody > tr:nth-of-type(even) {
+    background-color: #FFFFFF !important;
+}
+
+.table > tbody > tr > td {
+    border-top: 1px solid #D8E8F8 !important;
+    font-size: 12px !important;
+    color: #222 !important;
+    padding: 0 20px !important;
+    height: 40px !important;
+    vertical-align: middle !important;
+    line-height: 1.4 !important;
+}
+
+.table > tbody > tr:hover > td {
+    background-color: #C1D4EC !important;
+}
+
+.table td > a {
+    color: #15428B !important;
+    font-size: 12px !important;
+}
+
+.table td > a:hover {
+    color: #0A2860 !important;
+    text-decoration: underline !important;
+}
+
+/* ============================================================
+   BUTTONS — ExtJS 3.0 authentic gray → blue-hover style
+   ============================================================ */
+.btn {
+    font-size: 12px !important;
+    font-weight: bold !important;
+    border-radius: 2px !important;
+    padding: 3px 10px !important;
+    text-shadow: none !important;
+    line-height: 1.6 !important;
+    /* Base: ExtJS 3.0 silver gray */
+    background: linear-gradient(to bottom, #FFFFFF 0%, #E1E1E1 100%) !important;
+    border: 1px solid #ABABAB !important;
+    color: #333333 !important;
+}
+
+.btn:hover,
+.btn:focus {
+    /* The iconic ExtJS blue hover */
+    background: linear-gradient(to bottom, #DAE9F8 0%, #C0D9F4 50%, #AECEF0 100%) !important;
+    border-color: #6699C8 !important;
+    color: #333333 !important;
+}
+
+.btn-xs {
+    padding: 2px 7px !important;
+    font-size: 12px !important;
+}
+
+/* Default / Primary / Info — all use the ExtJS gray base */
+.btn-default,
+.btn-primary,
+.btn-info {
+    background: linear-gradient(to bottom, #FFFFFF 0%, #E1E1E1 100%) !important;
+    border: 1px solid #ABABAB !important;
+    color: #333333 !important;
+}
+
+.btn-default:hover, .btn-default:focus,
+.btn-primary:hover, .btn-primary:focus,
+.btn-info:hover, .btn-info:focus {
+    background: linear-gradient(to bottom, #DAE9F8 0%, #C0D9F4 50%, #AECEF0 100%) !important;
+    border-color: #6699C8 !important;
+    color: #333333 !important;
+}
+
+/* Success — semantic green, ExtJS gradient style */
+.btn-success {
+    background: linear-gradient(to bottom, #9ED89E 0%, #5CA85C 100%) !important;
+    border: 1px solid #4A8A4A !important;
+    color: #FFFFFF !important;
+}
+
+.btn-success:hover, .btn-success:focus {
+    background: linear-gradient(to bottom, #AEE8AE 0%, #6CB86C 100%) !important;
+    border-color: #387838 !important;
+    color: #FFFFFF !important;
+}
+
+/* Danger — semantic red, ExtJS gradient style */
+.btn-danger {
+    background: linear-gradient(to bottom, #F09090 0%, #C84040 100%) !important;
+    border: 1px solid #A03030 !important;
+    color: #FFFFFF !important;
+}
+
+.btn-danger:hover, .btn-danger:focus {
+    background: linear-gradient(to bottom, #F8A0A0 0%, #D85050 100%) !important;
+    border-color: #802828 !important;
+    color: #FFFFFF !important;
+}
+
+/* ============================================================
+   FORM ELEMENTS
+   ============================================================ */
+.form-control {
+    border: 1px solid #99BBE8 !important;
+    border-radius: 2px !important;
+    font-size: 12px !important;
+    padding: 4px 6px !important;
+    box-shadow: inset 0 1px 3px rgba(0,50,150,.08) !important;
+    background: #FFFFFF !important;
+    color: #222 !important;
+}
+
+.form-control:focus {
+    border-color: #3764A0 !important;
+    box-shadow: inset 0 1px 2px rgba(0,50,150,.1), 0 0 5px rgba(55,100,160,.25) !important;
+}
+
+label {
+    font-size: 12px !important;
+    font-weight: bold !important;
+    color: #15428B !important;
+    margin-bottom: 3px !important;
+}
+
+/* ============================================================
+   MODALS
+   ============================================================ */
+.modal-header {
+    background: linear-gradient(to bottom, #DDE9F8 0%, #C4D8F2 100%) !important;
+    border-radius: 4px 4px 0 0 !important;
+    border-bottom: 1px solid #99BBE8 !important;
+    padding: 7px 15px !important;
+}
+
+.modal-title {
+    color: #15428B !important;
+    font-size: 12px !important;
+    font-weight: bold !important;
+    text-shadow: none !important;
+}
+
+.modal-header .close {
+    color: #15428B !important;
+    opacity: 0.7 !important;
+    text-shadow: none !important;
+}
+
+.modal-header .close:hover {
+    opacity: 1 !important;
+    color: #15428B !important;
+}
+
+/* Permission checkboxes (usergroup edit) */
+.perm-checkbox-label {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    font-weight: normal !important;
+    color: #222 !important;
+    font-size: 12px !important;
+    margin-bottom: 5px !important;
+    cursor: pointer !important;
+}
+
+.perm-checkbox-label input[type="checkbox"] {
+    width: 13px !important;
+    height: 13px !important;
+    margin: 0 !important;
+    flex-shrink: 0 !important;
+    cursor: pointer !important;
+    accent-color: #316AC5 !important;
+}
+
+.modal-footer {
+    background: #EEF2F9 !important;
+    border-top: 1px solid #99BBE8 !important;
+}
+
+.modal-content {
+    border: 1px solid #6593CF !important;
+    border-radius: 4px !important;
+    box-shadow: 0 4px 16px rgba(0,30,90,.3) !important;
+}
+
+/* ============================================================
+   LANG TABS
+   ============================================================ */
+.lang-switch {
+    background: linear-gradient(to bottom, #EEF5FF 0%, #D0E4F7 100%) !important;
+    border: 1px solid #99BBE8 !important;
+    color: #15428B !important;
+    font-size: 12px !important;
+    border-radius: 3px 3px 0 0 !important;
+    margin-left: 2px !important;
+    padding: 4px 10px !important;
+
+    position: relative;
+    bottom: -2px;
+}
+
+.lang-switch.active {
+    background: #FFFFFF !important;
+    border-bottom-color: #FFFFFF !important;
+    color: #15428B !important;
+    font-weight: bold !important;
+}
+
+.lang-container {
+    background: #F4F8FE !important;
+    border: 1px solid #99BBE8 !important;
+    border-radius: 0 3px 3px 3px !important;
+}
+
+/* ============================================================
+   MISC
+   ============================================================ */
+.attribute-container {
+    background: #EEF4FB !important;
+    border: 1px solid #C0D4EC !important;
+    border-radius: 2px !important;
+}
+
+.object-relation-card,
+.image-card {
+    border: 1px solid #99BBE8 !important;
+    background: #F5F9FF !important;
+    border-radius: 2px !important;
+}
+
+/* Nav tabs (field groups etc) */
+.nav-tabs > li > a {
+    background: linear-gradient(to bottom, #EEF5FF 0%, #D0E4F7 100%) !important;
+    border: 1px solid #99BBE8 !important;
+    color: #15428B !important;
+    font-size: 12px !important;
+    border-radius: 3px 3px 0 0 !important;
+}
+
+.nav-tabs > li.active > a,
+.nav-tabs > li.active > a:hover {
+    background: #FFFFFF !important;
+    border-bottom-color: #FFFFFF !important;
+    color: #15428B !important;
+    font-weight: bold !important;
+}
+
+/* Autocomplete dropdown */
+.autocomplete-container .list-group {
+    border: 1px solid #99BBE8;
+    box-shadow: 0 2px 6px rgba(0,30,90,.2);
+}
+
+.autocomplete-container .list-group .list-group-item {
+    border-color: #D8E8F8;
+    font-size: 11px;
+    color: #15428B;
+}
+
+.autocomplete-container .list-group .list-group-item:hover {
+    background: #EEF4FB;
+}
+
+/* Icon preview tooltip */
+.icon-preview-tooltip {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 24px;
+    transform: translateY(-50%);
+    background: #fff;
+    border: 1px solid #99BBE8;
+    border-radius: 3px;
+    box-shadow: 0 2px 8px rgba(0,30,90,.2);
+    padding: 6px;
+    z-index: 100;
+    pointer-events: none;
+}
+
+.icon-preview-wrap:hover .icon-preview-tooltip {
+    display: block;
+}
+
+/* ---- end ExtJS theme ---- */
+
+
+#sidebar-nav .nav li a.dropdown-toggle .drop-icon{
+    top: 0;
+    right: 0;
+    margin-top: 0;
+    bottom: 0;
+    width: 44px;
+    height: 44px;
+    padding-top: 16px;
+    text-align: center;
+    background: rgba(255,255,255,.1);
+    
+    opacity:0.3;
+}
+
+#sidebar-nav .nav li a.dropdown-toggle:hover .drop-icon{
+    opacity:1;
+}
+
+#sidebar-nav .nav>.open>.submenu>li>a.dropdown-toggle>.drop-icon{
+    margin-top: 0;
+    font-size: inherit;
+}
+
+#sidebar-nav .nav li .submenu>li>a{
+    height: 28px;
+    line-height: 12px;
+    padding-top: 10px;
+    padding-bottom : 21px;
+    padding-left: 46px;
+    box-shadow: none !important;
+    border-left: 4px solid transparent;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+#sidebar-nav .nav>.open>.submenu>li>.submenu a{
+    padding-left: 66px;
+}
+#sidebar-nav .nav>.open>.submenu>li>.submenu>li>.submenu a{
+    padding-left: 86px;
+}
+#sidebar-nav .nav>.open>.submenu>li>.submenu>li>.submenu>li>.submenu a{
+    padding-left: 106px;
+}
+#sidebar-nav .nav>.open>.submenu>li>.submenu>li>.submenu>li>.submenu>li>.submenu a{
+    padding-left: 126px;
+}
+#sidebar-nav .nav>.open>.submenu>li>.submenu>li>.submenu>li>.submenu>li>.submenu>li>.submenu a{
+    padding-left: 146px;
+}
+#sidebar-nav .nav>.open>.submenu>li>.submenu>li>.submenu>li>.submenu>li>.submenu>li>.submenu>li>.submenu a{
+    padding-left: 166px;
+}
+
+#sidebar-nav .nav li .submenu,
+#sidebar-nav .nav>.open>.submenu>li>.submenu,
+#sidebar-nav .nav>.open>.submenu>li>.submenu>li>.submenu,
+#sidebar-nav .nav>.open>.submenu>li>.submenu>li>.submenu>li>.submenu,
+#sidebar-nav .nav>.open>.submenu>li>.submenu>li>.submenu>li>.submenu>li>.submenu,
+#sidebar-nav .nav>.open>.submenu>li>.submenu>li>.submenu>li>.submenu>li>.submenu>li>.submenu,
+#sidebar-nav .nav>.open>.submenu>li>.submenu>li>.submenu>li>.submenu>li>.submenu>li>.submenu>li>.submenu,
+#sidebar-nav .nav>.open>.submenu>li>.submenu>li>.submenu>li>.submenu>li>.submenu>li>.submenu>li>.submenu>li>.submenu,
+#sidebar-nav .nav>.open>.submenu>li>.submenu>li>.submenu>li>.submenu>li>.submenu>li>.submenu>li>.submenu>li>.submenu>li>.submenu{
+    background: rgba(0,0,0,.07);
+}
+
+
+#sidebar-nav .active > a{
+    border-left: 4px solid #3498db !important;
+    background-color: #1a1d22 !important;
+}
+
+#header-navbar .nav>li>a:hover, #header-navbar .nav>li>a:focus, #header-navbar .nav .open>a, #header-navbar .nav .open>a:hover, #header-navbar .nav .open>a:focus{
+    background: rgba(0,0,0,.05);
+    color: #000;
+}
+
+#sidebar-nav .nav li .submenu>li>a:hover, #sidebar-nav .nav li .submenu>li>a.active{
+    background: #121418 !important;
+}
+
+#sidebar-nav .nav li .submenu{
+    padding: 0;
+}
+
+
+#sidebar-nav .nav li a span {
+    font-size: 12px !important;
+    padding-left: 0 !important;
+}
+#sidebar-nav .nav>.open>.submenu>li>.submenu a:before{
+    display: none;
+}
+
+#nav-col, .navbar>.container .navbar-brand{
+    width: 320px;
+}
+
+#content-wrapper {
+    margin-left: 320px;
+    border-left: 1px solid #6593CF !important;
+}
+
+.container-login #content-wrapper{
+    margin: 0 !important;
+}
+
+
+.lang-container{
+    position: relative;
+    background: #eee;
+    padding: 5px;
+}
+
+.lang-switch-container{
+    position: absolute;
+    top: -27px;
+    right: 10px;
+}
+
+.lang-switch{
+    display: inline-block;
+    background: #f9f9f9;
+    padding: 5px 10px;
+    margin-left: 5px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.lang-switch.active{
+    background: #eee;
+}
+
+.lang-content{
+    display: none;
+}
+
+.lang-content.active{
+    display: block;
+}
+
+
+/* All sidebar menu list items — 40px rows */
+.profile-box-menu .profile-box-content .menu-items li {
+    display: block !important;
+    height: 40px !important;
+    line-height: 40px !important;
+    border-bottom: 1px solid #e7ebee !important;
+    padding: 0 !important;
+    font-size: 12px !important;
+    color: #344644 !important;
+    background: none !important;
+}
+
+/* <a> and <button> carry the 20px gutters and fill the full row */
+.profile-box-menu .profile-box-content .menu-items li > a,
+.profile-box-menu .profile-box-content .menu-items li > form > button {
+    display: block !important;
+    height: 40px !important;
+    line-height: 40px !important;
+    padding: 0 20px !important;
+    width: 100% !important;
+    color: #344644 !important;
+    font-size: 12px !important;
+    font-weight: normal !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    text-align: left !important;
+}
+
+.profile-box-menu .profile-box-content .menu-items li:hover,
+.profile-box-menu .profile-box-content .menu-items li > a:hover,
+.profile-box-menu .profile-box-content .menu-items li > form > button:hover {
+    background: #e7ebee !important;
+    color: #344644 !important;
+    text-decoration: none !important;
+}
+
+/* .btn links inside menu items must not inherit the 40px row height */
+.profile-box-menu .profile-box-content .menu-items li a.btn,
+.profile-box-menu .profile-box-content .menu-items li a.btn:hover {
+    height: auto !important;
+    line-height: 1.6 !important;
+    display: inline-block !important;
+    width: auto !important;
+    white-space: nowrap !important;
+    overflow: visible !important;
+    padding: 2px 7px !important;
+}
+
+/* Flex row variant — for items with a label on left and action button on right */
+.profile-box-menu .profile-box-content .menu-items li.menu-item-action {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 0 20px !important;
+    overflow: visible !important;
+}
+
+.profile-box-menu .profile-box-content .menu-items li.more{
+    display: block;
+    height: 40px;
+    line-height: 40px;
+    border-bottom: 1px solid #e7ebee;
+    padding: 0 20px;
+    font-size: 12px;
+    color: #344644;
+    cursor: move;
+}
+.profile-box-menu .profile-box-content .menu-items li.more i{
+    width: 24px;
+}
+
+.profile-box-menu .profile-box-content .menu-items li.more .pull-left{
+    
+}
+
+.profile-box-menu .profile-box-content .menu-items li.more .pull-right{
+    
+}
+
+.profile-box-menu .profile-box-content .menu-items li.more:hover .btn{
+    opacity: 1;
+}
+
+.profile-box-menu .profile-box-content .menu-items li.more .btn{
+    margin: 6px 0 6px 3px;
+    padding: 3px 8px;
+    height: auto;
+    line-height: 1.5;
+    color: #fff;
+    opacity: 0;
+    -webkit-transition: all 0.15s ease-in-out 0s;
+    transition: all 0.15s ease-in-out 0s;
+    cursor: pointer;
+}
+
+
+.profile-box-menu .profile-box-content .menu-items li.more .btn-danger{
+    border-bottom: 4px solid #d43f3a;
+}
+
+.profile-box-menu .profile-box-content .menu-items li.more .btn-danger:hover{
+    background-color: #c0392b;
+}
+
+.profile-box-menu .profile-box-content .menu-items li.more .btn-info{
+    border-bottom: 4px solid #0298d1;
+}
+
+.profile-box-menu .profile-box-content .menu-items li.more .btn-info:hover{
+    background-color: #0298d1;
+}
+
+
+.attribute-container{
+    background: #f4f4f4;
+    padding: 15px;
+    border-radius: 3px;
+}
+
+.object-relation-card,
+.image-card{
+    border: 1px solid #ddd;
+    background: #fff;
+    padding: 10px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    position: relative;
+}
+
+.image-card{
+    max-width: 219px;
+}
+
+.image-card img{
+    display: block;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+.object-relation-card .delete,
+.image-card .delete{
+    cursor: pointer;
+    color: red;
+    font-size: 20px;
+    line-height: 10px;
+    vertical-align: middle;
+}
+
+
+.image-card .delete{
+    position: absolute;
+    top: 10px;
+    right: 15px;
+}
+
+.object-relation-card .delete{
+    margin-left: 10px;
+}
+
+
+#image-editor{
+
+}
+
+#image-editor .canvas{
+    text-align: center;
+}
+
+#image-editor .canvas > img{
+    max-width: 100%;
+}
+
+.modal-full{
+    width: 98%;
+}
+
+
+#header-nav .form-control{
+    margin-top: 13px !important;
+    margin-right: 30px !important;
+    border: 1px solid #ddd;
+    width: 300px
+}
+
+/* Language switcher & logout spacing */
+#header-nav .dropdown { margin-top: 10px !important; }
+#header-nav .hidden-xxs { margin-top: 10px !important; }
+
+/* User info block */
+#header-user-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 12px;
+    height: 62px;
+    text-align: right;
+    line-height: 1.2;
+    cursor: default;
+}
+#header-user-info .user-name {
+    font-size: 12px !important;
+    font-weight: bold !important;
+    color: #15428B !important;
+    white-space: nowrap;
+}
+#header-user-info .user-role {
+    font-size: 11px !important;
+    color: #5A7FB0 !important;
+    white-space: nowrap;
+}
+
+.autocomplete-container{
+    position: relative;
+}
+
+.autocomplete-container .list-group{
+    position: absolute;
+    top: 10px;
+    left: 0;
+    right: 0;
+    opacity: 0;
+    transition: 0.1s all;
+}
+
+.autocomplete-container .list-group.visible{
+    top: 41px;
+    opacity: 1;
+}
+
+.reveal-button-group .btn-group{
+    opacity: 0.3;
+    transition: all 0.2s;
+}
+
+.reveal-button-group:hover .btn-group{
+    opacity: 1;
+}
+
+
+.nav-tabs{
+    background: transparent;
+}
+
+.nav-tabs > li > a{
+    background: rgba(0,0,0,.1);
+    border-radius: 3px 3px 0 0;
+}
+
+.google-map{
+    min-height: 350px;
+}
+
+.modal-max{
+    width: 95%;
+}
+
+body.iframe{
+    background: #f3f3f3;
+    padding: 20px;
+}
+
+
+
+.ck-list-group{
+    padding: 20px 0;
+    border-radius: 0;
+}
+
+.ck-list-group .list-group-item{
+    cursor: pointer;
+    color: #3498db;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    border-radius: 0;
+}
+
+
+/* ============================================================
+   :active states — tactile press feedback
+   ============================================================ */
+
+/* Transition on interactive elements so active state feels snappy but not laggy */
+.btn {
+    transition: transform 0.05s ease, box-shadow 0.05s ease, background-color 0.1s ease;
+}
+
+.lang-switch,
+.image-card img,
+.image-card .delete,
+.object-relation-card .delete,
+.ck-list-group .list-group-item,
+.autocomplete-container .list-group .list-group-item,
+.object-browser-node {
+    transition: transform 0.05s ease, opacity 0.05s ease, background 0.05s ease;
+}
+
+/* --- Buttons: press-down effect --- */
+.btn:active,
+.btn.active {
+    /*transform: translateY(2px);*/
+    box-shadow: inset 0 2px 5px rgba(0,0,0,.25) !important;
+    outline: none;
+}
+
+.btn-default:active,
+.btn-default.active {
+    background-color: #c8c8c8;
+    border-color: #adadad;
+}
+
+.btn-primary:active,
+.btn-primary.active {
+    background-color: #1a4a7a;
+    border-color: #163d65;
+}
+
+.btn-info:active,
+.btn-info.active {
+    background-color: #1a8aab;
+    border-color: #15748f;
+}
+
+.btn-success:active,
+.btn-success.active {
+    background-color: #2d7a2d;
+    border-color: #256325;
+}
+
+.btn-danger:active,
+.btn-danger.active {
+    background-color: #8b1a18;
+    border-color: #741614;
+}
+
+.btn-warning:active,
+.btn-warning.active {
+    background-color: #c07000;
+    border-color: #a35f00;
+}
+
+/* --- Navbar top links --- */
+#header-navbar .nav > li > a:active {
+    background: rgba(0,0,0,.15) !important;
+    transform: translateY(1px);
+}
+
+/* --- Sidebar tree links --- */
+#sidebar-nav .nav li a:active,
+#sidebar-nav .nav li .submenu > li > a:active {
+    background: #080a0d !important;
+}
+
+/* --- Sidebar profile-box menu items (item actions, field groups) --- */
+.profile-box-menu .profile-box-content .menu-items li > a:active {
+    background: rgba(0,0,0,.12);
+    padding-left: 24px;
+}
+
+/* --- Table links --- */
+.table td > a:active {
+    color: #000;
+    opacity: 0.7;
+}
+
+/* --- Lang switch tabs --- */
+.lang-switch:active {
+    background: #d0d0d0;
+    transform: translateY(1px);
+}
+
+/* --- Autocomplete / object-browser list items --- */
+.ck-list-group .list-group-item:active,
+.autocomplete-container .list-group .list-group-item:active {
+    background: rgba(52, 152, 219, .12);
+    transform: translateY(1px);
+    color: #1a6898;
+}
+
+/* --- Image card thumbnail (opens editor) --- */
+.image-card img:active {
+    opacity: 0.75;
+    transform: scale(0.97);
+}
+
+/* --- Delete / action icons on cards --- */
+.image-card .delete:active,
+.object-relation-card .delete:active {
+    transform: scale(0.8);
+    opacity: 0.7;
+}
+
+/* --- Object browser tree nodes (modal) --- */
+.object-browser-node:active {
+    background: rgba(255,255,255,.15) !important;
+    transform: translateX(2px);
+}
+
+/* ============================================================
+   MEDIA LIBRARY GRID
+   ============================================================ */
+
+.media-library-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 4px 0;
+}
+
+.media-library-item {
+    width: 160px;
+    border: 1px solid #C9D9EC;
+    border-radius: 3px;
+    background: #fff;
+    overflow: hidden;
+    font-size: 12px;
+}
+
+.media-library-item.media-browser-selectable:hover {
+    border-color: #5B9BD5;
+    box-shadow: 0 0 0 2px rgba(91,155,213,.3);
+}
+
+.media-library-thumb {
+    width: 100%;
+    height: 100px;
+    background: #F0F5FB;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.media-library-thumb img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover;
+}
+
+.media-library-info {
+    padding: 5px 7px 2px;
+    border-top: 1px solid #e7ebee;
+}
+
+.media-library-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #344644;
+    font-size: 11px;
+}
+
+.media-library-meta {
+    color: #999;
+    font-size: 10px;
+}
+
+.media-library-actions {
+    padding: 4px 6px;
+    display: flex;
+    gap: 4px;
+    border-top: 1px solid #e7ebee;
+    background: #f8fafd;
+}
+
+/* ---- Form buttons inside .menu-items look like <a> links ---- */
+.profile-box-menu .profile-box-content .menu-items li form {
+    display: block;
+}
+
+.profile-box-menu .profile-box-content .menu-items li:last-child form {
+    border-bottom: none;
+}
+
+.profile-box-menu .profile-box-content .menu-items li form button {
+    display: block !important;
+    width: 100% !important;
+    height: 40px !important;
+    line-height: 40px !important;
+    padding: 0 20px !important;
+    margin: 0 !important;
+    font-size: 12px !important;
+    font-weight: normal !important;
+    color: #344644 !important;
+    background: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    text-align: left !important;
+    cursor: pointer !important;
+    -webkit-transition: background-color 0.15s ease-in-out 0s;
+    transition: background-color 0.15s ease-in-out 0s;
+}
+
+.profile-box-menu .profile-box-content .menu-items li form button:hover,
+.profile-box-menu .profile-box-content .menu-items li form button:focus,
+.profile-box-menu .profile-box-content .menu-items li form button:active {
+    background-color: #e7ebee !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Delete button red tint */
+.profile-box-menu .profile-box-content .menu-items li form button.danger {
+    color: #c0392b !important;
+}
+
+/* .btn inside menu-item forms (restore, status toggle): restore full ExtJS button appearance */
+.profile-box-menu .profile-box-content .menu-items li form button.btn {
+    display: inline-block !important;
+    width: auto !important;
+    height: auto !important;
+    text-align: center !important;
+    background: linear-gradient(to bottom, #FFFFFF 0%, #E1E1E1 100%) !important;
+    border: 1px solid #ABABAB !important;
+    color: #333333 !important;
+    font-size: 12px !important;
+    font-weight: bold !important;
+    border-radius: 2px !important;
+    padding: 2px 7px !important;
+    line-height: 1.6 !important;
+    box-shadow: none !important;
+    cursor: pointer !important;
+}
+.profile-box-menu .profile-box-content .menu-items li form button.btn:hover,
+.profile-box-menu .profile-box-content .menu-items li form button.btn:focus {
+    background: linear-gradient(to bottom, #DAE9F8 0%, #C0D9F4 50%, #AECEF0 100%) !important;
+    border-color: #6699C8 !important;
+    color: #333333 !important;
+    box-shadow: none !important;
+    outline: none !important;
+}

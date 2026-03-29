@@ -1,0 +1,22 @@
+{
+    "name": "marble/admin",
+    "description": "Marble CMS Admin Package for Laravel",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Marble\\Admin\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Marble\\Admin\\MarbleServiceProvider"
+            ]
+        }
+    },
+    "require": {
+        "php": "^8.2",
+        "laravel/framework": "^11.0|^12.0"
+    }
+}
