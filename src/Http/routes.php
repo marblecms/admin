@@ -139,6 +139,7 @@ Route::prefix('media')->as('media.')->group(function () {
     Route::get('json', [\Marble\Admin\Http\Controllers\MediaController::class, 'json'])->name('json');
     Route::get('transform/{media}', \Marble\Admin\Http\Controllers\MediaTransformController::class)->name('transform');
     Route::post('{media}/focal-point', [\Marble\Admin\Http\Controllers\MediaController::class, 'saveFocalPoint'])->name('focal-point');
+    Route::post('ckeditor-upload', [\Marble\Admin\Http\Controllers\MediaController::class, 'ckeditorUpload'])->name('ckeditor-upload');
 });
 
 // API Token management (admin)

@@ -256,6 +256,7 @@
         CKEDITOR.replaceAll(function(textarea, config) {
             if ($(textarea).hasClass("rich-text-editor")) {
                 config.extraPlugins = 'marblelink';
+                config.filebrowserImageUploadUrl = '{{ route('marble.media.ckeditor-upload') }}?_token={{ csrf_token() }}';
                 config.toolbar = [
                     { name: 'clipboard', items: ['Undo', 'Redo'] },
                     { name: 'styles', items: ['Styles', 'Format'] },

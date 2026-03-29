@@ -116,6 +116,35 @@ class MediaController extends Controller
         );
     }
 
+    public function ckeditorUpload(Request $request)
+    {
+        $funcNum = $request->query('CKEditorFuncNum', 0);
+
+        $request->validate(['upload' => 'required|file|image|max:51200']);
+
+        $file     = $request->file('upload');
+        $filename = $file->hashName();
+
+        Storage::put($filename, file_get_contents($file));
+
+        $size = @getimagesize($file->getRealPath());
+
+        Media::create([
+            'filename'          => $filename,
+            'original_filename' => $file->getClientOriginalName(),
+            'disk'              => 'public',
+            'mime_type'         => $file->getMimeType(),
+            'size'              => $file->getSize(),
+            'width'             => $size[0] ?? null,
+            'height'            => $size[1] ?? null,
+        ]);
+
+        $url = url('/image/' . $filename);
+
+        return response('<script>window.parent.CKEDITOR.tools.callFunction(' . (int)$funcNum . ', ' . json_encode($url) . ', "");</script>')
+            ->header('Content-Type', 'text/html');
+    }
+
     public function saveFocalPoint(Request $request, Media $media)
     {
         $request->validate([
