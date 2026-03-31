@@ -22,10 +22,12 @@ class MarbleRouter
         $path = '/' . ltrim($path, '/');
 
         // Strip locale prefix if configured
+        $strippedLocalePrefix = null;
         if (config('marble.uri_locale_prefix', false)) {
             foreach (Language::all() as $lang) {
                 $prefix = '/' . $lang->code;
                 if (str_starts_with($path, $prefix . '/') || $path === $prefix) {
+                    $strippedLocalePrefix = $prefix;
                     $path = substr($path, strlen($prefix)) ?: '/';
                     Marble::setLocale($lang->code);
                     break;
@@ -81,6 +83,11 @@ class MarbleRouter
 
         foreach ($candidates as $item) {
             $absoluteSlug = $item->slug($languageId);
+
+            // Strip locale prefix from slug (already stripped from $path above)
+            if ($strippedLocalePrefix && str_starts_with($absoluteSlug, $strippedLocalePrefix)) {
+                $absoluteSlug = substr($absoluteSlug, strlen($strippedLocalePrefix)) ?: '/';
+            }
 
             // Strip root item slug prefix for site-relative comparison
             $compareSlug = ($rootSlug && str_starts_with($absoluteSlug, $rootSlug))

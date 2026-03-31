@@ -70,15 +70,31 @@ class Files extends BaseFieldType
     {
         $files = $oldValue ?? [];
 
-        // Handle removals: comma-separated indices
+        // Collect removed indices and delete their storage files
+        $removeKeys = [];
         if (is_string($newValue) && $newValue !== 'noop' && $newValue !== '') {
-            $removeKeys = explode(',', $newValue);
+            $removeKeys = array_map('trim', explode(',', $newValue));
             foreach ($removeKeys as $key) {
-                $key = trim($key);
                 if (isset($files[$key])) {
                     Storage::delete($files[$key]['filename'] ?? '');
-                    unset($files[$key]);
                 }
+            }
+        }
+
+        // Apply order input (original indices in new order, removals already excluded by JS)
+        $orderStr = $request->input("fields_order.{$blueprintFieldId}.{$languageId}");
+        if ($orderStr !== null && $orderStr !== '') {
+            $orderIndices = array_map('intval', explode(',', $orderStr));
+            $reordered = [];
+            foreach ($orderIndices as $idx) {
+                if (isset($files[$idx]) && !in_array((string)$idx, $removeKeys)) {
+                    $reordered[] = $files[$idx];
+                }
+            }
+            $files = $reordered;
+        } else {
+            foreach ($removeKeys as $key) {
+                unset($files[$key]);
             }
             $files = array_values($files);
         }

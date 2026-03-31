@@ -55,25 +55,21 @@
         @endif
     </h1>
 
+
     {{-- Breadcrumb --}}
-    <ol class="breadcrumb" style="margin-bottom:16px">
-        <li class="{{ empty($breadcrumb) ? 'active' : '' }}">
-            @if(empty($breadcrumb))
-                @include('marble::components.famicon', ['name' => 'folder']) {{ trans('marble::admin.all_files') }}
-            @else
-                <a href="{{ route('marble.media.index') }}">@include('marble::components.famicon', ['name' => 'folder']) {{ trans('marble::admin.all_files') }}</a>
-            @endif
-        </li>
+    @if(!empty($breadcrumb))
+    <div style="margin:-6px 0 12px;font-size:12px;color:#888">
+        <a href="{{ route('marble.media.index') }}" style="color:#5580B0">@include('marble::components.famicon', ['name' => 'folder']) {{ trans('marble::admin.all_files') }}</a>
         @foreach($breadcrumb as $crumb)
-            <li class="{{ $crumb->id === $currentFolder?->id ? 'active' : '' }}">
-                @if($crumb->id === $currentFolder?->id)
-                    {{ $crumb->name }}
-                @else
-                    <a href="{{ route('marble.media.index', ['folder' => $crumb->id]) }}">{{ $crumb->name }}</a>
-                @endif
-            </li>
+            <span style="margin:0 4px;color:#bbb">›</span>
+            @if($crumb->id === $currentFolder?->id)
+                <span style="color:#555">{{ $crumb->name }}</span>
+            @else
+                <a href="{{ route('marble.media.index', ['folder' => $crumb->id]) }}" style="color:#5580B0">{{ $crumb->name }}</a>
+            @endif
         @endforeach
-    </ol>
+    </div>
+    @endif
 
     {{-- Folders --}}
     <div class="main-box">
@@ -236,6 +232,12 @@
                     {{ $media->appends(request()->query())->links() }}
                 </div>
             @endif
+
+
+            <div class="alert alert-warning" style="padding:8px 14px;font-size:12px;margin-bottom:12px">
+                @include('marble::components.famicon', ['name' => 'error'])
+                {{ trans('marble::admin.media_public_notice') }}
+            </div>
         </div>
     </div>
 @endsection

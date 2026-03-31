@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('marble_redirects', function (Blueprint $table) {
+        Schema::create('redirects', function (Blueprint $table) {
             $table->id();
             $table->string('source_path')->unique()->index();
             $table->string('target_path')->nullable();
@@ -22,6 +22,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('marble_redirects');
+        Schema::dropIfExists('redirects');
     }
 };

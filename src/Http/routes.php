@@ -32,6 +32,10 @@ Route::prefix('item')->as('item.')->group(function () {
     Route::get('export/{item}', [\Marble\Admin\Http\Controllers\ImportExportController::class, 'export'])->name('export');
     Route::get('import', [\Marble\Admin\Http\Controllers\ImportExportController::class, 'importForm'])->name('import-form');
     Route::post('import', [\Marble\Admin\Http\Controllers\ImportExportController::class, 'import'])->name('import');
+    // Workflow state
+    Route::post('workflow/advance/{item}', [\Marble\Admin\Http\Controllers\ItemWorkflowController::class, 'advance'])->name('workflow.advance');
+    Route::post('workflow/retreat/{item}', [\Marble\Admin\Http\Controllers\ItemWorkflowController::class, 'retreat'])->name('workflow.retreat');
+    Route::post('workflow/reject/{item}', [\Marble\Admin\Http\Controllers\ItemWorkflowController::class, 'reject'])->name('workflow.reject');
 });
 
 // Trash
@@ -125,6 +129,7 @@ Route::prefix('activity-log')->as('activity-log.')->group(function () {
 Route::prefix('form')->as('form.')->group(function () {
     Route::get('{item}/submissions', [\Marble\Admin\Http\Controllers\FormSubmissionController::class, 'index'])->name('index');
     Route::get('{item}/submissions/{submission}', [\Marble\Admin\Http\Controllers\FormSubmissionController::class, 'show'])->name('show');
+    Route::post('{item}/submissions/{submission}/mark-read', [\Marble\Admin\Http\Controllers\FormSubmissionController::class, 'markRead'])->name('mark-read');
     Route::delete('{item}/submissions/{submission}', [\Marble\Admin\Http\Controllers\FormSubmissionController::class, 'destroy'])->name('destroy');
 });
 
@@ -157,6 +162,32 @@ Route::prefix('package')->as('package.')->group(function () {
     Route::post('import', [\Marble\Admin\Http\Controllers\MarblePackageController::class, 'import'])->name('import.do');
 });
 
+
+// Workflows
+Route::prefix('workflow')->as('workflow.')->group(function () {
+    Route::get('/', [\Marble\Admin\Http\Controllers\WorkflowController::class, 'index'])->name('index');
+    Route::post('create', [\Marble\Admin\Http\Controllers\WorkflowController::class, 'create'])->name('create');
+    Route::get('edit/{workflow}', [\Marble\Admin\Http\Controllers\WorkflowController::class, 'edit'])->name('edit');
+    Route::post('save/{workflow}', [\Marble\Admin\Http\Controllers\WorkflowController::class, 'save'])->name('save');
+    Route::delete('delete/{workflow}', [\Marble\Admin\Http\Controllers\WorkflowController::class, 'delete'])->name('delete');
+});
+
+// Notifications
+Route::prefix('notifications')->as('notification.')->group(function () {
+    Route::get('count', [\Marble\Admin\Http\Controllers\NotificationController::class, 'count'])->name('count');
+    Route::get('recent', [\Marble\Admin\Http\Controllers\NotificationController::class, 'recent'])->name('recent');
+    Route::post('mark-all-read', [\Marble\Admin\Http\Controllers\NotificationController::class, 'markAllRead'])->name('mark-all-read');
+    Route::post('{notification}/mark-read', [\Marble\Admin\Http\Controllers\NotificationController::class, 'markRead'])->name('mark-read');
+});
+
+// Configuration
+Route::prefix('configuration')->as('configuration.')->group(function () {
+    Route::get('/', [\Marble\Admin\Http\Controllers\ConfigurationController::class, 'index'])->name('index');
+    Route::post('settings', [\Marble\Admin\Http\Controllers\ConfigurationController::class, 'saveSettings'])->name('settings.save');
+    Route::post('languages', [\Marble\Admin\Http\Controllers\ConfigurationController::class, 'saveLanguages'])->name('languages.save');
+    Route::post('languages/add', [\Marble\Admin\Http\Controllers\ConfigurationController::class, 'addLanguage'])->name('languages.add');
+    Route::delete('languages/{language}', [\Marble\Admin\Http\Controllers\ConfigurationController::class, 'deleteLanguage'])->name('languages.delete');
+});
 
 // Redirect Manager
 Route::prefix('redirects')->as('redirect.')->group(function () {

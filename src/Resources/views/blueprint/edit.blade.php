@@ -63,12 +63,17 @@
                         <div class="form-group">
                             <label>Icon</label>
                             <div style="display:flex; align-items:center; gap:10px;">
-                                <select name="icon" class="form-control" onchange="document.getElementById('icon-preview').src='{{ asset('vendor/marble/assets/images/famicons/') }}/' + this.value + '.svg'">
-                                    @foreach($famicons as $icon)
-                                        <option value="{{ $icon }}" {{ $blueprint->icon === $icon ? 'selected' : '' }}>{{ $icon }}</option>
-                                    @endforeach
-                                </select>
-                                <img id="icon-preview" src="{{ asset('vendor/marble/assets/images/famicons/' . ($blueprint->icon ?: 'page') . '.svg') }}" width="24" height="24" alt="">
+                                <div style="position:relative; flex:1">
+                                    <input type="text" id="icon-search" autocomplete="off" class="form-control"
+                                           placeholder="Search icons…"
+                                           value="{{ $blueprint->icon ?: '' }}" />
+                                    <input type="hidden" name="icon" id="icon-value" value="{{ $blueprint->icon ?: '' }}" />
+                                    <ul id="icon-suggestions" style="display:none; position:absolute; z-index:9999; background:#fff; border:1px solid #c0c0c0; border-radius:3px; margin:0; padding:0; list-style:none; width:100%; max-height:220px; overflow-y:auto; box-shadow:0 3px 8px rgba(0,0,0,.15)"></ul>
+                                </div>
+                                <img id="icon-preview"
+                                     src="{{ asset('vendor/marble/assets/images/famicons/' . ($blueprint->icon ?: 'page') . '.svg') }}"
+                                     width="28" height="28" alt=""
+                                     style="flex-shrink:0; opacity:{{ $blueprint->icon ? '1' : '0.3' }}">
                             </div>
                         </div>
                     </div>
@@ -77,7 +82,7 @@
                     <label>{{ trans('marble::admin.inherits_from') }}</label>
                     <select name="parent_blueprint_id" class="form-control">
                         <option value="">— {{ trans('marble::admin.none') }} —</option>
-                        @foreach($allBlueprints as $bp)
+                        @foreach($allBlueprints->flatten(1) as $bp)
                             @if($bp->id !== $blueprint->id)
                                 <option value="{{ $bp->id }}" {{ $blueprint->parent_blueprint_id == $bp->id ? 'selected' : '' }}>{{ $bp->name }}</option>
                             @endif
@@ -159,16 +164,41 @@
             </div>
         </div>
 
+        {{-- Workflow --}}
+        <div class="main-box">
+            <header class="main-box-header clearfix">
+                <h2>{{ trans('marble::admin.workflow') }}</h2>
+            </header>
+            <div class="main-box-body clearfix">
+                <div class="form-group">
+                    <label>{{ trans('marble::admin.workflow') }}</label>
+                    <select name="workflow_id" class="form-control">
+                        <option value="">— {{ trans('marble::admin.none') }} —</option>
+                        @foreach($workflows as $wf)
+                            <option value="{{ $wf->id }}" {{ $blueprint->workflow_id == $wf->id ? 'selected' : '' }}>{{ $wf->name }}</option>
+                        @endforeach
+                    </select>
+                    <small class="text-muted">{{ trans('marble::admin.workflow_hint') }}</small>
+                </div>
+            </div>
+        </div>
+
         {{-- Allowed Children --}}
         <div class="main-box">
             <header class="main-box-header clearfix">
                 <h2>Allowed Child Blueprints</h2>
             </header>
             <div class="main-box-body clearfix">
-                <select multiple name="allowed_child_blueprints[]" class="form-control" size="8">
+                <select multiple name="allowed_child_blueprints[]" class="form-control" size="10">
                     <option value="all" {{ $blueprint->allowsAllChildren() ? 'selected' : '' }}>— All —</option>
-                    @foreach($allBlueprints as $bp)
-                        <option value="{{ $bp->id }}" {{ $blueprint->allowedChildBlueprints->contains($bp->id) ? 'selected' : '' }}>{{ $bp->name }}</option>
+                    @foreach($allBlueprints as $groupName => $bps)
+                        <optgroup label="{{ $groupName }}">
+                            @foreach($bps as $bp)
+                                @if($bp->id !== $blueprint->id)
+                                    <option value="{{ $bp->id }}" {{ $blueprint->allowedChildBlueprints->contains($bp->id) ? 'selected' : '' }}>{{ $bp->name }}</option>
+                                @endif
+                            @endforeach
+                        </optgroup>
                     @endforeach
                 </select>
                 <small class="text-muted">Hold Ctrl/Cmd to select multiple.</small>
@@ -203,7 +233,7 @@
                         <label>{{ trans('marble::admin.form_success_redirect') }}</label>
                         <select name="form_success_item_id" class="form-control">
                             <option value="">— {{ trans('marble::admin.none') }} —</option>
-                            @foreach($allBlueprints as $bp)
+                            @foreach($allBlueprints->flatten(1) as $bp)
                                 @foreach($bp->items()->where('status','published')->get() as $successItem)
                                     <option value="{{ $successItem->id }}" {{ $blueprint->form_success_item_id == $successItem->id ? 'selected' : '' }}>
                                         {{ $bp->name }}: {{ $successItem->name() }}
@@ -217,8 +247,7 @@
             </div>
         </div>
 
-        <div class="form-group">
-            <a class="btn btn-danger" href="{{ url("{$prefix}/blueprint/all") }}">@include('marble::components.famicon', ['name' => 'cancel']) {{ trans('marble::admin.cancel') }}</a>
+        <div class="form-group pull-right">
             <button type="submit" class="btn btn-success">@include('marble::components.famicon', ['name' => 'disk']) {{ trans('marble::admin.save') }}</button>
         </div>
     </form>
@@ -227,5 +256,80 @@
         document.getElementById('is_form_checkbox').addEventListener('change', function(){
             document.getElementById('form-builder-options').style.display = this.checked ? '' : 'none';
         });
+
+        // Icon search/autocomplete
+        (function() {
+            var icons    = @json($famicons);
+            var baseUrl  = '{{ asset('vendor/marble/assets/images/famicons/') }}/';
+            var $input   = $('#icon-search');
+            var $hidden  = $('#icon-value');
+            var $preview = $('#icon-preview');
+            var $list    = $('#icon-suggestions');
+
+            function showSuggestions(query) {
+                var q = query.toLowerCase().replace(/\s+/g, '_');
+                var matches = q.length === 0
+                    ? icons.slice(0, 40)
+                    : icons.filter(function(i) { return i.indexOf(q) !== -1; }).slice(0, 40);
+
+                $list.empty();
+                if (matches.length === 0) { $list.hide(); return; }
+
+                matches.forEach(function(icon) {
+                    var $li = $('<li>').css({
+                        display: 'flex', alignItems: 'center', gap: '8px',
+                        padding: '5px 10px', cursor: 'pointer', fontSize: '13px'
+                    }).hover(
+                        function() { $(this).css('background', '#e8f0fb'); },
+                        function() { $(this).css('background', ''); }
+                    ).on('mousedown', function(e) {
+                        e.preventDefault();
+                        selectIcon(icon);
+                    });
+                    $li.append($('<img>').attr('src', baseUrl + icon + '.svg').css({ width: 16, height: 16, flexShrink: 0 }));
+                    $li.append($('<span>').text(icon));
+                    $list.append($li);
+                });
+                $list.show();
+            }
+
+            function selectIcon(icon) {
+                $hidden.val(icon);
+                $input.val(icon);
+                $preview.attr('src', baseUrl + icon + '.svg').css('opacity', 1);
+                $list.hide();
+            }
+
+            $input.on('input', function() {
+                showSuggestions($(this).val());
+            }).on('focus', function() {
+                showSuggestions($(this).val());
+            }).on('blur', function() {
+                setTimeout(function() { $list.hide(); }, 150);
+            }).on('keydown', function(e) {
+                var $items = $list.children('li');
+                var $active = $list.children('li.ac-active');
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    var $next = $active.length ? $active.removeClass('ac-active').next() : $items.first();
+                    $next.addClass('ac-active').css('background', '#e8f0fb');
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    var $prev = $active.length ? $active.removeClass('ac-active').prev() : $items.last();
+                    $prev.addClass('ac-active').css('background', '#e8f0fb');
+                } else if (e.key === 'Enter' && $active.length) {
+                    e.preventDefault();
+                    selectIcon($active.find('span').text());
+                } else if (e.key === 'Escape') {
+                    $list.hide();
+                }
+            });
+
+            $(document).on('click', function(e) {
+                if (!$(e.target).closest('#icon-search, #icon-suggestions').length) {
+                    $list.hide();
+                }
+            });
+        })();
     </script>
 @endsection

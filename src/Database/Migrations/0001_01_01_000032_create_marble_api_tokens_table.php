@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('marble_api_tokens', function (Blueprint $table) {
+        Schema::create('api_tokens', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('name');
             $table->string('token', 64)->unique();
@@ -23,6 +23,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('marble_api_tokens');
+        Schema::dropIfExists('api_tokens');
     }
 };

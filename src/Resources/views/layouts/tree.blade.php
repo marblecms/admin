@@ -8,7 +8,7 @@
 
     @foreach($nodes as $node)
         @php $hasChildren = count($node->tree_children) > 0; @endphp
-        <li class="open {{ ($selectedItem ?? null) == $node->id ? 'active' : '' }}">
+        <li class="open {{ ($selectedItem ?? null) == $node->id ? 'active' : '' }}" data-node-id="{{ $node->id }}">
             @if($isModal)
                 <a href="javascript:;" class="{{ $hasChildren ? 'dropdown-toggle' : '' }} object-browser-node" data-node-id="{{ $node->id }}" data-node-name="{{ $node->name() }}">
             @else

@@ -1,75 +1,89 @@
 @extends('marble::layouts.app')
 
-@php $prefix = config('marble.route_prefix', 'admin'); @endphp
-
 @section('sidebar')
 
     {{-- Stats --}}
     <div class="main-box">
         <header class="main-box-header clearfix">
-            <h2>@include('marble::components.famicon', ['name' => 'chart_bar']) Stats</h2>
+            <h2>@include('marble::components.famicon', ['name' => 'chart_bar']) {{ trans('marble::admin.stats') }}</h2>
         </header>
         <div class="main-box-body clearfix">
             <table class="table" style="margin-bottom:0">
                 <tr>
-                    <td class="text-muted">Items total</td>
+                    <td class="text-muted">{{ trans('marble::admin.items_total') }}</td>
                     <td class="text-right"><strong>{{ $stats['items_total'] }}</strong></td>
                 </tr>
                 <tr>
-                    <td class="text-muted">Published</td>
+                    <td class="text-muted">{{ trans('marble::admin.items_published') }}</td>
                     <td class="text-right"><span class="label label-success">{{ $stats['items_published'] }}</span></td>
                 </tr>
                 <tr>
-                    <td class="text-muted">Draft</td>
+                    <td class="text-muted">{{ trans('marble::admin.items_draft') }}</td>
                     <td class="text-right"><span class="label label-default">{{ $stats['items_draft'] }}</span></td>
                 </tr>
                 <tr>
-                    <td class="text-muted">Media files</td>
+                    <td class="text-muted">{{ trans('marble::admin.trash') }}</td>
+                    <td class="text-right">
+                        <a href="{{ route('marble.trash.index') }}" style="color:inherit">
+                            <span class="{{ $stats['trash_count'] > 0 ? 'label label-warning' : '' }}">{{ $stats['trash_count'] }}</span>
+                        </a>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="text-muted">{{ trans('marble::admin.media_files') }}</td>
                     <td class="text-right"><strong>{{ $stats['media_count'] }}</strong></td>
                 </tr>
                 <tr>
-                    <td class="text-muted">Users</td>
+                    <td class="text-muted">{{ trans('marble::admin.users') }}</td>
                     <td class="text-right"><strong>{{ $stats['users_count'] }}</strong></td>
                 </tr>
+                @if($stats['unread_submissions'] > 0)
+                <tr>
+                    <td class="text-muted">{{ trans('marble::admin.unread_submissions') }}</td>
+                    <td class="text-right"><span class="label label-primary">{{ $stats['unread_submissions'] }}</span></td>
+                </tr>
+                @endif
             </table>
         </div>
     </div>
 
     {{-- Upcoming scheduled --}}
-    @if($upcomingItems->isNotEmpty())
     <div class="main-box">
         <header class="main-box-header clearfix">
-            <h2>@include('marble::components.famicon', ['name' => 'clock']) Upcoming</h2>
+            <h2>@include('marble::components.famicon', ['name' => 'clock']) {{ trans('marble::admin.upcoming') }}</h2>
         </header>
         <div class="main-box-body clearfix">
-            <table class="table" style="margin-bottom:0">
-                @foreach($upcomingItems as $upcoming)
-                <tr onclick="window.location='{{ route('marble.item.edit', $upcoming) }}'" style="cursor:pointer">
-                    <td>
-                        {{ $upcoming->name() ?: '—' }}
-                        <br><small class="text-muted">
-                            @if($upcoming->published_at && $upcoming->published_at->isFuture())
-                                Publishes {{ $upcoming->published_at->diffForHumans() }}
-                            @elseif($upcoming->expires_at && $upcoming->expires_at->isFuture())
-                                Expires {{ $upcoming->expires_at->diffForHumans() }}
-                            @endif
-                        </small>
-                    </td>
-                </tr>
-                @endforeach
-            </table>
+            @if($upcomingItems->isEmpty())
+                <p class="text-muted" style="padding:10px 15px;margin:0;font-size:12px">{{ trans('marble::admin.nothing_scheduled') }}</p>
+            @else
+                <table class="table table-hover" style="margin-bottom:0">
+                    @foreach($upcomingItems as $upcoming)
+                    <tr onclick="window.location='{{ route('marble.item.edit', $upcoming) }}'" style="cursor:pointer">
+                        <td>
+                            {{ $upcoming->name() ?: '—' }}
+                            <br><small class="text-muted">
+                                @if($upcoming->published_at && $upcoming->published_at->isFuture())
+                                    {{ trans('marble::admin.publishes') }} {{ $upcoming->published_at->diffForHumans() }}
+                                @elseif($upcoming->expires_at && $upcoming->expires_at->isFuture())
+                                    {{ trans('marble::admin.expires') }} {{ $upcoming->expires_at->diffForHumans() }}
+                                @endif
+                            </small>
+                        </td>
+                    </tr>
+                    @endforeach
+                </table>
+            @endif
         </div>
     </div>
-    @endif
 
     {{-- Unread form submissions --}}
     @if($unreadSubmissions->isNotEmpty())
     <div class="main-box">
         <header class="main-box-header clearfix">
-            <h2>@include('marble::components.famicon', ['name' => 'report']) Unread Submissions</h2>
+            <h2>@include('marble::components.famicon', ['name' => 'report']) {{ trans('marble::admin.unread_submissions') }}</h2>
         </header>
         <div class="main-box-body clearfix">
-            <table class="table" style="margin-bottom:0">
+            <table class="table table-hover" style="margin-bottom:0">
                 @foreach($unreadSubmissions as $sub)
                 <tr onclick="window.location='{{ route('marble.form.show', [$sub->item, $sub]) }}'" style="cursor:pointer">
                     <td>
@@ -87,7 +101,7 @@
     {{-- System info --}}
     <div class="main-box">
         <header class="main-box-header clearfix">
-            <h2>@include('marble::components.famicon', ['name' => 'server']) System</h2>
+            <h2>@include('marble::components.famicon', ['name' => 'server']) {{ trans('marble::admin.system') }}</h2>
         </header>
         <div class="main-box-body clearfix">
             <table class="table" style="margin-bottom:0">
@@ -100,7 +114,7 @@
                     <td class="text-right"><code>{{ app()->version() }}</code></td>
                 </tr>
                 <tr>
-                    <td class="text-muted">Environment</td>
+                    <td class="text-muted">{{ trans('marble::admin.environment') }}</td>
                     <td class="text-right"><code>{{ app()->environment() }}</code></td>
                 </tr>
             </table>
@@ -112,42 +126,70 @@
 @section('content')
     <h1>Dashboard</h1>
 
-    {{-- Last Edited Items --}}
+    {{-- Activity Feed --}}
     <div class="main-box">
         <header class="main-box-header clearfix">
-            <h2>{{ trans('marble::admin.last_edited') }}</h2>
+            <h2>
+                @include('marble::components.famicon', ['name' => 'time']) {{ trans('marble::admin.activity_feed') }}
+                <span class="pull-right">
+                    <a href="{{ route('marble.activity-log.index') }}" class="btn btn-xs btn-default">{{ trans('marble::admin.list') }}</a>
+                </span>
+            </h2>
         </header>
         <div class="main-box-body clearfix">
-            @if($recentItems->isEmpty())
-                <p class="text-muted" style="padding:10px 0">{{ trans('marble::admin.no_items') }}</p>
+            @if($recentActivity->isEmpty())
+                <p class="text-muted" style="padding:10px 0">{{ trans('marble::admin.no_activity') }}</p>
             @else
+                @php
+                    $actionMap = [
+                        'item.created'    => 'activity_created',
+                        'item.saved'      => 'activity_saved',
+                        'item.deleted'    => 'activity_deleted',
+                        'item.published'  => 'activity_published',
+                        'item.draft'      => 'activity_draft',
+                        'item.duplicated' => 'activity_duplicated',
+                        'item.moved'      => 'activity_moved',
+                        'item.reverted'   => 'activity_reverted',
+                    ];
+                    $actionIcon = [
+                        'item.created'    => 'add',
+                        'item.saved'      => 'pencil',
+                        'item.deleted'    => 'bin',
+                        'item.published'  => 'tick',
+                        'item.draft'      => 'cross',
+                        'item.duplicated' => 'page_copy',
+                        'item.moved'      => 'arrow_right',
+                        'item.reverted'   => 'arrow_undo',
+                    ];
+                @endphp
                 <table class="table table-hover" style="margin-bottom:0">
                     <tbody>
-                        @foreach($recentItems as $recentItem)
-                            <tr onclick="window.location='{{ route('marble.item.edit', $recentItem) }}'" style="cursor:pointer">
-                                <td style="width:24px;padding-right:0">
-                                    @if($recentItem->blueprint?->icon)
-                                        @include('marble::components.famicon', ['name' => $recentItem->blueprint->icon])
+                        @foreach($recentActivity as $entry)
+                        <tr @if($entry->item) onclick="window.location='{{ route('marble.item.edit', $entry->item_id) }}'" style="cursor:pointer" @endif>
+                            <td style="width:20px;padding-right:0;color:#999">
+                                @include('marble::components.famicon', ['name' => $actionIcon[$entry->action] ?? 'bullet_go'])
+                            </td>
+                            <td>
+                                <strong>{{ $entry->item_name ?: '—' }}</strong>
+                                @if($entry->item?->blueprint)
+                                    <small class="text-muted" style="margin-left:4px">{{ $entry->item->blueprint->name }}</small>
+                                @endif
+                                <br>
+                                <small class="text-muted">
+                                    {{ trans('marble::admin.' . ($actionMap[$entry->action] ?? 'activity_saved')) }}
+                                    @if($entry->user)
+                                        {{ trans('marble::admin.by') }} <strong>{{ $entry->user->name }}</strong>
                                     @endif
-                                </td>
-                                <td>
-                                    {{ $recentItem->name() ?: '—' }}
-                                    <small class="text-muted" style="margin-left:6px">{{ $recentItem->blueprint?->name }}</small>
-                                </td>
-                                <td style="width:80px">
-                                    @if($recentItem->status === 'published')
-                                        <span class="label label-success">{{ trans('marble::admin.published') }}</span>
-                                    @else
-                                        <span class="label label-default">{{ trans('marble::admin.draft') }}</span>
-                                    @endif
-                                </td>
-                                <td class="text-muted" style="width:140px;white-space:nowrap">
-                                    {{ $recentItem->updated_at->diffForHumans() }}
-                                </td>
-                            </tr>
+                                    · {{ $entry->created_at->diffForHumans() }}
+                                </small>
+                            </td>
+                        </tr>
                         @endforeach
                     </tbody>
                 </table>
+                @if($recentActivity->hasPages())
+                    <div style="padding:10px 15px">{{ $recentActivity->links() }}</div>
+                @endif
             @endif
         </div>
     </div>
@@ -161,24 +203,18 @@
                     <h2>
                         {{ trans('marble::admin.classes') }}
                         <span class="pull-right">
-                            <a href="{{ url("{$prefix}/blueprint/add") }}" class="btn btn-xs btn-success" style="margin-right:4px">
-                                {{ trans('marble::admin.create') }}
-                            </a>
-
-                            <a href="{{ url("{$prefix}/blueprint/all") }}" class="btn btn-xs btn-default">
-                                {{ trans('marble::admin.list') }}
-                            </a>
+                            <a href="{{ route('marble.blueprint.index') }}" class="btn btn-xs btn-default">{{ trans('marble::admin.list') }}</a>
                         </span>
                     </h2>
                 </header>
                 <div class="main-box-body clearfix">
                     @if($blueprints->isEmpty())
-                        <p class="text-muted" style="padding:20px 0;text-align:center;margin:0">No blueprints yet.</p>
+                        <p class="text-muted" style="padding:20px 0;text-align:center;margin:0">{{ trans('marble::admin.no_blueprints') }}</p>
                     @else
                     <table class="table table-hover" style="margin-bottom:0">
                         <tbody>
                             @foreach($blueprints as $blueprint)
-                            <tr onclick="window.location='{{ url("{$prefix}/blueprint/edit/{$blueprint->id}") }}'" style="cursor:pointer">
+                            <tr onclick="window.location='{{ route('marble.blueprint.edit', $blueprint) }}'" style="cursor:pointer">
                                 <td style="width:24px;padding-right:0">
                                     @include('marble::components.famicon', ['name' => $blueprint->icon ?: 'brick'])
                                 </td>
@@ -205,15 +241,7 @@
                     <h2>
                         {{ trans('marble::admin.users') }}
                         <span class="pull-right">
-                            <a href="{{ url("{$prefix}/user-group/all") }}" class="btn btn-xs btn-default" style="margin-right:4px">
-                                {{ trans('marble::admin.usergroups') }}
-                            </a>
-                            <a href="{{ url("{$prefix}/user/add") }}" class="btn btn-xs btn-success" style="margin-right:4px">
-                                {{ trans('marble::admin.create') }}
-                            </a>
-                            <a href="{{ url("{$prefix}/user/all") }}" class="btn btn-xs btn-default">
-                                {{ trans('marble::admin.list') }}
-                            </a>
+                            <a href="{{ route('marble.user.index') }}" class="btn btn-xs btn-default">{{ trans('marble::admin.list') }}</a>
                         </span>
                     </h2>
                 </header>
@@ -221,11 +249,13 @@
                     <table class="table table-hover" style="margin-bottom:0">
                         <tbody>
                             @foreach($users as $user)
-                            <tr onclick="window.location='{{ url("{$prefix}/user/edit/{$user->id}") }}'" style="cursor:pointer">
-                                <td>
+                            <tr onclick="window.location='{{ route('marble.user.edit', $user) }}'" style="cursor:pointer">
+                                <td style="width:20px;padding-right:0">
                                     @include('marble::components.famicon', ['name' => 'status_online'])
+                                </td>
+                                <td>
                                     {{ $user->name }}
-                                    <small class="text-muted">{{ $user->email }}</small>
+                                    <small class="text-muted" style="margin-left:4px">{{ $user->email }}</small>
                                 </td>
                             </tr>
                             @endforeach

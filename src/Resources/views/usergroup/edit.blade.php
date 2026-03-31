@@ -44,6 +44,26 @@
                 </div>
 
                 <div class="form-group">
+                    <label>{{ trans('marble::admin.root_node') }}</label>
+                    <small class="text-muted" style="display:block;margin-bottom:4px">{{ trans('marble::admin.root_node_hint') }}</small>
+                    <div style="display:flex;gap:8px;align-items:center">
+                        <input type="hidden" name="entry_item_id" id="group_entry_item_id_input" value="{{ old('entry_item_id', $group->entry_item_id) }}" />
+                        <input type="text" class="form-control" id="group_entry_item_id_display"
+                               value="{{ $group->entryItem?->name() }}"
+                               placeholder="{{ trans('marble::admin.root_node_placeholder') }}"
+                               readonly />
+                        <button type="button" class="btn btn-default btn-sm"
+                                onclick="ObjectBrowser.open(function(item){ document.getElementById('group_entry_item_id_input').value=item.id; document.getElementById('group_entry_item_id_display').value=item.name; })">
+                            {{ trans('marble::admin.select_object') }}
+                        </button>
+                        <button type="button" class="btn btn-default btn-sm"
+                                onclick="document.getElementById('group_entry_item_id_input').value=''; document.getElementById('group_entry_item_id_display').value='';">
+                            {{ trans('marble::admin.remove') }}
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
                     <label>{{ trans('marble::admin.allowed_classes') }}</label>
                     <select multiple name="allowed_blueprints[]" class="form-control" size="10">
                         <option value="all" {{ $group->allowsAllBlueprints() ? 'selected' : '' }}>- All -</option>

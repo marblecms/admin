@@ -26,6 +26,7 @@ class Blueprint extends Model
         'form_success_message',
         'form_success_item_id',
         'api_public',
+        'workflow_id',
     ];
 
     protected $casts = [
@@ -72,6 +73,11 @@ class Blueprint extends Model
         return $this->belongsTo(Item::class, 'form_success_item_id');
     }
 
+    public function workflow(): BelongsTo
+    {
+        return $this->belongsTo(Workflow::class);
+    }
+
     // -------------------------------------------------------------------------
     // Blueprint Inheritance
     // -------------------------------------------------------------------------
@@ -103,10 +109,13 @@ class Blueprint extends Model
             return $own;
         }
 
+        $ownIdentifiers = $own->pluck('identifier')->flip();
+
         $inherited = $parent->fields()->with('fieldGroup', 'fieldType')->get()
+            ->reject(fn ($f) => $ownIdentifiers->has($f->identifier))
             ->each(fn ($f) => $f->setAttribute('_inherited', true));
 
-        return $inherited->merge($own);
+        return $inherited->merge($own)->sortBy('sort_order')->values();
     }
 
     // -------------------------------------------------------------------------
@@ -147,17 +156,30 @@ class Blueprint extends Model
     // -------------------------------------------------------------------------
 
     /**
+     * Get only this blueprint's own fields grouped by field group, sorted.
+     * Used in the blueprint field editor so inherited fields are not shown.
+     */
+    public function ownGroupedFields(): array
+    {
+        $fields = $this->fields()->with('fieldGroup', 'fieldType')->get();
+        return $this->buildGrouped($fields);
+    }
+
+    /**
      * Get all fields (including inherited) grouped by field group, sorted.
      */
     public function groupedFields(): array
     {
-        $fields  = $this->allFields();
+        return $this->buildGrouped($this->allFields());
+    }
+
+    private function buildGrouped(\Illuminate\Support\Collection $fields): array
+    {
         $grouped = [];
 
         foreach ($fields as $field) {
-            $groupKey = $field->blueprint_field_group_id ?? 0;
-            $group    = $field->fieldGroup ?? null;
-            $sortKey  = $group ? $group->sort_order : 9999;
+            $group   = $field->fieldGroup ?? null;
+            $sortKey = $group ? $group->sort_order : 9999;
 
             if (!isset($grouped[$sortKey])) {
                 $grouped[$sortKey] = [

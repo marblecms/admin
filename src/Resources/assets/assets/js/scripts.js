@@ -4,6 +4,25 @@ $(function($) {
             opacity: 1
         });
     }, 200);
+    // Restore tree collapsed state from localStorage
+    var marbleTreeCollapsed = JSON.parse(localStorage.getItem('marble_tree_collapsed') || '[]');
+    var marbleActiveAncestors = {};
+    $('#sidebar-nav .active').each(function() {
+        $(this).parents('li[data-node-id]').each(function() {
+            marbleActiveAncestors[$(this).data('node-id')] = true;
+        });
+    });
+    $('#sidebar-nav li[data-node-id]').each(function() {
+        var $item = $(this);
+        var nodeId = String($item.data('node-id'));
+        if (marbleTreeCollapsed.indexOf(nodeId) !== -1 && !marbleActiveAncestors[nodeId]) {
+            $item.removeClass('open');
+            $item.children('.submenu').hide();
+            var $img = $item.find('> a .tree-expand-icon');
+            if ($img.length) $img.attr('src', $img.data('plus'));
+        }
+    });
+
     $('#sidebar-nav').on('click', '.dropdown-toggle .tree-expand-icon', function(e) {
         e.preventDefault();
         e.stopPropagation();
@@ -18,6 +37,16 @@ $(function($) {
             $item.children('.submenu').slideUp('fast');
             $img.attr('src', $img.data('plus'));
         }
+
+        // Persist collapsed state
+        var nodeId = String($item.data('node-id'));
+        var collapsed = JSON.parse(localStorage.getItem('marble_tree_collapsed') || '[]');
+        if ($item.hasClass('open')) {
+            collapsed = collapsed.filter(function(id) { return id !== nodeId; });
+        } else {
+            if (collapsed.indexOf(nodeId) === -1) collapsed.push(nodeId);
+        }
+        localStorage.setItem('marble_tree_collapsed', JSON.stringify(collapsed));
     });
     $('body').on('mouseenter', '#page-wrapper.nav-small #sidebar-nav .dropdown-toggle', function(e) {
         var $sidebar = $(this).parents('#sidebar-nav');

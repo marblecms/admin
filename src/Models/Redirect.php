@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Redirect extends Model
 {
-    protected $table = 'marble_redirects';
+    protected $table = 'redirects';
 
     protected $fillable = [
         'source_path',

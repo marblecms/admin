@@ -24,6 +24,13 @@ class FormSubmissionController extends Controller
         return view('marble::form.show', compact('item', 'submission'));
     }
 
+    public function markRead(Item $item, FormSubmission $submission)
+    {
+        $submission->update(['read' => true]);
+
+        return redirect()->route('marble.item.edit', $item);
+    }
+
     public function destroy(Item $item, FormSubmission $submission)
     {
         $submission->delete();

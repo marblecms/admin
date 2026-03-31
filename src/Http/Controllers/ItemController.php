@@ -16,6 +16,7 @@ use Marble\Admin\Models\ItemRevision;
 use Marble\Admin\Models\ItemValue;
 use Marble\Admin\Models\FormSubmission;
 use Marble\Admin\Models\Language;
+use Marble\Admin\Models\Redirect;
 use Marble\Admin\Services\ActivityLogService;
 use Marble\Admin\Services\WebhookService;
 
@@ -27,6 +28,7 @@ class ItemController extends Controller
     {
         $this->authorize('update', $item);
         $languages = Language::all();
+        $item->blueprint->load('workflow.steps');
         $groupedFields = $item->blueprint->groupedFields();
 
         $childItems = null;
@@ -64,6 +66,24 @@ class ItemController extends Controller
             'submissions'   => $submissions,
             'breadcrumb'    => \Marble\Admin\Facades\Marble::breadcrumb($item),
             'aliases'       => \Marble\Admin\Models\ItemUrlAlias::where('item_id', $item->id)->with('language')->get(),
+            'inboundRedirects' => (function () use ($item) {
+                $slugPaths = collect(Language::all())
+                    ->map(fn ($l) => $item->slug($l->id))
+                    ->filter()
+                    ->map(fn ($s) => ltrim($s, '/'))
+                    ->unique()
+                    ->values();
+
+                return Redirect::where('active', true)
+                    ->where(function ($q) use ($item, $slugPaths) {
+                        $q->where('target_item_id', $item->id);
+                        foreach ($slugPaths as $path) {
+                            $q->orWhere('target_path', $path)
+                              ->orWhere('target_path', '/' . $path);
+                        }
+                    })
+                    ->get();
+            })(),
         ]);
     }
 
@@ -91,7 +111,7 @@ class ItemController extends Controller
             $this->snapshotRevision($item, $languages);
         }
 
-        foreach ($item->blueprint->fields as $field) {
+        foreach ($item->blueprint->allFields() as $field) {
             if ($field->locked) {
                 continue;
             }
@@ -161,7 +181,7 @@ class ItemController extends Controller
         $item = Item::create([
             'blueprint_id' => $blueprintId,
             'parent_id'    => $parentId,
-            'status'       => 'published',
+            'status'       => 'draft',
         ]);
 
         foreach ($blueprint->fields as $field) {
@@ -261,6 +281,36 @@ class ItemController extends Controller
     {
         $this->authorize('update', $item);
 
+        // Validate: check each alias for conflicts before saving anything
+        $errors = [];
+        foreach ($request->input('aliases', []) as $row) {
+            $alias  = trim($row['alias'] ?? '', '/');
+            $rowId  = !empty($row['id']) ? (int) $row['id'] : null;
+            if (!$alias) continue;
+
+            // Conflict with another item's alias
+            $takenByAlias = \Marble\Admin\Models\ItemUrlAlias::where('alias', $alias)
+                ->where('item_id', '!=', $item->id)
+                ->when($rowId, fn($q) => $q->where('id', '!=', $rowId))
+                ->exists();
+
+            // Conflict with an existing item slug
+            $takenBySlug = \Marble\Admin\Models\ItemValue::whereHas('blueprintField', fn($q) => $q->where('identifier', 'slug'))
+                ->where('value', $alias)
+                ->where('item_id', '!=', $item->id)
+                ->exists();
+
+            if ($takenByAlias || $takenBySlug) {
+                $errors[] = "/{$alias}";
+            }
+        }
+
+        if (!empty($errors)) {
+            return redirect()->route('marble.item.edit', $item)
+                ->withErrors(['aliases' => trans('marble::admin.alias_conflict', ['alias' => implode(', ', $errors)])])
+                ->withInput();
+        }
+
         // Delete removed aliases (those not in the submitted list)
         $keepIds = collect($request->input('aliases', []))->pluck('id')->filter()->values();
         \Marble\Admin\Models\ItemUrlAlias::where('item_id', $item->id)
@@ -312,12 +362,21 @@ class ItemController extends Controller
             'sort_order'   => $item->sort_order,
         ]);
 
+        $slugFieldIds = $item->blueprint->fields()
+            ->where('identifier', 'slug')
+            ->pluck('id')
+            ->flip();
+
         foreach ($item->itemValues()->get() as $iv) {
+            $value = $iv->value;
+            if ($slugFieldIds->has($iv->blueprint_field_id) && $value !== null && $value !== '') {
+                $value = $value . '-copy';
+            }
             ItemValue::create([
                 'item_id'            => $newItem->id,
                 'blueprint_field_id' => $iv->blueprint_field_id,
                 'language_id'        => $iv->language_id,
-                'value'              => $iv->value,
+                'value'              => $value,
             ]);
         }
 
@@ -482,6 +541,7 @@ class ItemController extends Controller
                 'parent_id' => $item->parent_id,
                 'blueprint' => $item->blueprint->name,
                 'icon'      => $item->blueprint->icon,
+                'slug'      => $item->slug(),
             ])->values()
         );
     }

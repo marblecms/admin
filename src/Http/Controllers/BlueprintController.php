@@ -11,6 +11,7 @@ use Marble\Admin\Models\Blueprint;
 use Marble\Admin\Models\BlueprintField;
 use Marble\Admin\Models\BlueprintGroup;
 use Marble\Admin\Models\FieldType;
+use Marble\Admin\Models\Workflow;
 
 class BlueprintController extends Controller
 {
@@ -90,8 +91,9 @@ class BlueprintController extends Controller
         return view('marble::blueprint.edit', [
             'blueprint'       => $blueprint,
             'blueprintGroups' => BlueprintGroup::all(),
-            'allBlueprints'   => Blueprint::all(),
+            'allBlueprints'   => Blueprint::with('group')->orderBy('name')->get()->groupBy(fn($b) => $b->group?->name ?? trans('marble::admin.no_group')),
             'famicons'        => $famicons,
+            'workflows'       => Workflow::orderBy('name')->get(),
         ]);
     }
 
@@ -114,6 +116,7 @@ class BlueprintController extends Controller
         $blueprint->form_success_message  = $request->input('form_success_message') ?: null;
         $blueprint->form_success_item_id  = $request->input('form_success_item_id') ?: null;
         $blueprint->api_public            = $request->input('api_public', 0);
+        $blueprint->workflow_id           = $request->input('workflow_id') ?: null;
         $blueprint->save();
 
         // Sync allowed child blueprints

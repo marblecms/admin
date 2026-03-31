@@ -46,7 +46,10 @@ class UserGroupController extends Controller
             'can_create_groups', 'can_edit_groups', 'can_delete_groups', 'can_list_groups',
         ];
 
-        $data = ['name' => $request->input('name')];
+        $data = [
+            'name'          => $request->input('name'),
+            'entry_item_id' => $request->input('entry_item_id') ?: null,
+        ];
         foreach ($booleanFields as $field) {
             $data[$field] = $request->boolean($field);
         }

@@ -49,11 +49,12 @@
                                         <form method="POST" action="{{ route('marble.trash.restore', $item->id) }}" style="display:inline">
                                             @csrf
                                             <button type="submit" class="btn btn-xs btn-info">
-                                                @include('marble::components.famicon', ['name' => 'resultset_previous']) {{ trans('marble::admin.restore') }}
+                                                @include('marble::components.famicon', ['name' => 'arrow_rotate_cw']) {{ trans('marble::admin.restore') }}
                                             </button>
                                         </form>
                                         <form method="POST" action="{{ route('marble.trash.force-delete', $item->id) }}" style="display:inline" onsubmit="return confirm('{{ trans('marble::admin.are_you_sure') }}')">
                                             @csrf
+                                            @method('DELETE')
                                             <button type="submit" class="btn btn-xs btn-danger">
                                                 @include('marble::components.famicon', ['name' => 'bin']) {{ trans('marble::admin.delete_permanent') }}
                                             </button>

@@ -1,0 +1,64 @@
+@extends('marble::layouts.app')
+
+@php $prefix = config('marble.route_prefix', 'admin'); @endphp
+
+@section('content')
+    <h1>{{ trans('marble::admin.workflows') }}</h1>
+
+    <div class="main-box">
+        <header class="main-box-header clearfix">
+            <h2>{{ trans('marble::admin.workflows') }}</h2>
+            <div class="pull-right" style="padding:10px">
+                <form method="POST" action="{{ url("{$prefix}/workflow/create") }}">
+                    @csrf
+                    <button type="submit" class="btn btn-success btn-sm">
+                        @include('marble::components.famicon', ['name' => 'add'])
+                        {{ trans('marble::admin.add_workflow') }}
+                    </button>
+                </form>
+            </div>
+        </header>
+        <div class="main-box-body clearfix">
+            @if($workflows->isEmpty())
+                <p class="text-muted" style="padding:20px">{{ trans('marble::admin.no_workflows') }}</p>
+            @else
+                <table class="table table-hover" style="margin-bottom:0">
+                    <thead>
+                        <tr>
+                            <th>{{ trans('marble::admin.name') }}</th>
+                            <th>{{ trans('marble::admin.workflow_steps') }}</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($workflows as $workflow)
+                            <tr>
+                                <td>
+                                    <a href="{{ route('marble.workflow.edit', $workflow) }}">{{ $workflow->name }}</a>
+                                </td>
+                                <td>
+                                    @foreach($workflow->steps as $step)
+                                        <span class="label label-default" style="margin-right:3px">{{ $step->name }}</span>
+                                    @endforeach
+                                    <span class="label label-success">{{ trans('marble::admin.published') }}</span>
+                                </td>
+                                <td class="text-right">
+                                    <a href="{{ route('marble.workflow.edit', $workflow) }}" class="btn btn-xs btn-default">
+                                        @include('marble::components.famicon', ['name' => 'pencil']) {{ trans('marble::admin.edit') }}
+                                    </a>
+                                    <form method="POST" action="{{ route('marble.workflow.delete', $workflow) }}" style="display:inline" onsubmit="return confirm('{{ trans('marble::admin.confirm_delete') }}')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-xs btn-danger">
+                                            @include('marble::components.famicon', ['name' => 'bin']) {{ trans('marble::admin.delete') }}
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            @endif
+        </div>
+    </div>
+@endsection

@@ -25,7 +25,7 @@ class TreeHelper
         }
 
         // Load ALL descendants in one query using the materialized path
-        $descendants = Item::where('path', 'like', $entryItem->path . '/%')
+        $descendants = Item::where('path', 'like', $entryItem->path . '%')
             ->with('blueprint')
             ->orderBy('sort_order')
             ->get();

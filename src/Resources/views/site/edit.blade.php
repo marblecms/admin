@@ -44,7 +44,22 @@
                             <p class="help-block">{{ trans('marble::admin.root_item_hint') }}</p>
                         </div>
                     </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>{{ trans('marble::admin.settings_item') }}</label>
+                            <select name="settings_item_id" class="form-control">
+                                <option value="">— {{ trans('marble::admin.none') }} —</option>
+                                @foreach($items as $item)
+                                    <option value="{{ $item->id }}" {{ old('settings_item_id', $site?->settings_item_id) == $item->id ? 'selected' : '' }}>
+                                        {{ str_repeat('— ', $item->_depth) }}{{ $item->name() ?: '[' . $item->id . ']' }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <p class="help-block">{{ trans('marble::admin.settings_item_hint') }}</p>
+                        </div>
+                    </div>
                 </div>
+
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
@@ -78,15 +93,10 @@
             </div>
         </div>
 
-        <div class="main-box">
-            <div class="main-box-body clearfix">
-                <a href="{{ route('marble.site.index') }}" class="btn btn-danger">
-                    @include('marble::components.famicon', ['name' => 'cancel']) {{ trans('marble::admin.cancel') }}
-                </a>
-                <button type="submit" class="btn btn-success">
-                    @include('marble::components.famicon', ['name' => 'disk']) {{ trans('marble::admin.save') }}
-                </button>
-            </div>
+        <div class="clearfix">
+            <button type="submit" class="btn btn-success pull-right">
+                @include('marble::components.famicon', ['name' => 'disk']) {{ trans('marble::admin.save') }}
+            </button>
         </div>
     </form>
 @endsection

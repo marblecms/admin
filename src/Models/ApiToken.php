@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ApiToken extends Model
 {
-    protected $table = 'marble_api_tokens';
+    protected $table = 'api_tokens';
 
     protected $fillable = [
         'name',

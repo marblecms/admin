@@ -2,6 +2,36 @@
 
 @section('javascript-head')
     <script type="text/javascript" src="{{ asset('vendor/marble/assets/js/attributes/attributes.js') }}"></script>
+    <style>
+        #marble-autosave-toast {
+            display: none;
+            position: fixed;
+            top: 70px;
+            right: 24px;
+            padding: 10px 18px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            z-index: 99999;
+            box-shadow: 0 4px 12px rgba(0,0,0,.2);
+            color: #fff;
+        }
+        #marble-autosave-toast.toast-success { background: #27ae60; }
+        #marble-autosave-toast.toast-error   { background: #c0392b; }
+        #marble-autosave-toast.toast-saving  { background: #7f8c8d; }
+
+        .marble-spinner {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid rgba(255,255,255,.4);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: marble-spin .6s linear infinite;
+            vertical-align: middle;
+        }
+        @keyframes marble-spin { to { transform: rotate(360deg); } }
+    </style>
 @endsection
 
 @section('javascript')
@@ -82,19 +112,28 @@
         var autosaveDelay = {{ config('marble.autosave_interval', 30) * 1000 }};
         var autosaveTimer = null;
 
+        function marbleShowToast(msg, type) {
+            var $toast = $('#marble-autosave-toast');
+            $toast.removeClass('toast-success toast-error').addClass(type === 'error' ? 'toast-error' : 'toast-success');
+            $toast.text(msg).stop(true).fadeIn(200);
+            if (type !== 'error') {
+                setTimeout(function() { $toast.fadeOut(400); }, 2000);
+            }
+        }
+
         function marbleAutosave() {
             var $form = $('#marble-edit-form');
-            $('#autosave-indicator').text('Saving…').show();
+            marbleShowToast('Saving…', 'saving');
             $.ajax({
                 url: $form.attr('action'),
                 method: 'POST',
                 data: $form.serialize(),
                 success: function() {
                     formDirty = false;
-                    $('#autosave-indicator').text('Saved').fadeOut(2000);
+                    marbleShowToast('Autosaved ✓', 'success');
                 },
                 error: function() {
-                    $('#autosave-indicator').text('Autosave failed').show();
+                    marbleShowToast('Autosave failed', 'error');
                 }
             });
         }
@@ -105,7 +144,27 @@
                 autosaveTimer = setTimeout(marbleAutosave, autosaveDelay);
             });
         });
+
+        // Also trigger autosave on CKEditor content changes
+        if (typeof CKEDITOR !== 'undefined') {
+            CKEDITOR.on('instanceCreated', function(e) {
+                e.editor.on('change', function() {
+                    clearTimeout(autosaveTimer);
+                    autosaveTimer = setTimeout(marbleAutosave, autosaveDelay);
+                });
+            });
+        }
         @endif
+
+        // Save button spinner
+        $(function() {
+            $('form').on('submit', function() {
+                var $btn = $(this).find('.marble-save-btn');
+                if ($btn.length) {
+                    $btn.prop('disabled', true).html('<span class="marble-spinner"></span> {{ trans('marble::admin.saving') }}');
+                }
+            });
+        });
     </script>
 @endsection
 
@@ -117,6 +176,9 @@
     @endif
     @if($errors->has('delete'))
         <div class="alert alert-danger" style="margin-bottom:10px">{{ $errors->first('delete') }}</div>
+    @endif
+    @if($errors->has('aliases'))
+        <div class="alert alert-danger" style="margin-bottom:10px">{{ $errors->first('aliases') }}</div>
     @endif
 
     {{-- Lock warning --}}
@@ -151,7 +213,7 @@
                         <span>
                             @if($item->status === 'published')
                                 @include('marble::components.famicon', ['name' => 'tick'])
-                                <span style="color:#5cb85c;font-weight:bold">{{ trans('marble::admin.published') }}</span>
+                                {{ trans('marble::admin.published') }}
                             @else
                                 @include('marble::components.famicon', ['name' => 'pencil'])
                                 <span style="color:#999;font-weight:bold">{{ trans('marble::admin.draft') }}</span>
@@ -169,13 +231,17 @@
                     @if($item->blueprint->show_in_tree)
                         <li class="menu-item-action">
                             <span>
-                                @include('marble::components.famicon', ['name' => 'application_side_tree'])
-                                {{ trans('marble::admin.show_in_nav') }}
+                                @include('marble::components.famicon', ['name' => $item->show_in_nav ? 'application_side_tree' : 'application_side_tree'])
+                                @if($item->show_in_nav)
+                                    {{ trans('marble::admin.show_in_navigation') }}
+                                @else
+                                    <span style="color:#999;font-weight:bold">{{ trans('marble::admin.hidden_in_navigation') }}</span>
+                                @endif
                             </span>
                             <form method="POST" action="{{ route('marble.item.toggle-nav', $item) }}" style="display:inline">
                                 @csrf
-                                <button type="submit" class="btn btn-xs {{ $item->show_in_nav ? 'btn-success' : 'btn-default' }}">
-                                    {{ $item->show_in_nav ? trans('marble::admin.yes') : trans('marble::admin.no') }}
+                                <button type="submit" class="btn btn-xs btn-info">
+                                    {{ $item->show_in_nav ? trans('marble::admin.hide_in_nav') : trans('marble::admin.show_in_nav') }}
                                 </button>
                             </form>
                         </li>
@@ -232,6 +298,9 @@
             </div>
         </div>
     </div>
+    
+    {{-- Workflow Timeline --}}
+    @include('marble::item.partials.workflow-timeline')
 
     {{-- URL Aliases --}}
     <div class="main-box clearfix profile-box-menu">
@@ -333,6 +402,49 @@
         </div>
     </div>
 
+
+    {{-- Reachable via --}}
+    @php
+        $frontendUrl = rtrim(config('marble.frontend_url', ''), '/');
+        $reachableRoutes = [];
+
+        foreach ($languages as $lang) {
+            $slug = $item->slug($lang->id);
+            if ($slug) $reachableRoutes[] = ['type' => 'slug', 'lang' => strtoupper($lang->code), 'path' => $slug];
+        }
+
+        foreach ($aliases as $alias) {
+            $reachableRoutes[] = ['type' => 'alias', 'lang' => strtoupper($alias->language->code ?? ''), 'path' => '/' . ltrim($alias->alias, '/')];
+        }
+
+        foreach ($inboundRedirects as $redirect) {
+            $reachableRoutes[] = ['type' => 'redirect', 'lang' => null, 'path' => '/' . ltrim($redirect->source_path, '/'), 'code' => $redirect->status_code];
+        }
+    @endphp
+    @if(count($reachableRoutes))
+    <div class="main-box clearfix profile-box-menu">
+        <div class="main-box-body clearfix">
+            <div class="profile-box-header gray-bg clearfix" style="padding:0 15px 15px">
+                <h2>Reachable via</h2>
+            </div>
+            <div class="profile-box-content clearfix" style="padding:8px 15px">
+                @foreach($reachableRoutes as $route)
+                <div style="display:flex;align-items:baseline;gap:6px;padding:4px 0;border-bottom:1px dotted #eee;font-size:12px">
+                    @if($route['type'] === 'slug')
+                        <span style="color:#999;min-width:28px">{{ trans("slug") }} - {{ $route['lang'] }}</span>
+                    @elseif($route['type'] === 'alias')
+                        <span style="color:#999;min-width:28px">{{ trans("alias") }} - {{ $route['lang'] }}</span>
+                    @else
+                        <span style="color:#999;min-width:28px">{{ trans("redirect") }} - {{ $route['code'] }}</span>
+                    @endif
+                    <a href="{{ $frontendUrl . $route['path'] }}" target="_blank" style="word-break:break-all">{{ $route['path'] }}</a>
+                </div>
+                @endforeach
+            </div>
+        </div>
+    </div>
+    @endif
+
     {{-- Used by (Reverse Relations) --}}
     @if($usedBy->isNotEmpty())
         <div class="main-box clearfix profile-box-menu">
@@ -408,7 +520,9 @@
     <h1>
         {{ $item->name() }}
         @if(config('marble.autosave', false))
+            @if(config('marble.autosave', false))
             <small id="autosave-indicator" style="display:none; color:#999; font-weight:normal; margin-left:10px"></small>
+            @endif
         @endif
     </h1>
 
@@ -441,7 +555,7 @@
                 </div>
             </div>
             <div class="form-group pull-right" style="margin-bottom:16px">
-                <button type="submit" class="btn btn-success">@include('marble::components.famicon', ['name' => 'disk']) {{ trans('marble::admin.save') }}</button>
+                <button type="submit" class="btn btn-success marble-save-btn">@include('marble::components.famicon', ['name' => 'disk']) {{ trans('marble::admin.save') }}</button>
             </div>
             <div class="clearfix"></div>
         </form>
@@ -464,16 +578,7 @@
                 <div class="main-box-body clearfix">
                     @foreach($group['fields'] as $field)
                         @continue($field->locked)
-                        @if($field->_inherited ?? false)
-                            <div style="opacity:0.6; pointer-events:none; position:relative">
-                                <span style="position:absolute;top:4px;right:8px;font-size:10px;color:#999;z-index:1">
-                                    @include('marble::components.famicon', ['name' => 'brick']) {{ trans('marble::admin.inherited') }}
-                                </span>
-                                @include('marble::item.edit_field', ['field' => $field, 'item' => $item, 'languages' => $languages])
-                            </div>
-                        @else
-                            @include('marble::item.edit_field', ['field' => $field, 'item' => $item, 'languages' => $languages])
-                        @endif
+                        @include('marble::item.edit_field', ['field' => $field, 'item' => $item, 'languages' => $languages])
                     @endforeach
                 </div>
             </div>
@@ -489,5 +594,9 @@
 
     @if($item->blueprint->list_children && $childItems)
         @include('marble::item.children', ['item' => $item, 'childItems' => $childItems])
+    @endif
+
+    @if(config('marble.autosave', false))
+        <div id="marble-autosave-toast" class="toast-success"></div>
     @endif
 @endsection

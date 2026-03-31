@@ -36,13 +36,16 @@
 
     <header class="navbar" id="header-navbar">
         <div class="container">
-            <a href="{{ url("{$prefix}/item/edit/{$entryItemId}") }}" id="logo" class="navbar-brand">Marble</a>
+            <a href="{{ url("{$prefix}/item/edit/{$entryItemId}") }}" id="logo" class="navbar-brand">
+                <img src="{{ asset('vendor/marble/assets/images/logo.png') }}" style="margin-right: 10px" /> 
+                Marble
+            </a>
             <div class="clearfix">
                 @php
                     $isContent   = request()->routeIs('marble.media.*', 'marble.trash.*', 'marble.redirect.*', 'marble.item.import*', 'marble.package.*');
-                    $isStructure = request()->routeIs('marble.blueprint.*', 'marble.site.*');
+                    $isStructure = request()->routeIs('marble.blueprint.*', 'marble.site.*', 'marble.workflow.*');
                     $isUsers     = request()->routeIs('marble.user.*', 'marble.user-group.*');
-                    $isSystem    = request()->routeIs('marble.activity-log.*', 'marble.webhook.*', 'marble.api-token.*');
+                    $isSystem    = request()->routeIs('marble.activity-log.*', 'marble.webhook.*', 'marble.api-token.*', 'marble.configuration.*');
                     $isDashboard = request()->routeIs('marble.dashboard');
                 @endphp
                 <div class="nav-no-collapse navbar-left pull-left hidden-sm hidden-xs">
@@ -80,6 +83,7 @@
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a href="{{ route('marble.blueprint.index') }}">@include('marble::components.famicon', ['name' => 'brick']) {{ trans('marble::admin.classes') }}</a></li>
+                                <li><a href="{{ route('marble.workflow.index') }}">@include('marble::components.famicon', ['name' => 'chart_bar']) {{ trans('marble::admin.workflows') }}</a></li>
                                 <li><a href="{{ route('marble.site.index') }}">@include('marble::components.famicon', ['name' => 'application_xp']) {{ trans('marble::admin.sites') }}</a></li>
                             </ul>
                         </li>
@@ -105,6 +109,8 @@
                                 <span class="caret"></span>
                             </a>
                             <ul class="dropdown-menu">
+                                <li><a href="{{ route('marble.configuration.index') }}">@include('marble::components.famicon', ['name' => 'wrench']) {{ trans('marble::admin.configuration') }}</a></li>
+                                <li role="separator" class="divider"></li>
                                 <li><a href="{{ route('marble.activity-log.index') }}">@include('marble::components.famicon', ['name' => 'time']) {{ trans('marble::admin.activity_log') }}</a></li>
                                 <li><a href="{{ route('marble.webhook.index') }}">@include('marble::components.famicon', ['name' => 'connect']) {{ trans('marble::admin.webhooks') }}</a></li>
                                 <li><a href="{{ route('marble.api-token.index') }}">@include('marble::components.famicon', ['name' => 'key']) API Tokens</a></li>
@@ -119,6 +125,23 @@
                             <input type="text" class="form-control" id="search-field" placeholder="{{ trans('marble::admin.search_placeholder') }}" />
                             <ul class="list-group"></ul>
                         </li>
+                        {{-- Notification bell --}}
+                        <li class="dropdown" id="notification-bell-li">
+                            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#" id="notification-bell" style="position:relative">
+                                @include('marble::components.famicon', ['name' => 'bell'])
+                                <span id="notification-badge" style="display:none; position:absolute; top:4px; right:4px; background:#d9534f; color:#fff; border-radius:50%; width:16px; height:16px; font-size:10px; line-height:16px; text-align:center; font-weight:bold"></span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-right" id="notification-dropdown" style="min-width:320px; max-height:400px; overflow-y:auto; padding:0; border-radius:3px">
+                                <li style="padding:10px 15px; border-bottom:1px solid #eee; display:flex; align-items:center; justify-content:space-between">
+                                    <strong style="font-size:13px">{{ trans('marble::admin.notifications') }}</strong>
+                                    <a href="#" id="mark-all-read" style="font-size:12px; color:#999">{{ trans('marble::admin.mark_all_read') }}</a>
+                                </li>
+                                <li id="notification-list-empty" style="padding:20px 15px; text-align:center; color:#999; font-size:13px">
+                                    {{ trans('marble::admin.no_notifications') }}
+                                </li>
+                            </ul>
+                        </li>
+
                         {{-- Language switcher --}}
                         @php $adminLanguages = \Marble\Admin\Models\Language::all(); @endphp
                         <li class="dropdown">
@@ -182,7 +205,6 @@
                     @hasSection('content_class')
                     @else
                     <div class="col-lg-3">
-                        <h1>&nbsp;</h1>
                         @yield('sidebar')
                     </div>
                     @endif
@@ -295,6 +317,70 @@
             $('#media-browser-modal').modal('hide');
         });
         $(".datepicker").datepicker();
+
+        // Notification bell polling
+        (function () {
+            var countUrl  = '{{ route('marble.notification.count') }}';
+            var recentUrl = '{{ route('marble.notification.recent') }}';
+            var markAllUrl= '{{ route('marble.notification.mark-all-read') }}';
+            var csrfToken = $('meta[name="csrf-token"]').attr('content');
+
+            function renderNotifications(items) {
+                var $list  = $('#notification-dropdown');
+                var $empty = $('#notification-list-empty');
+                $list.find('.notif-item').remove();
+
+                if (!items.length) {
+                    $empty.show();
+                    return;
+                }
+                $empty.hide();
+
+                items.forEach(function (n) {
+                    var $li = $('<li class="notif-item" style="border-bottom:1px solid #f0f0f0">')
+                        .css('background', n.read ? '' : '#f8fbff');
+                    var inner = '<a href="' + (n.url || '#') + '" style="display:block; padding:10px 15px; white-space:normal">' +
+                        '<div style="display:flex; justify-content:space-between; gap:8px">' +
+                        '<strong style="font-size:13px">' + $('<div>').text(n.title).html() + '</strong>' +
+                        '<small style="color:#aaa; white-space:nowrap">' + n.created_at + '</small>' +
+                        '</div>' +
+                        (n.body ? '<div style="font-size:12px; color:#666; margin-top:2px">' + $('<div>').text(n.body).html() + '</div>' : '') +
+                        '</a>';
+                    $li.html(inner);
+                    $list.append($li);
+                });
+            }
+
+            function pollCount() {
+                $.getJSON(countUrl, function (data) {
+                    var $badge = $('#notification-badge');
+                    if (data.count > 0) {
+                        $badge.text(data.count > 9 ? '9+' : data.count).show();
+                    } else {
+                        $badge.hide();
+                    }
+                });
+            }
+
+            $('#notification-bell').on('click', function () {
+                $.getJSON(recentUrl, function (items) {
+                    renderNotifications(items);
+                });
+            });
+
+            $('#mark-all-read').on('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                $.post(markAllUrl, { _token: csrfToken }, function () {
+                    $('#notification-badge').hide();
+                    $('#notification-dropdown .notif-item').css('background', '');
+                    pollCount();
+                });
+            });
+
+            pollCount();
+            setInterval(pollCount, 30000);
+        })();
 
         CKEDITOR.plugins.addExternal('marblelink', '{{ asset('vendor/marble/assets/ckeditor/plugins/marblelink/') }}/', 'plugin.js');
 

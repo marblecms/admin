@@ -32,7 +32,6 @@ h1 {
     font-size: 20px !important;
     font-weight: bold !important;
     color: #15428B !important;
-    border-bottom: 1px solid #99BBE8 !important;
     padding: 0 0 6px 0 !important;
     margin-bottom: 12px !important;
     margin-top: 8px !important;
@@ -72,6 +71,12 @@ h6 { font-size: 11px !important; font-weight: bold !important; text-shadow: none
     text-shadow: none !important;
     margin: 4px 2px !important;
     box-shadow: 0 1px 0 rgba(255,255,255,0.75) inset !important;
+}
+
+/* caret color — match link color instead of default white */
+#header-navbar .nav > li .caret {
+    border-top-color: #15428B !important;
+    border-bottom-color: #15428B !important;
 }
 
 /* x-btn hover */
@@ -381,14 +386,15 @@ h6 { font-size: 11px !important; font-weight: bold !important; text-shadow: none
 }
 
 /* ============================================================
-   TABLE / GRID — alternating blue rows, blue header
+   TABLE / GRID — alternating blue rows, gray header (ExtJS 3 style)
    ============================================================ */
 .table > thead > tr > th {
-    background: linear-gradient(to bottom, #D8E8F8 0%, #BDD1EC 100%) !important;
-    color: #15428B !important;
+    background: linear-gradient(to bottom, #F5F5F5 0%, #E0E0E0 100%) !important;
+    color: #333333 !important;
     font-weight: bold !important;
     font-size: 12px !important;
-    border-bottom: 2px solid #99BBE8 !important;
+    text-transform: none !important;
+    border-bottom: 2px solid #C0C0C0 !important;
     padding: 5px 8px !important;
     white-space: nowrap;
 }
@@ -593,9 +599,6 @@ label {
     border-radius: 3px 3px 0 0 !important;
     margin-left: 2px !important;
     padding: 4px 10px !important;
-
-    position: relative;
-    bottom: -2px;
 }
 
 .lang-switch.active {
@@ -998,6 +1001,14 @@ label {
 
 }
 
+#header-navbar .dropdown:hover .dropdown-menu {
+    display: block;
+}
+
+.btn-lg{
+    padding: 5px 10px !important;
+}
+
 #image-editor .canvas{
     text-align: center;
 }
@@ -1010,16 +1021,20 @@ label {
     width: 98%;
 }
 
+.table-responsive > table{
+    margin-bottom: 0 !important;
+}
+
 
 #header-nav .form-control{
-    margin-top: 13px !important;
+    margin-top: 14px !important;
     margin-right: 30px !important;
     border: 1px solid #ddd;
     width: 300px
 }
 
 /* Language switcher & logout spacing */
-#header-nav .dropdown { margin-top: 10px !important; }
+#header-nav .dropdown { margin-top: 7px !important; }
 #header-nav .hidden-xxs { margin-top: 10px !important; }
 
 /* User info block */

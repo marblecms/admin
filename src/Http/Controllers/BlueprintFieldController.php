@@ -16,7 +16,7 @@ class BlueprintFieldController extends Controller
         return view('marble::blueprint.fields', [
             'blueprint' => $blueprint,
             'fields' => $blueprint->fields()->with('fieldType', 'fieldGroup')->get(),
-            'groupedFields' => $blueprint->groupedFields(),
+            'groupedFields' => $blueprint->ownGroupedFields(),
             'fieldGroups' => $blueprint->fieldGroups,
             'fieldTypes' => FieldType::all(),
         ]);

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Marble\Admin\MarbleRouter;
 use Marble\Admin\Models\Blueprint;
+use Marble\Admin\Models\MarbleSetting;
 use Marble\Admin\Models\Item;
 use Marble\Admin\Models\User;
 use Marble\Admin\Models\UserGroup;
@@ -36,6 +37,7 @@ class MarbleServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        $this->mergeDbSettings();
         $this->registerFieldTypes();
         $this->registerMigrations();
         $this->registerRouteMacros(); // must be before registerRoutes (auto_routing uses Route::marble())
@@ -49,6 +51,40 @@ class MarbleServiceProvider extends ServiceProvider
         $this->registerComponents();
         $this->app['router']->pushMiddlewareToGroup('web', \Marble\Admin\Http\Middleware\DetectMarbleSite::class);
         $this->app['router']->pushMiddlewareToGroup('web', \Marble\Admin\Http\Middleware\HandleMarbleRedirects::class);
+    }
+
+    protected function mergeDbSettings(): void
+    {
+        try {
+            $map = [
+                'frontend_url'       => 'marble.frontend_url',
+                'primary_locale'     => 'marble.primary_locale',
+                'uri_locale_prefix'  => 'marble.uri_locale_prefix',
+                'autosave'           => 'marble.autosave',
+                'autosave_interval'  => 'marble.autosave_interval',
+                'lock_ttl'           => 'marble.lock_ttl',
+                'cache_ttl'          => 'marble.cache_ttl',
+            ];
+
+            $settings = MarbleSetting::allKeyed();
+
+            foreach ($map as $dbKey => $configKey) {
+                if (array_key_exists($dbKey, $settings)) {
+                    $value = $settings[$dbKey];
+                    // Cast booleans
+                    if (in_array($dbKey, ['uri_locale_prefix', 'autosave'])) {
+                        $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
+                    }
+                    // Cast integers
+                    if (in_array($dbKey, ['autosave_interval', 'lock_ttl', 'cache_ttl'])) {
+                        $value = (int) $value;
+                    }
+                    config([$configKey => $value]);
+                }
+            }
+        } catch (\Exception $e) {
+            // Table may not exist yet during install
+        }
     }
 
     protected function registerFieldTypes(): void
@@ -89,7 +125,7 @@ class MarbleServiceProvider extends ServiceProvider
         $prefix = config('marble.route_prefix', 'admin');
 
         // Admin routes (authenticated)
-        Route::middleware(['web', 'auth:marble', \Marble\Admin\Http\Middleware\SetMarbleGuard::class])
+        Route::middleware(['web', \Marble\Admin\Http\Middleware\MarbleAuthenticate::class, \Marble\Admin\Http\Middleware\SetMarbleGuard::class])
             ->prefix($prefix)
             ->as('marble.')
             ->group(__DIR__ . '/Http/routes.php');
@@ -101,7 +137,7 @@ class MarbleServiceProvider extends ServiceProvider
             ->group(__DIR__ . '/Http/auth_routes.php');
 
         // Field type AJAX routes
-        Route::middleware(['web', 'auth:marble', \Marble\Admin\Http\Middleware\SetMarbleGuard::class])
+        Route::middleware(['web', \Marble\Admin\Http\Middleware\MarbleAuthenticate::class, \Marble\Admin\Http\Middleware\SetMarbleGuard::class])
             ->prefix($prefix . '/api')
             ->as('marble.')
             ->group(function () {

@@ -37,24 +37,6 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="form-group">
-                    <label>{{ trans('marble::admin.root_node') }}</label>
-                    <small class="text-muted" style="display:block;margin-bottom:4px">{{ trans('marble::admin.root_node_hint') }}</small>
-                    @php $rootItem = $user?->rootItem; @endphp
-                    <div style="display:flex;align-items:center;gap:8px">
-                        <input type="hidden" name="root_item_id" id="root_item_id_input" value="{{ old('root_item_id', $user?->root_item_id) }}" />
-                        <input type="text" class="form-control" id="root_item_id_display"
-                               value="{{ $rootItem ? $rootItem->name() : '' }}"
-                               placeholder="{{ trans('marble::admin.root_node_placeholder') }}"
-                               readonly style="cursor:pointer;background:#fff"
-                               onclick="marbleOpenRootItemBrowser()" />
-                        @if($rootItem)
-                            <button type="button" class="btn btn-default btn-sm" onclick="marbleClearRootItem()">
-                                @include('marble::components.famicon', ['name' => 'cancel'])
-                            </button>
-                        @endif
-                    </div>
-                </div>
             </div>
         </div>
 
@@ -64,19 +46,4 @@
         </div>
         <div class="clearfix"></div>
     </form>
-@endsection
-
-@section('javascript')
-<script>
-function marbleOpenRootItemBrowser() {
-    ObjectBrowser.open(function(item) {
-        document.getElementById('root_item_id_input').value = item.id;
-        document.getElementById('root_item_id_display').value = item.name;
-    });
-}
-function marbleClearRootItem() {
-    document.getElementById('root_item_id_input').value = '';
-    document.getElementById('root_item_id_display').value = '';
-}
-</script>
 @endsection

@@ -24,6 +24,7 @@ class Item extends Model
         'show_in_nav',
         'published_at',
         'expires_at',
+        'current_workflow_step_id',
     ];
 
     protected $casts = [
@@ -65,6 +66,48 @@ class Item extends Model
     public function itemLock(): HasOne
     {
         return $this->hasOne(ItemLock::class);
+    }
+
+    public function workflowStep(): BelongsTo
+    {
+        return $this->belongsTo(WorkflowStep::class, 'current_workflow_step_id');
+    }
+
+    public function nextWorkflowStep(): ?WorkflowStep
+    {
+        $workflow = $this->blueprint?->workflow;
+        if (!$workflow) {
+            return null;
+        }
+
+        $steps = $workflow->steps;
+
+        if (!$this->current_workflow_step_id) {
+            return $steps->first();
+        }
+
+        $idx = $steps->search(fn ($s) => $s->id === $this->current_workflow_step_id);
+
+        if ($idx === false) {
+            return null;
+        }
+
+        return $steps->get($idx + 1); // null if already at last step
+    }
+
+    public function isAtFinalWorkflowStep(): bool
+    {
+        $workflow = $this->blueprint?->workflow;
+        if (!$workflow) {
+            return false;
+        }
+
+        $steps = $workflow->steps;
+        if ($steps->isEmpty()) {
+            return false;
+        }
+
+        return $this->current_workflow_step_id === $steps->last()->id;
     }
 
     // -------------------------------------------------------------------------

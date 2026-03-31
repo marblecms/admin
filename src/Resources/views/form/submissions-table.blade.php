@@ -6,7 +6,7 @@
         @if($submissions->isEmpty())
             <p class="text-muted" style="padding:20px 0; text-align:center">{{ trans('marble::admin.no_submissions') }}</p>
         @else
-            <table class="table table-striped table-hover">
+            <table class="table table-striped table-hover" style="margin-bottom: 0">
                 <thead>
                     <tr>
                         <th style="width:140px">{{ trans('marble::admin.submitted_at') }}</th>
@@ -28,6 +28,16 @@
                                 @endforeach
                             </td>
                             <td onclick="event.stopPropagation()">
+                                @if(!$submission->read)
+                                    <form method="POST" action="{{ route('marble.form.mark-read', [$item, $submission]) }}">
+                                        @csrf
+                                        <button type="submit" class="btn btn-xs btn-default">
+                                            @include('marble::components.famicon', ['name' => 'tick']) {{ trans('marble::admin.mark_read') }}
+                                        </button>
+                                    </form>
+                                @endif
+                            </td>
+                            <td onclick="event.stopPropagation()">
                                 <form method="POST" action="{{ route('marble.form.destroy', [$item, $submission]) }}" onsubmit="return confirm('{{ trans('marble::admin.are_you_sure') }}')">
                                     @csrf @method('DELETE')
                                     <button type="submit" class="btn btn-xs btn-danger">
@@ -39,9 +49,11 @@
                     @endforeach
                 </tbody>
             </table>
-            <div style="padding:10px 0">
-                {{ $submissions->links() }}
-            </div>
+            @if( $submissions->hasPages() )
+                <div style="padding:10px 0">
+                    {{ $submissions->links() }}
+                </div>
+            @endif
         @endif
     </div>
 </div>

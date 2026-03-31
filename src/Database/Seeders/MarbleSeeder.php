@@ -44,10 +44,10 @@ class MarbleSeeder extends Seeder
 
         // ── System Blueprints ─────────────────────────────────────────────────
 
-        $systemFolder = Blueprint::firstOrCreate(
-            ['identifier' => 'system_folder'],
+        $rootFolder = Blueprint::firstOrCreate(
+            ['identifier' => 'root_folder'],
             [
-                'name'               => 'System Folder',
+                'name'               => 'Root Folder',
                 'icon'               => 'folder',
                 'blueprint_group_id' => $systemGroup->id,
                 'allow_children'     => true,
@@ -56,38 +56,23 @@ class MarbleSeeder extends Seeder
                 'locked'             => true,
             ]
         );
+        $this->ensureAllowAllChildren($rootFolder->id);
+        $this->ensureNameField($rootFolder, $textfield);
+
+        $systemFolder = Blueprint::firstOrCreate(
+            ['identifier' => 'system_folder'],
+            [
+                'name'               => 'System Folder',
+                'icon'               => 'folder',
+                'blueprint_group_id' => $systemGroup->id,
+                'allow_children'     => true,
+                'list_children'      => true,
+                'show_in_tree'       => true,
+                'locked'             => true,
+            ]
+        );
         $this->ensureAllowAllChildren($systemFolder->id);
         $this->ensureNameField($systemFolder, $textfield);
-
-        $contentFolder = Blueprint::firstOrCreate(
-            ['identifier' => 'system_content_folder'],
-            [
-                'name'               => 'Content Folder',
-                'icon'               => 'folder',
-                'blueprint_group_id' => $systemGroup->id,
-                'allow_children'     => true,
-                'list_children'      => true,
-                'show_in_tree'       => true,
-                'locked'             => true,
-            ]
-        );
-        $this->ensureAllowAllChildren($contentFolder->id);
-        $this->ensureNameField($contentFolder, $textfield);
-
-        $settingsFolder = Blueprint::firstOrCreate(
-            ['identifier' => 'system_settings_folder'],
-            [
-                'name'               => 'Settings Folder',
-                'icon'               => 'folder',
-                'blueprint_group_id' => $systemGroup->id,
-                'allow_children'     => true,
-                'list_children'      => true,
-                'show_in_tree'       => true,
-                'locked'             => true,
-            ]
-        );
-        $this->ensureAllowAllChildren($settingsFolder->id);
-        $this->ensureNameField($settingsFolder, $textfield);
 
         // ── SimplePage Blueprint ──────────────────────────────────────────────
 
@@ -135,7 +120,7 @@ class MarbleSeeder extends Seeder
             ['identifier' => 'contact_form'],
             [
                 'name'               => 'Contact Form',
-                'icon'               => 'page',
+                'icon'               => 'application_form',
                 'blueprint_group_id' => $formGroup->id,
                 'allow_children'     => false,
                 'show_in_tree'       => true,
@@ -152,35 +137,94 @@ class MarbleSeeder extends Seeder
             'identifier' => 'slug', 'name' => 'Slug', 'sort_order' => 0, 'translatable' => true,
         ]);
         $this->ensureBlueprintField($contactForm, $textfield, [
-            'identifier'    => 'form_title',
-            'name'          => 'Form Title',
+            'identifier'    => 'subject',
+            'name'          => 'Subject',
             'sort_order'    => 1,
             'translatable'  => true,
         ]);
         $this->ensureBlueprintField($contactForm, $textblock, [
-            'identifier'    => 'intro_text',
-            'name'          => 'Intro Text',
+            'identifier'    => 'message',
+            'name'          => 'Message',
             'sort_order'    => 2,
             'translatable'  => true,
         ]);
-        $this->ensureBlueprintField($contactForm, $checkbox, [
-            'identifier'    => 'show_phone',
-            'name'          => 'Show phone field',
-            'sort_order'    => 3,
-            'translatable'  => false,
-        ]);
+
+        // ── Site Settings Blueprint ───────────────────────────────────────────
+
+        $siteSettings = Blueprint::firstOrCreate(
+            ['identifier' => 'site_settings'],
+            [
+                'name'               => 'Site Settings',
+                'icon'               => 'cog',
+                'blueprint_group_id' => $systemGroup->id,
+                'allow_children'     => false,
+                'list_children'      => false,
+                'show_in_tree'       => true,
+                'hide_system_fields' => true,
+                'locked'             => false,
+                'versionable'        => false,
+                'schedulable'        => false,
+            ]
+        );
+
+        // Internal name (hidden in UI via hide_system_fields, shown in tree)
+        $this->ensureBlueprintField($siteSettings, $textfield,  ['identifier' => 'name', 'name' => 'Name', 'sort_order' => -1, 'translatable' => false]);
+
+        // Branding
+        $this->ensureBlueprintField($siteSettings, $textfield,  ['identifier' => 'site_name',  'name' => 'Site Name',  'sort_order' => 10, 'translatable' => true]);
+        $this->ensureBlueprintField($siteSettings, $textfield,  ['identifier' => 'tagline',    'name' => 'Tagline',    'sort_order' => 20, 'translatable' => true]);
+        $this->ensureBlueprintField($siteSettings, $fileFt,     ['identifier' => 'logo',       'name' => 'Logo',       'sort_order' => 30, 'translatable' => false]);
+        $this->ensureBlueprintField($siteSettings, $fileFt,     ['identifier' => 'favicon',    'name' => 'Favicon',    'sort_order' => 40, 'translatable' => false]);
+
+        // SEO
+        $this->ensureBlueprintField($siteSettings, $textfield,  ['identifier' => 'meta_title_template', 'name' => 'Meta Title Template', 'sort_order' => 50, 'translatable' => true]);
+        $this->ensureBlueprintField($siteSettings, $textblock,  ['identifier' => 'meta_description',    'name' => 'Meta Description',    'sort_order' => 60, 'translatable' => true]);
+        $this->ensureBlueprintField($siteSettings, $fileFt,     ['identifier' => 'og_image',            'name' => 'OG Image',            'sort_order' => 70, 'translatable' => false]);
+        $this->ensureBlueprintField($siteSettings, $textfield,  ['identifier' => 'robots',              'name' => 'Robots',              'sort_order' => 80, 'translatable' => false]);
+
+        // Contact
+        $this->ensureBlueprintField($siteSettings, $textblock,  ['identifier' => 'address', 'name' => 'Address', 'sort_order' => 100, 'translatable' => false]);
+        $this->ensureBlueprintField($siteSettings, $textfield,  ['identifier' => 'phone',   'name' => 'Phone',   'sort_order' => 110, 'translatable' => false]);
+        $this->ensureBlueprintField($siteSettings, $textfield,  ['identifier' => 'email',   'name' => 'E-Mail',  'sort_order' => 120, 'translatable' => true]);
+
+        // Social Media
+        $this->ensureBlueprintField($siteSettings, $textfield,  ['identifier' => 'instagram_url', 'name' => 'Instagram', 'sort_order' => 140, 'translatable' => false]);
+        $this->ensureBlueprintField($siteSettings, $textfield,  ['identifier' => 'facebook_url',  'name' => 'Facebook',  'sort_order' => 150, 'translatable' => false]);
+        $this->ensureBlueprintField($siteSettings, $textfield,  ['identifier' => 'linkedin_url',  'name' => 'LinkedIn',  'sort_order' => 160, 'translatable' => false]);
+
+        // Footer
+        $this->ensureBlueprintField($siteSettings, $textfield,  ['identifier' => 'copyright', 'name' => 'Copyright', 'sort_order' => 180, 'translatable' => true]);
 
         // ── Root Item Tree ────────────────────────────────────────────────────
 
-        $root = $this->createItem($systemFolder, null, 'published', 0, '/1/', false);
+        $root = $this->createItem($rootFolder, null, 'published', 0, '/1/', false);
         $root->id === 1 ?: null; // always id=1 on fresh install
-        $this->setFieldValues($root, $systemFolder, $textfield, ['name' => ['en' => 'Root']]);
+        $this->setFieldValues($root, $rootFolder, $textfield, ['name' => ['en' => 'Root']]);
 
-        $contentItem = $this->createItem($contentFolder, $root->id, 'published', 0);
-        $this->setFieldValues($contentItem, $contentFolder, $textfield, ['name' => ['en' => 'Content']]);
+        $contentItem = $this->createItem($systemFolder, $root->id, 'published', 0);
+        $this->setFieldValues($contentItem, $systemFolder, $textfield, ['name' => ['en' => 'Content']]);
 
-        $settingsItem = $this->createItem($settingsFolder, $root->id, 'published', 1);
-        $this->setFieldValues($settingsItem, $settingsFolder, $textfield, ['name' => ['en' => 'Settings']]);
+        $settingsItem = $this->createItem($systemFolder, $root->id, 'published', 1);
+        $this->setFieldValues($settingsItem, $systemFolder, $textfield, ['name' => ['en' => 'Settings']]);
+
+        $siteSettingsItem = $this->createItem($siteSettings, $settingsItem->id, 'published', 0, null, false);
+        $this->setFieldValues($siteSettingsItem, $siteSettings, $textfield, [
+            'name'                 => ['en' => 'Site Settings'],
+            'site_name'            => ['en' => 'My Website'],
+            'tagline'              => ['en' => 'Building great things'],
+            'meta_title_template'  => ['en' => '%title% | My Website'],
+            'robots'               => ['en' => 'index, follow'],
+            'phone'                => ['en' => '+1 234 567 890'],
+            'email'                => ['en' => 'hello@mywebsite.com'],
+            'instagram_url'        => ['en' => 'https://instagram.com/mywebsite'],
+            'facebook_url'         => ['en' => 'https://facebook.com/mywebsite'],
+            'linkedin_url'         => ['en' => 'https://linkedin.com/company/mywebsite'],
+            'copyright'            => ['en' => '© 2024 My Website. All rights reserved.'],
+        ]);
+        $this->setFieldValues($siteSettingsItem, $siteSettings, $textblock, [
+            'meta_description' => ['en' => 'We are a passionate team building great software.'],
+            'address'          => ['en' => "123 Main Street\nCity, Country"],
+        ]);
 
         // Startpage — site root, slug is empty, not shown in nav
         $startpage = $this->createItem($simplePage, $contentItem->id, 'published', 0, null, false);
@@ -205,12 +249,34 @@ class MarbleSeeder extends Seeder
         ]);
         $this->setHtmlValue($customers, $simplePage, $htmlblock, 'content', '<p>We work with clients across many industries.</p>');
 
+        // Our Customers — 3 fake customer child pages
+        $customers1 = $this->createItem($simplePage, $customers->id, 'published', 0);
+        $this->setFieldValues($customers1, $simplePage, $textfield, [
+            'name' => ['en' => 'Acme Corp'],
+            'slug' => ['en' => 'acme-corp'],
+        ]);
+        $this->setHtmlValue($customers1, $simplePage, $htmlblock, 'content', '<p>Acme Corp is a global leader in innovative solutions.</p>');
+
+        $customers2 = $this->createItem($simplePage, $customers->id, 'published', 1);
+        $this->setFieldValues($customers2, $simplePage, $textfield, [
+            'name' => ['en' => 'Globex Industries'],
+            'slug' => ['en' => 'globex-industries'],
+        ]);
+        $this->setHtmlValue($customers2, $simplePage, $htmlblock, 'content', '<p>Globex Industries powers manufacturing across 40 countries.</p>');
+
+        $customers3 = $this->createItem($simplePage, $customers->id, 'published', 2);
+        $this->setFieldValues($customers3, $simplePage, $textfield, [
+            'name' => ['en' => 'Initech Solutions'],
+            'slug' => ['en' => 'initech-solutions'],
+        ]);
+        $this->setHtmlValue($customers3, $simplePage, $htmlblock, 'content', '<p>Initech Solutions delivers enterprise software to Fortune 500 companies.</p>');
+
         // Contact
         $contactPage = $this->createItem($contactForm, $startpage->id, 'published', 3);
         $this->setFieldValues($contactPage, $contactForm, $textfield, [
-            'name'       => ['en' => 'Contact'],
-            'slug'       => ['en' => 'contact'],
-            'form_title' => ['en' => 'Get in touch'],
+            'name'    => ['en' => 'Contact'],
+            'slug'    => ['en' => 'contact'],
+            'subject' => ['en' => 'Get in touch'],
         ]);
 
         // ── Default Site ──────────────────────────────────────────────────────
@@ -224,8 +290,11 @@ class MarbleSeeder extends Seeder
                 'active'       => true,
             ]
         );
-        // Ensure root_item_id is always up to date (idempotent re-seed)
-        $defaultSite->update(['root_item_id' => $startpage->id]);
+        // Ensure root_item_id and settings_item_id are always up to date (idempotent re-seed)
+        $defaultSite->update([
+            'root_item_id'     => $startpage->id,
+            'settings_item_id' => $siteSettingsItem->id,
+        ]);
 
         // ── User Group & Admin User ───────────────────────────────────────────
 

@@ -60,10 +60,6 @@
 @section('content')
     <h1>
         {{ trans('marble::admin.revision_diff') }}
-        <small style="font-size:14px;font-weight:normal;color:#999">
-            {{ $revision->created_at->format('d.m.Y H:i') }}
-            @if($revision->user) · {{ $revision->user->name }} @endif
-        </small>
     </h1>
 
     {{-- Breadcrumb --}}
@@ -91,11 +87,11 @@
                     &rarr;
                     <span style="color:#27ae60">{{ trans('marble::admin.diff_after') }}</span>
                     @if($previous)
-                        <small style="font-weight:normal;color:#999;margin-left:10px">
+                        <small style="font-weight:normal;color:#999;margin-left:10px;font-size:12px">
                             {{ trans('marble::admin.diff_compared_to') }} {{ $previous->created_at->format('d.m.Y H:i') }}
                         </small>
                     @else
-                        <small style="font-weight:normal;color:#999;margin-left:10px">
+                        <small style="font-weight:normal;color:#999;margin-left:10px;font-size:12px">
                             {{ trans('marble::admin.diff_first_revision') }}
                         </small>
                     @endif
@@ -143,12 +139,9 @@
             @csrf
             <span class="pull-right">
                 <button type="submit" class="btn btn-success">
-                    @include('marble::components.famicon', ['name' => 'resultset_previous']) {{ trans('marble::admin.restore') }}
+                    @include('marble::components.famicon', ['name' => 'arrow_rotate_cw']) {{ trans('marble::admin.restore') }}
                 </button>
             </span>
-            <a href="{{ route('marble.item.edit', $item) }}" class="btn btn-default">
-                {{ trans('marble::admin.cancel') }}
-            </a>
         </form>
     </div>
 @endsection

@@ -4,6 +4,7 @@ namespace Marble\Admin\Http\Controllers;
 
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
+use Marble\Admin\Models\ActivityLog;
 use Marble\Admin\Models\Blueprint;
 use Marble\Admin\Models\FormSubmission;
 use Marble\Admin\Models\Item;
@@ -16,19 +17,20 @@ class DashboardController extends Controller
     {
         $user = Auth::guard('marble')->user();
 
-        $recentItems = Item::with('blueprint')
-            ->orderByDesc('updated_at')
-            ->limit(15)
-            ->get();
+        $recentActivity = ActivityLog::with('user', 'item.blueprint')
+            ->orderByDesc('created_at')
+            ->paginate(10);
 
         $trashCount = Item::onlyTrashed()->count();
 
         $stats = [
-            'items_total'     => Item::count(),
-            'items_published' => Item::where('status', 'published')->count(),
-            'items_draft'     => Item::where('status', 'draft')->count(),
-            'media_count'     => Media::count(),
-            'users_count'     => User::count(),
+            'items_total'        => Item::count(),
+            'items_published'    => Item::where('status', 'published')->count(),
+            'items_draft'        => Item::where('status', 'draft')->count(),
+            'media_count'        => Media::count(),
+            'users_count'        => User::count(),
+            'trash_count'        => $trashCount,
+            'unread_submissions' => FormSubmission::where('read', false)->count(),
         ];
 
         $upcomingItems = Item::where(function ($q) {
@@ -47,14 +49,14 @@ class DashboardController extends Controller
             ->get();
 
         return view('marble::dashboard.view', [
-            'blueprints'         => Blueprint::all(),
-            'users'              => User::all(),
-            'currentUser'        => $user,
-            'recentItems'        => $recentItems,
-            'trashCount'         => $trashCount,
-            'stats'              => $stats,
-            'upcomingItems'      => $upcomingItems,
-            'unreadSubmissions'  => $unreadSubmissions,
+            'blueprints'        => Blueprint::all(),
+            'users'             => User::all(),
+            'currentUser'       => $user,
+            'recentActivity'    => $recentActivity,
+            'trashCount'        => $trashCount,
+            'stats'             => $stats,
+            'upcomingItems'     => $upcomingItems,
+            'unreadSubmissions' => $unreadSubmissions,
         ]);
     }
 }

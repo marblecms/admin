@@ -56,7 +56,7 @@
         <div class="pull-right">
             <form action="{{ url("{$prefix}/blueprint/{$blueprint->id}/field/add") }}" method="post" style="display:inline">
                 @csrf
-                <button type="submit" class="btn btn-xs btn-success pull-right" style="margin-right:15px">@include('marble::components.famicon', ['name' => 'add']) {{ trans('marble::admin.add_class') }}</button>
+                <button type="submit" class="btn btn-lg btn-success pull-right">@include('marble::components.famicon', ['name' => 'add']) {{ trans('marble::admin.add_class') }}</button>
                 <select name="type" class="form-control pull-right" style="width: auto; margin-right: 30px">
                     @foreach($fieldTypes as $ft)
                         <option value="{{ $ft->id }}">{{ $ft->name }}</option>
@@ -106,8 +106,8 @@
                             <h2><b>{{ $field->name }}</b> &lt; {{ $field->fieldType->name }} &gt;</h2>
                         </header>
                         <div class="main-box-body clearfix">
-                            @if(!in_array($field->identifier, ['name', 'slug']))
-                                <div style="position: absolute; top: 10px; right: 10px">
+                            @if($field->identifier !== 'name')
+                                <div style="position: absolute; top: 4px; right: 4px">
                                     <button type="button" class="btn btn-xs btn-danger"
                                         onclick="marbleDeleteField('{{ url("{$prefix}/blueprint/{$blueprint->id}/field/delete/{$field->id}") }}')">
                                         @include('marble::components.famicon', ['name' => 'bin']) {{ trans('marble::admin.delete') }}
@@ -130,7 +130,7 @@
                                 </div>
                             </div>
 
-                            <div class="row">
+                            <div class="row form-group">
                                 <div class="col-md-3">
                                     <label>
                                         <input type="checkbox" name="translatable[{{ $field->id }}]" value="1" {{ $field->translatable ? 'checked' : '' }} /> Translatable
@@ -142,11 +142,21 @@
                                     </label>
                                 </div>
                             </div>
-                            <div class="row" style="margin-top:8px">
+                            <div class="row form-group" style="margin-top:8px">
                                 <div class="col-md-6">
                                     <div class="form-group" style="margin-bottom:4px">
                                         <label style="color:#777">{{ trans('marble::admin.validation_rules') }}</label>
-                                        <input type="text" name="validation_rules[{{ $field->id }}]" value="{{ $field->validation_rules ?? '' }}" class="form-control input-sm" placeholder="e.g. required|max:255" />
+                                        <div class="input-group input-group-sm">
+                                            <input type="text" name="validation_rules[{{ $field->id }}]" id="vr-input-{{ $field->id }}" value="{{ $field->validation_rules ?? '' }}" class="form-control" placeholder="e.g. required|max:255" />
+                                            <div class="input-group-btn">
+                                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" style="height:30px">+ <span class="caret"></span></button>
+                                                <ul class="dropdown-menu dropdown-menu-right" style="font-size:14px;min-width:140px">
+                                                    @foreach(['required','nullable','string','integer','numeric','email','url','min:1','max:255','unique:items'] as $rule)
+                                                        <li><a href="#" onclick="event.preventDefault();(function(r,id){var inp=document.getElementById('vr-input-'+id);inp.value=inp.value?(inp.value+'|'+r):r;}('{{ $rule }}','{{ $field->id }}'))">{{ $rule }}</a></li>
+                                                    @endforeach
+                                                </ul>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-md-3" style="padding-top:20px">
@@ -183,12 +193,9 @@
             });
         </script>
 
-        <div class="main-box">
-            <div class="main-box-body clearfix">
-                <div class="form-group">
-                    <a class="btn btn-danger" href="{{ url("{$prefix}/dashboard") }}">@include('marble::components.famicon', ['name' => 'cancel']) {{ trans('marble::admin.cancel') }}</a>
-                    <button type="submit" class="btn btn-success">@include('marble::components.famicon', ['name' => 'disk']) {{ trans('marble::admin.save') }}</button>
-                </div>
+        <div class="clearfix">
+            <div class="form-group pull-right">
+                <button type="submit" class="btn btn-success">@include('marble::components.famicon', ['name' => 'disk']) {{ trans('marble::admin.save') }}</button>
             </div>
         </div>
     </form>

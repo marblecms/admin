@@ -9,13 +9,18 @@ class Site extends Model
 {
     protected $table = 'sites';
 
-    protected $fillable = ['name', 'domain', 'root_item_id', 'default_language_id', 'active', 'is_default'];
+    protected $fillable = ['name', 'domain', 'root_item_id', 'settings_item_id', 'default_language_id', 'active', 'is_default'];
 
     protected $casts = ['active' => 'boolean', 'is_default' => 'boolean'];
 
     public function rootItem(): BelongsTo
     {
         return $this->belongsTo(Item::class, 'root_item_id');
+    }
+
+    public function settingsItem(): BelongsTo
+    {
+        return $this->belongsTo(Item::class, 'settings_item_id');
     }
 
     public function defaultLanguage(): BelongsTo

@@ -144,6 +144,24 @@ class MarbleManager
     }
 
     /**
+     * Returns the settings item for the current site.
+     * Falls back to the default site's settings item if the current site has none.
+     * e.g. Marble::settings()->value('site_name')
+     */
+    public function settings(): ?Item
+    {
+        $site = Site::current();
+
+        if ($site?->settings_item_id) {
+            return $site->settingsItem;
+        }
+
+        // Fallback: default site
+        $default = Site::where('is_default', true)->with('settingsItem')->first();
+        return $default?->settingsItem;
+    }
+
+    /**
      * Start a fluent item query for a given blueprint identifier.
      * e.g. Marble::items('news')->published()->paginate(10)
      */

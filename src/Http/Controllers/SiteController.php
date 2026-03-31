@@ -50,6 +50,7 @@ class SiteController extends Controller
             'name'                => 'required|string|max:255',
             'domain'              => 'nullable|string|max:255',
             'root_item_id'        => 'nullable|exists:items,id',
+            'settings_item_id'    => 'nullable|exists:items,id',
             'default_language_id' => 'nullable|exists:languages,id',
             'active'              => 'nullable|boolean',
             'is_default'          => 'nullable|boolean',

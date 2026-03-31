@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static int primaryLanguageId()
  *
  * @method static \Marble\Admin\Models\Site|null currentSite()
+ * @method static \Marble\Admin\Models\Item|null settings()
  *
  * @method static \Marble\Admin\Models\Item|null item(int $id)
  * @method static \Marble\Admin\Models\Item|null resolve(string $path)

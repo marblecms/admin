@@ -27,6 +27,8 @@ class MarblePackageController extends Controller
         'object_relation_list',
         'keyvalue_store',
         'repeater',
+        'file',
+        'files',
     ];
 
     public function exportForm()
