@@ -3,7 +3,9 @@
 namespace Marble\Admin;
 
 use Marble\Admin\Facades\Marble;
+use Marble\Admin\MarbleDebugbarContext;
 use Marble\Admin\Models\Item;
+use Marble\Admin\Models\ItemMountPoint;
 use Marble\Admin\Models\ItemUrlAlias;
 use Marble\Admin\Models\Language;
 use Marble\Admin\Models\Site;
@@ -95,7 +97,37 @@ class MarbleRouter
                 : $absoluteSlug;
 
             if ($compareSlug === $path) {
+                static::populateDebugbarContext($item, $languageId, $site);
                 return $item;
+            }
+        }
+
+        // Try mount-point paths: find items mounted somewhere whose computed
+        // mount-context slug matches the requested path.
+        $mountPoints = ItemMountPoint::with(['item.blueprint', 'mountParent'])->get();
+
+        foreach ($mountPoints as $mount) {
+            $mountedItem = $mount->item;
+            if (!$mountedItem || !$mountedItem->isPublished()) {
+                continue;
+            }
+
+            $mountSlug = $mountedItem->slug($languageId, $mount->mount_parent_id);
+            if (!$mountSlug) {
+                continue;
+            }
+
+            if ($strippedLocalePrefix && str_starts_with($mountSlug, $strippedLocalePrefix)) {
+                $mountSlug = substr($mountSlug, strlen($strippedLocalePrefix)) ?: '/';
+            }
+
+            $compareMountSlug = ($rootSlug && str_starts_with($mountSlug, $rootSlug))
+                ? substr($mountSlug, strlen($rootSlug))
+                : $mountSlug;
+
+            if ($compareMountSlug === $path) {
+                static::populateDebugbarContext($mountedItem, $languageId, $site);
+                return $mountedItem;
             }
         }
 
@@ -106,10 +138,30 @@ class MarbleRouter
             ->first();
 
         if ($alias && $alias->item?->isPublished()) {
+            static::populateDebugbarContext($alias->item, $languageId, $site);
             return $alias->item;
         }
 
         return null;
+    }
+
+    private static function populateDebugbarContext(Item $item, int $languageId, ?Site $site): void
+    {
+        if (!config('marble.debugbar', false)) {
+            return;
+        }
+
+        $item->loadMissing('blueprint');
+        MarbleDebugbarContext::setItem($item);
+
+        $lang = Language::find($languageId);
+        if ($lang) {
+            MarbleDebugbarContext::setLanguage($lang);
+        }
+
+        if ($site) {
+            MarbleDebugbarContext::setSite($site);
+        }
     }
 
     /**

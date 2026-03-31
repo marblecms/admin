@@ -78,6 +78,10 @@
                                     <div class="btn-group">
                                         <a href="{{ url("{$prefix}/blueprint/{$blueprint->id}/field/edit") }}" class="btn btn-primary btn-xs">@include('marble::components.famicon', ['name' => 'application_form']) {{ trans('marble::admin.edit_attributes') }}</a>
                                         <a href="{{ url("{$prefix}/blueprint/edit/{$blueprint->id}") }}" class="btn btn-info btn-xs">@include('marble::components.famicon', ['name' => 'pencil']) {{ trans('marble::admin.edit') }}</a>
+                                        <form method="POST" action="{{ route('marble.blueprint.duplicate', $blueprint) }}" style="display:inline">
+                                            @csrf
+                                            <button type="submit" class="btn btn-xs btn-default" title="{{ trans('marble::admin.duplicate') }}">@include('marble::components.famicon', ['name' => 'page_copy'])</button>
+                                        </form>
                                         <form method="POST" action="{{ url("{$prefix}/blueprint/delete/{$blueprint->id}") }}" style="display:inline" onsubmit="return confirm('{{ trans('marble::admin.are_you_sure') }}')">
                                             @csrf
                                             @method('DELETE')

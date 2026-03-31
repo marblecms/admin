@@ -343,6 +343,75 @@
         </div>
     </div>
 
+    {{-- Draft Preview --}}
+    @if($item->status !== 'published')
+    <div class="main-box clearfix profile-box-menu">
+        <div class="main-box-body clearfix">
+            <div class="profile-box-header gray-bg clearfix" style="padding:0 15px 15px">
+                <h2>{{ trans('marble::admin.draft_preview') }}</h2>
+            </div>
+            <div class="profile-box-content clearfix" style="padding:10px 15px">
+                @if(session('preview_url'))
+                    <div style="margin-bottom:8px">
+                        <a href="{{ session('preview_url') }}" target="_blank" class="btn btn-xs btn-success btn-block">
+                            @include('marble::components.famicon', ['name' => 'monitor']) {{ trans('marble::admin.open_preview') }}
+                        </a>
+                        <small class="text-muted" style="display:block;margin-top:4px;word-break:break-all">{{ session('preview_url') }}</small>
+                    </div>
+                @elseif($item->preview_token)
+                    @php $frontendUrl = rtrim(config('marble.frontend_url', ''), '/'); @endphp
+                    <div style="margin-bottom:8px">
+                        <a href="{{ $frontendUrl }}/marble-preview/{{ $item->preview_token }}" target="_blank" class="btn btn-xs btn-success btn-block">
+                            @include('marble::components.famicon', ['name' => 'monitor']) {{ trans('marble::admin.open_preview') }}
+                        </a>
+                    </div>
+                @endif
+                <form method="POST" action="{{ route('marble.item.preview.generate', $item) }}">
+                    @csrf
+                    <button type="submit" class="btn btn-xs btn-default btn-block">
+                        @include('marble::components.famicon', ['name' => 'key']) {{ $item->preview_token ? trans('marble::admin.refresh_preview_token') : trans('marble::admin.generate_preview') }}
+                    </button>
+                </form>
+                <small class="text-muted" style="display:block;margin-top:6px">{{ trans('marble::admin.draft_preview_hint') }}</small>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    {{-- Copy Language --}}
+    @if(count($languages) > 1)
+    <div class="main-box clearfix profile-box-menu">
+        <div class="main-box-body clearfix">
+            <div class="profile-box-header gray-bg clearfix" style="padding:0 15px 15px">
+                <h2>{{ trans('marble::admin.copy_language') }}</h2>
+            </div>
+            <div class="profile-box-content clearfix" style="padding:10px 15px">
+                <form method="POST" action="{{ route('marble.item.copy-language', $item) }}">
+                    @csrf
+                    <div style="display:flex;gap:6px;align-items:center;margin-bottom:8px">
+                        <select name="from_language_id" class="form-control input-sm" style="flex:1">
+                            @foreach($languages as $lang)
+                                <option value="{{ $lang->id }}">{{ strtoupper($lang->code) }}</option>
+                            @endforeach
+                        </select>
+                        <span style="color:#aaa">→</span>
+                        <select name="to_language_id" class="form-control input-sm" style="flex:1">
+                            @foreach($languages as $lang)
+                                <option value="{{ $lang->id }}" {{ $loop->index === 1 ? 'selected' : '' }}>{{ strtoupper($lang->code) }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-xs btn-default btn-block"
+                            onclick="return confirm('{{ trans('marble::admin.copy_language_confirm') }}')">
+                        @include('marble::components.famicon', ['name' => 'page_copy']) {{ trans('marble::admin.copy_language') }}
+                    </button>
+                </form>
+                <small class="text-muted" style="display:block;margin-top:6px">{{ trans('marble::admin.copy_language_hint') }}</small>
+            </div>
+        </div>
+    </div>
+    @endif
+
     {{-- Scheduling --}}
     @if($item->blueprint->schedulable)
     <div class="main-box clearfix profile-box-menu">
@@ -413,6 +482,16 @@
             if ($slug) $reachableRoutes[] = ['type' => 'slug', 'lang' => strtoupper($lang->code), 'path' => $slug];
         }
 
+        // Mount-point paths
+        foreach ($mountPoints as $mount) {
+            foreach ($languages as $lang) {
+                $mountSlug = $item->slug($lang->id, $mount->mount_parent_id);
+                if ($mountSlug) {
+                    $reachableRoutes[] = ['type' => 'mount', 'lang' => strtoupper($lang->code), 'path' => $mountSlug];
+                }
+            }
+        }
+
         foreach ($aliases as $alias) {
             $reachableRoutes[] = ['type' => 'alias', 'lang' => strtoupper($alias->language->code ?? ''), 'path' => '/' . ltrim($alias->alias, '/')];
         }
@@ -425,21 +504,78 @@
     <div class="main-box clearfix profile-box-menu">
         <div class="main-box-body clearfix">
             <div class="profile-box-header gray-bg clearfix" style="padding:0 15px 15px">
-                <h2>Reachable via</h2>
+                <h2>{{ trans('marble::admin.reachable_via') }}</h2>
             </div>
             <div class="profile-box-content clearfix" style="padding:8px 15px">
                 @foreach($reachableRoutes as $route)
                 <div style="display:flex;align-items:baseline;gap:6px;padding:4px 0;border-bottom:1px dotted #eee;font-size:12px">
                     @if($route['type'] === 'slug')
-                        <span style="color:#999;min-width:28px">{{ trans("slug") }} - {{ $route['lang'] }}</span>
+                        <span style="color:#999;min-width:42px">{{ trans('marble::admin.slug') }} {{ $route['lang'] }}</span>
+                    @elseif($route['type'] === 'mount')
+                        <span style="color:#777;min-width:42px">{{ trans('marble::admin.mount') }} {{ $route['lang'] }}</span>
                     @elseif($route['type'] === 'alias')
-                        <span style="color:#999;min-width:28px">{{ trans("alias") }} - {{ $route['lang'] }}</span>
+                        <span style="color:#999;min-width:42px">{{ trans('marble::admin.alias') }} {{ $route['lang'] }}</span>
                     @else
-                        <span style="color:#999;min-width:28px">{{ trans("redirect") }} - {{ $route['code'] }}</span>
+                        <span style="color:#999;min-width:42px">{{ trans('marble::admin.redirect') }} {{ $route['code'] }}</span>
                     @endif
                     <a href="{{ $frontendUrl . $route['path'] }}" target="_blank" style="word-break:break-all">{{ $route['path'] }}</a>
                 </div>
                 @endforeach
+            </div>
+        </div>
+    </div>
+    @endif
+
+    {{-- Mount Points --}}
+    @if($item->blueprint->allow_children || $mountPoints->isNotEmpty())
+    <div class="main-box clearfix profile-box-menu">
+        <div class="main-box-body clearfix">
+            <div class="profile-box-header gray-bg clearfix" style="padding:0 15px 15px">
+                <h2>{{ trans('marble::admin.mount_points') }}</h2>
+            </div>
+            <div class="profile-box-content clearfix" style="padding:8px 15px">
+                @if($mountPoints->isEmpty())
+                    <p class="text-muted" style="font-size:12px;margin:0 0 10px">{{ trans('marble::admin.mount_points_hint') }}</p>
+                @else
+                    @foreach($mountPoints as $mount)
+                        <div style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px dotted #eee;font-size:12px">
+                            <span style="flex:1">
+                                🔗
+                                @if($mount->mountParent)
+                                    <a href="{{ route('marble.item.edit', $mount->mountParent) }}">{{ $mount->mountParent->name() }}</a>
+                                @else
+                                    <span class="text-muted">–</span>
+                                @endif
+                            </span>
+                            <form method="POST" action="{{ route('marble.item.mount.destroy', [$item, $mount]) }}">
+                                @csrf @method('DELETE')
+                                <button type="submit" class="btn btn-xs btn-danger" title="{{ trans('marble::admin.mount_remove') }}">✕</button>
+                            </form>
+                        </div>
+                    @endforeach
+                @endif
+
+                {{-- Add mount point via object browser --}}
+                <div style="margin-top:10px">
+                    <input type="hidden" id="new-mount-parent-id" value="" />
+                    <input type="text" id="new-mount-parent-name" class="form-control input-sm"
+                           placeholder="{{ trans('marble::admin.mount_select_parent') }}"
+                           readonly style="cursor:pointer;background:#fff"
+                           onclick="ObjectBrowser.open(function(node){ document.getElementById('new-mount-parent-id').value=node.id; document.getElementById('new-mount-parent-name').value=node.name; })" />
+                    <form method="POST" action="{{ route('marble.item.mount.store', $item) }}" id="add-mount-form" style="margin-top:6px">
+                        @csrf
+                        <input type="hidden" name="mount_parent_id" id="add-mount-parent-hidden" value="" />
+                        <button type="button" class="btn btn-xs btn-default" onclick="
+                            var id = document.getElementById('new-mount-parent-id').value;
+                            if (!id) return;
+                            document.getElementById('add-mount-parent-hidden').value = id;
+                            document.getElementById('add-mount-form').submit();
+                        ">
+                            @include('marble::components.famicon', ['name' => 'add']) {{ trans('marble::admin.mount_add') }}
+                        </button>
+                    </form>
+                    @error('mount') <small class="text-danger">{{ $message }}</small> @enderror
+                </div>
             </div>
         </div>
     </div>

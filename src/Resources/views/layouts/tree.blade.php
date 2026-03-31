@@ -27,6 +27,9 @@
                     <img src="{{ asset('vendor/marble/assets/images/famicons/' . $node->blueprint->effectiveIcon() . '.svg') }}" width="16" height="16" alt="" style="vertical-align:middle; margin-right:2px;">
                 @endif
                 <span>{{ $node->name() }}</span>
+                @if(!empty($node->_is_mount))
+                    <span title="{{ trans('marble::admin.mount_point') }}" style="opacity:.5; margin-left:3px; font-size:10px">🔗</span>
+                @endif
             </a>
 
             @include('marble::layouts.tree', ['nodes' => $node->tree_children, 'isRoot' => false, 'isModal' => $isModal, 'selectedItem' => $selectedItem ?? null])

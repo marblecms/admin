@@ -140,6 +140,64 @@ class BlueprintController extends Controller
         return redirect()->route('marble.blueprint.edit', $blueprint);
     }
 
+    public function duplicate(Blueprint $blueprint)
+    {
+        $this->authorize('create', Blueprint::class);
+
+        $clone = DB::transaction(function () use ($blueprint) {
+            $blueprint->load('fields.fieldType', 'fieldGroups');
+
+            // Find a unique identifier
+            $baseIdentifier = $blueprint->identifier . '_copy';
+            $identifier     = $baseIdentifier;
+            $i = 2;
+            while (Blueprint::where('identifier', $identifier)->exists()) {
+                $identifier = $baseIdentifier . '_' . $i++;
+            }
+
+            $clone = $blueprint->replicate(['id']);
+            $clone->name       = $blueprint->name . ' (Copy)';
+            $clone->identifier = $identifier;
+            $clone->save();
+
+            // Clone field groups (map old id → new id)
+            $groupIdMap = [];
+            foreach ($blueprint->fieldGroups as $group) {
+                $newGroup = $group->replicate(['id']);
+                $newGroup->blueprint_id = $clone->id;
+                $newGroup->save();
+                $groupIdMap[$group->id] = $newGroup->id;
+            }
+
+            // Clone fields
+            foreach ($blueprint->fields as $field) {
+                $newField = $field->replicate(['id']);
+                $newField->blueprint_id       = $clone->id;
+                $newField->blueprint_field_group_id = isset($groupIdMap[$field->blueprint_field_group_id])
+                    ? $groupIdMap[$field->blueprint_field_group_id]
+                    : null;
+                $newField->save();
+            }
+
+            // Copy allowed children config
+            $children = DB::table('blueprint_allowed_children')
+                ->where('blueprint_id', $blueprint->id)
+                ->get();
+            foreach ($children as $child) {
+                DB::table('blueprint_allowed_children')->insert([
+                    'blueprint_id'       => $clone->id,
+                    'child_blueprint_id' => $child->child_blueprint_id,
+                    'allow_all'          => $child->allow_all,
+                ]);
+            }
+
+            return $clone;
+        });
+
+        return redirect()->route('marble.blueprint.edit', $clone)
+            ->with('success', trans('marble::admin.blueprint_duplicated'));
+    }
+
     public function delete(Blueprint $blueprint)
     {
         $this->authorize('delete', $blueprint);

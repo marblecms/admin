@@ -25,6 +25,7 @@ class Item extends Model
         'published_at',
         'expires_at',
         'current_workflow_step_id',
+        'preview_token',
     ];
 
     protected $casts = [
@@ -71,6 +72,19 @@ class Item extends Model
     public function workflowStep(): BelongsTo
     {
         return $this->belongsTo(WorkflowStep::class, 'current_workflow_step_id');
+    }
+
+    public function mountPoints(): HasMany
+    {
+        return $this->hasMany(ItemMountPoint::class, 'item_id');
+    }
+
+    /**
+     * Items that are mounted under this item (i.e. this item is their mount parent).
+     */
+    public function mountedChildren(): HasMany
+    {
+        return $this->hasMany(ItemMountPoint::class, 'mount_parent_id')->orderBy('sort_order');
     }
 
     public function nextWorkflowStep(): ?WorkflowStep
@@ -286,8 +300,11 @@ class Item extends Model
 
     /**
      * Get the slug for a given language, including parent slugs.
+     *
+     * Pass $mountParentId to compute the slug via a mount-point context
+     * instead of the canonical parent_id chain.
      */
-    public function slug(string|int|null $language = null): ?string
+    public function slug(string|int|null $language = null, ?int $mountParentId = null): ?string
     {
         $languageId = $this->resolveLanguageId($language);
         $slugValue = $this->rawValue('slug', $languageId);
@@ -298,8 +315,11 @@ class Item extends Model
 
         $slug = '/' . $slugValue;
 
-        // Walk up the tree using parent relationship
-        $parent = $this->parent;
+        // Walk up via mount parent (Phase 2) or canonical parent (Phase 1)
+        $parent = $mountParentId !== null
+            ? Item::find($mountParentId)
+            : $this->parent;
+
         while ($parent) {
             $parentSlug = $parent->rawValue('slug', $languageId);
             if ($parentSlug) {
@@ -320,7 +340,7 @@ class Item extends Model
     }
 
     /**
-     * Get all slugs for all languages.
+     * Get canonical slugs for all languages.
      */
     public function slugs(): array
     {
@@ -329,6 +349,49 @@ class Item extends Model
             $slugs[$lang->code] = $this->slug($lang->id);
         }
         return $slugs;
+    }
+
+    /**
+     * Get ALL slugs (canonical + all mount-point paths) for all languages.
+     *
+     * Returns: ['en' => [['path' => '/...', 'type' => 'canonical'|'mount', 'mount_id' => ?int], ...], ...]
+     */
+    public function allSlugs(): array
+    {
+        $mounts = $this->mountPoints()->with('mountParent')->get();
+        $result = [];
+
+        foreach (Language::all() as $lang) {
+            $paths = [];
+
+            $canonical = $this->slug($lang->id);
+            if ($canonical) {
+                $paths[] = ['path' => $canonical, 'type' => 'canonical', 'mount_id' => null];
+            }
+
+            foreach ($mounts as $mount) {
+                $mountSlug = $this->slug($lang->id, $mount->mount_parent_id);
+                if ($mountSlug && $mountSlug !== $canonical) {
+                    $paths[] = ['path' => $mountSlug, 'type' => 'mount', 'mount_id' => $mount->id];
+                }
+            }
+
+            $result[$lang->code] = $paths;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Generate (or return existing) preview token for draft previewing.
+     */
+    public function generatePreviewToken(): string
+    {
+        if (!$this->preview_token) {
+            $this->preview_token = bin2hex(random_bytes(32));
+            $this->saveQuietly();
+        }
+        return $this->preview_token;
     }
 
     /**

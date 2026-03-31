@@ -32,6 +32,13 @@ Route::prefix('item')->as('item.')->group(function () {
     Route::get('export/{item}', [\Marble\Admin\Http\Controllers\ImportExportController::class, 'export'])->name('export');
     Route::get('import', [\Marble\Admin\Http\Controllers\ImportExportController::class, 'importForm'])->name('import-form');
     Route::post('import', [\Marble\Admin\Http\Controllers\ImportExportController::class, 'import'])->name('import');
+    // Mount Points
+    Route::post('mount/{item}', [\Marble\Admin\Http\Controllers\ItemMountController::class, 'store'])->name('mount.store');
+    Route::delete('mount/{item}/{mount}', [\Marble\Admin\Http\Controllers\ItemMountController::class, 'destroy'])->name('mount.destroy');
+    // Draft Preview
+    Route::post('preview/{item}', [\Marble\Admin\Http\Controllers\PreviewController::class, 'generate'])->name('preview.generate');
+    // Copy Language
+    Route::post('copy-language/{item}', [\Marble\Admin\Http\Controllers\ItemLanguageCopyController::class, 'copy'])->name('copy-language');
     // Workflow state
     Route::post('workflow/advance/{item}', [\Marble\Admin\Http\Controllers\ItemWorkflowController::class, 'advance'])->name('workflow.advance');
     Route::post('workflow/retreat/{item}', [\Marble\Admin\Http\Controllers\ItemWorkflowController::class, 'retreat'])->name('workflow.retreat');
@@ -50,6 +57,7 @@ Route::prefix('trash')->as('trash.')->group(function () {
 Route::prefix('blueprint')->as('blueprint.')->group(function () {
     Route::get('all', [\Marble\Admin\Http\Controllers\BlueprintController::class, 'index'])->name('index');
     Route::get('add', [\Marble\Admin\Http\Controllers\BlueprintController::class, 'add'])->name('add');
+    Route::post('duplicate/{blueprint}', [\Marble\Admin\Http\Controllers\BlueprintController::class, 'duplicate'])->name('duplicate');
     Route::get('edit/{blueprint}', [\Marble\Admin\Http\Controllers\BlueprintController::class, 'edit'])->name('edit');
     Route::post('save/{blueprint}', [\Marble\Admin\Http\Controllers\BlueprintController::class, 'save'])->name('save');
     Route::delete('delete/{blueprint}', [\Marble\Admin\Http\Controllers\BlueprintController::class, 'delete'])->name('delete');
@@ -187,6 +195,17 @@ Route::prefix('configuration')->as('configuration.')->group(function () {
     Route::post('languages', [\Marble\Admin\Http\Controllers\ConfigurationController::class, 'saveLanguages'])->name('languages.save');
     Route::post('languages/add', [\Marble\Admin\Http\Controllers\ConfigurationController::class, 'addLanguage'])->name('languages.add');
     Route::delete('languages/{language}', [\Marble\Admin\Http\Controllers\ConfigurationController::class, 'deleteLanguage'])->name('languages.delete');
+});
+
+// Portal Users (admin management)
+Route::prefix('portal-users')->as('portal-user.')->group(function () {
+    Route::get('/', [\Marble\Admin\Http\Controllers\PortalUserController::class, 'index'])->name('index');
+    Route::get('create', [\Marble\Admin\Http\Controllers\PortalUserController::class, 'create'])->name('create');
+    Route::post('store', [\Marble\Admin\Http\Controllers\PortalUserController::class, 'store'])->name('store');
+    Route::get('edit/{portalUser}', [\Marble\Admin\Http\Controllers\PortalUserController::class, 'edit'])->name('edit');
+    Route::post('update/{portalUser}', [\Marble\Admin\Http\Controllers\PortalUserController::class, 'update'])->name('update');
+    Route::delete('delete/{portalUser}', [\Marble\Admin\Http\Controllers\PortalUserController::class, 'delete'])->name('delete');
+    Route::post('toggle/{portalUser}', [\Marble\Admin\Http\Controllers\PortalUserController::class, 'toggle'])->name('toggle');
 });
 
 // Redirect Manager

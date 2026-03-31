@@ -36,13 +36,19 @@ class ItemApiController extends Controller
         $status     = $request->query('status', 'published');
 
         $query = Item::whereHas('blueprint', fn ($q) => $q->where('identifier', $blueprint))
-            ->with('blueprint.fields.fieldType')
+            ->with(['blueprint.fields.fieldType', 'workflowStep'])
             ->orderBy('sort_order');
 
         if ($status === 'published') {
             $query->where('status', 'published');
         } elseif ($status !== 'all') {
             $query->where('status', $status);
+        }
+
+        // Optional parent filter
+        if ($request->has('parent_id')) {
+            $parentId = $request->query('parent_id');
+            $query->where('parent_id', $parentId === 'null' ? null : (int) $parentId);
         }
 
         $paginator = $query->paginate($perPage);
@@ -62,7 +68,7 @@ class ItemApiController extends Controller
 
     public function show(Request $request, int $id): JsonResponse
     {
-        $item = Item::with('blueprint.fields.fieldType')->find($id);
+        $item = Item::with(['blueprint.fields.fieldType', 'workflowStep'])->find($id);
 
         if (!$item) {
             return response()->json(['error' => 'Item not found.'], 404);
@@ -81,6 +87,53 @@ class ItemApiController extends Controller
         $languageId = $this->resolveLanguageId($request->query('language'));
 
         return response()->json($this->serializeItem($item, $languageId));
+    }
+
+    public function children(Request $request, int $id): JsonResponse
+    {
+        $item = Item::with('blueprint')->find($id);
+
+        if (!$item) {
+            return response()->json(['error' => 'Item not found.'], 404);
+        }
+
+        if (!$item->blueprint->api_public) {
+            $token = $request->attributes->get('marble_api_token');
+            if (!$token) {
+                return response()->json(['error' => 'Unauthorized', 'message' => 'Authentication required.'], 401);
+            }
+            if (!$token->hasAbility('read')) {
+                return response()->json(['error' => 'Forbidden', 'message' => 'Token lacks read ability.'], 403);
+            }
+        }
+
+        $languageId = $this->resolveLanguageId($request->query('language'));
+        $status     = $request->query('status', 'published');
+        $perPage    = min((int) ($request->query('per_page', 20)), 100);
+
+        $query = Item::where('parent_id', $item->id)
+            ->with(['blueprint.fields.fieldType', 'workflowStep'])
+            ->orderBy('sort_order');
+
+        if ($status === 'published') {
+            $query->where('status', 'published');
+        } elseif ($status !== 'all') {
+            $query->where('status', $status);
+        }
+
+        $paginator = $query->paginate($perPage);
+
+        $data = $paginator->getCollection()->map(fn (Item $child) => $this->serializeItem($child, $languageId));
+
+        return response()->json([
+            'data' => $data,
+            'meta' => [
+                'current_page' => $paginator->currentPage(),
+                'last_page'    => $paginator->lastPage(),
+                'total'        => $paginator->total(),
+                'per_page'     => $paginator->perPage(),
+            ],
+        ]);
     }
 
     public function resolve(Request $request): JsonResponse
@@ -104,15 +157,15 @@ class ItemApiController extends Controller
         }
 
         $languageId = $this->resolveLanguageId($request->query('language'));
+        $item->loadMissing('workflowStep');
 
         return response()->json($this->serializeItem($item, $languageId));
     }
 
     private function serializeItem(Item $item, int $languageId): array
     {
-        // Ensure blueprint & fields are loaded
         if (!$item->relationLoaded('blueprint')) {
-            $item->load('blueprint.fields.fieldType');
+            $item->load(['blueprint.fields.fieldType', 'workflowStep']);
         }
 
         $fields = [];
@@ -123,29 +176,40 @@ class ItemApiController extends Controller
 
             if ($fieldTypeIdentifier === 'object_relation') {
                 if ($rawValue) {
-                    $related = Item::with('blueprint.fields.fieldType')->find((int) $rawValue);
+                    $related = Item::with(['blueprint.fields.fieldType'])->find((int) $rawValue);
                     $fields[$field->identifier] = $related ? $this->serializeItemShallow($related, $languageId) : null;
                 } else {
                     $fields[$field->identifier] = null;
                 }
             } elseif ($fieldTypeIdentifier === 'object_relation_list') {
                 $ids = is_array($rawValue) ? $rawValue : (json_decode($rawValue ?? '[]', true) ?? []);
-                $relatedItems = Item::with('blueprint.fields.fieldType')->findMany($ids);
+                $relatedItems = Item::with(['blueprint.fields.fieldType'])->findMany($ids);
                 $fields[$field->identifier] = $relatedItems->map(fn (Item $r) => $this->serializeItemShallow($r, $languageId))->values()->all();
             } else {
                 $fields[$field->identifier] = $item->value($field->identifier, $languageId);
             }
         }
 
+        $workflowStep = null;
+        if ($item->current_workflow_step_id && $item->relationLoaded('workflowStep')) {
+            $workflowStep = $item->workflowStep?->name;
+        } elseif ($item->status === 'published') {
+            $workflowStep = 'published';
+        }
+
         return [
-            'id'         => $item->id,
-            'blueprint'  => $item->blueprint->identifier,
-            'status'     => $item->status,
-            'slug'       => $item->slug($languageId),
-            'url'        => MarbleRouter::urlFor($item, $languageId),
-            'created_at' => $item->created_at?->toIso8601String(),
-            'updated_at' => $item->updated_at?->toIso8601String(),
-            'fields'     => $fields,
+            'id'            => $item->id,
+            'name'          => $item->name($languageId),
+            'blueprint'     => $item->blueprint->identifier,
+            'status'        => $item->status,
+            'workflow_step' => $workflowStep,
+            'parent_id'     => $item->parent_id,
+            'slug'          => $item->slug($languageId),
+            'all_slugs'     => $item->allSlugs(),
+            'url'           => MarbleRouter::urlFor($item, $languageId),
+            'created_at'    => $item->created_at?->toIso8601String(),
+            'updated_at'    => $item->updated_at?->toIso8601String(),
+            'fields'        => $fields,
         ];
     }
 
@@ -163,7 +227,6 @@ class ItemApiController extends Controller
         foreach ($item->blueprint->fields as $field) {
             $fieldTypeIdentifier = $field->fieldType?->identifier ?? '';
 
-            // Don't recurse further into relation fields
             if (in_array($fieldTypeIdentifier, ['object_relation', 'object_relation_list'], true)) {
                 $fields[$field->identifier] = null;
             } else {
@@ -173,8 +236,10 @@ class ItemApiController extends Controller
 
         return [
             'id'         => $item->id,
+            'name'       => $item->name($languageId),
             'blueprint'  => $item->blueprint->identifier,
             'status'     => $item->status,
+            'parent_id'  => $item->parent_id,
             'slug'       => $item->slug($languageId),
             'url'        => MarbleRouter::urlFor($item, $languageId),
             'created_at' => $item->created_at?->toIso8601String(),

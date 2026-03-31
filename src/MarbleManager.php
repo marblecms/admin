@@ -349,6 +349,23 @@ class MarbleManager
     // Internal
     // -------------------------------------------------------------------------
 
+    /**
+     * Get the currently authenticated portal user (frontend auth).
+     * Returns null if no portal user is logged in.
+     */
+    public function portalUser(): ?\Marble\Admin\Models\PortalUser
+    {
+        return \Illuminate\Support\Facades\Auth::guard('portal')->user();
+    }
+
+    /**
+     * Check if a portal user is currently authenticated.
+     */
+    public function isPortalAuthenticated(): bool
+    {
+        return \Illuminate\Support\Facades\Auth::guard('portal')->check();
+    }
+
     protected function resolveLanguageId(string|int $language): int
     {
         if (is_int($language)) {

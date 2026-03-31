@@ -66,4 +66,13 @@ class User extends Authenticatable
     {
         return $this->userGroup?->canUseBlueprint($blueprintId) ?? false;
     }
+
+    /**
+     * Check a granular CRUD permission for a specific blueprint.
+     * $action: 'create' | 'read' | 'update' | 'delete'
+     */
+    public function canDoWithBlueprint(int $blueprintId, string $action): bool
+    {
+        return $this->userGroup?->canDoWithBlueprint($blueprintId, $action) ?? false;
+    }
 }

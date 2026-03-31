@@ -65,13 +65,46 @@
 
                 <div class="form-group">
                     <label>{{ trans('marble::admin.allowed_classes') }}</label>
-                    <select multiple name="allowed_blueprints[]" class="form-control" size="10">
-                        <option value="all" {{ $group->allowsAllBlueprints() ? 'selected' : '' }}>- All -</option>
-                        @foreach(\Marble\Admin\Models\Blueprint::all() as $bp)
-                            <option value="{{ $bp->id }}" {{ $group->allowedBlueprints->contains('id', $bp->id) ? 'selected' : '' }}>{{ $bp->name }}</option>
-                        @endforeach
-                    </select>
+                    <label class="perm-checkbox-label" style="margin-bottom:10px;display:block">
+                        <input type="checkbox" name="allow_all_blueprints" value="1" id="allow_all_blueprints_chk"
+                               {{ $group->allowsAllBlueprints() ? 'checked' : '' }}>
+                        {{ trans('marble::admin.allow_all_blueprints') }}
+                    </label>
+                    <div id="blueprint-perms-table" style="{{ $group->allowsAllBlueprints() ? 'display:none' : '' }}">
+                        <table class="table table-bordered table-sm" style="font-size:13px">
+                            <thead>
+                                <tr>
+                                    <th>{{ trans('marble::admin.blueprint') }}</th>
+                                    <th class="text-center">{{ trans('marble::admin.can_create') }}</th>
+                                    <th class="text-center">{{ trans('marble::admin.can_read') }}</th>
+                                    <th class="text-center">{{ trans('marble::admin.can_update') }}</th>
+                                    <th class="text-center">{{ trans('marble::admin.can_delete') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach(\Marble\Admin\Models\Blueprint::orderBy('name')->get() as $bp)
+                                    @php $perm = $blueprintPerms[$bp->id] ?? null; @endphp
+                                    <tr>
+                                        <td>{{ $bp->name }} <small class="text-muted">{{ $bp->identifier }}</small></td>
+                                        @foreach(['can_create', 'can_read', 'can_update', 'can_delete'] as $col)
+                                            <td class="text-center">
+                                                <input type="checkbox"
+                                                       name="blueprint_perms[{{ $bp->id }}][{{ $col }}]"
+                                                       value="1"
+                                                       {{ ($perm && $perm->$col) ? 'checked' : '' }}>
+                                            </td>
+                                        @endforeach
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
+                <script>
+                    document.getElementById('allow_all_blueprints_chk').addEventListener('change', function() {
+                        document.getElementById('blueprint-perms-table').style.display = this.checked ? 'none' : '';
+                    });
+                </script>
             </div>
         </div>
 

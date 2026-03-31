@@ -65,7 +65,7 @@
                 @endphp
                 <form method="POST" class="pull-right" action="{{ url("{$prefix}/item/workflow/advance/{$item->id}") }}">
                     @csrf
-                    <button type="submit" class="btn btn-sm btn-primary btn-block">
+                    <button type="submit" class="btn btn-xs btn-primary btn-block">
                         {{ $btnLabel }} @include('marble::components.famicon', ['name' => 'arrow_right'])
                     </button>
                 </form>
@@ -78,7 +78,7 @@
                 );
             @endphp
             @if($canRetreat)
-                <form method="POST" class="pull-left" action="{{ url("{$prefix}/item/workflow/retreat/{$item->id}") }}" style="margin-top:4px">
+                <form method="POST" class="pull-left" action="{{ url("{$prefix}/item/workflow/retreat/{$item->id}") }}">
                     @csrf
                     <button type="submit" class="btn btn-xs btn-default btn-block">
                         @include('marble::components.famicon', ['name' => 'arrow_left']) {{ trans('marble::admin.workflow_retreat') }}
@@ -88,8 +88,8 @@
 
             {{-- Reject button --}}
             @if($canReject)
-                <div style="clear:both; margin-top:6px">
-                    <button type="button" class="btn btn-xs btn-danger btn-block"
+                <div style="clear:both; padding-top:10px">
+                    <button type="button" class="btn btn-xs btn-block"
                             data-toggle="modal" data-target="#reject-modal-{{ $item->id }}">
                         @include('marble::components.famicon', ['name' => 'cancel'])
                         {{ trans('marble::admin.workflow_reject') }}
@@ -130,7 +130,7 @@
 
             {{-- Transition log --}}
             @if($transitions->isNotEmpty())
-                <div style="clear:both; margin-top:14px; border-top:1px solid #eee; padding-top:10px">
+                <div style="clear:both; margin-top:14px; padding-top:10px">
                     <small style="font-size:11px; text-transform:uppercase; color:#aaa; letter-spacing:.5px">{{ trans('marble::admin.workflow_history') }}</small>
                     @foreach($transitions as $t)
                         <div style="padding:5px 0; border-bottom:1px dotted #f0f0f0; font-size:12px">

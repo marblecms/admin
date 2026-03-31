@@ -110,4 +110,24 @@ return [
     | Fallback:        resources/views/marble-pages/default.blade.php
     */
     'auto_routing' => env('MARBLE_AUTO_ROUTING', false),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Debugbar
+    |--------------------------------------------------------------------------
+    | When enabled, a floating debug panel is injected into every frontend HTML
+    | response — but only when a Marble admin is logged in.
+    | Safe to leave on in production: unauthorized visitors never see it.
+    */
+    'debugbar' => env('MARBLE_DEBUGBAR', false),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Portal Users
+    |--------------------------------------------------------------------------
+    | portal_registration: allow visitors to self-register via /portal/register
+    | portal_home:         redirect target after login / registration
+    */
+    'portal_registration' => env('MARBLE_PORTAL_REGISTRATION', false),
+    'portal_home'         => env('MARBLE_PORTAL_HOME', '/'),
 ];

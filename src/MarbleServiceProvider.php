@@ -33,6 +33,15 @@ class MarbleServiceProvider extends ServiceProvider
         $this->app->singleton('marble', function ($app) {
             return new MarbleManager($app->make(FieldTypeRegistry::class));
         });
+
+        // Register the portal auth guard
+        $this->app['auth']->extend('marble-portal', function ($app, $name, array $config) {
+            return $app['auth']->createSessionDriver($name, $config);
+        });
+
+        $this->app['auth']->provider('marble-portal-provider', function ($app, array $config) {
+            return new \Illuminate\Auth\EloquentUserProvider($app['hash'], $config['model']);
+        });
     }
 
     public function boot(): void
@@ -49,8 +58,10 @@ class MarbleServiceProvider extends ServiceProvider
         $this->registerPolicies();
         $this->registerCommands();
         $this->registerComponents();
+        $this->registerPortalGuard();
         $this->app['router']->pushMiddlewareToGroup('web', \Marble\Admin\Http\Middleware\DetectMarbleSite::class);
         $this->app['router']->pushMiddlewareToGroup('web', \Marble\Admin\Http\Middleware\HandleMarbleRedirects::class);
+        $this->app['router']->pushMiddlewareToGroup('web', \Marble\Admin\Http\Middleware\InjectMarbleDebugbar::class);
     }
 
     protected function mergeDbSettings(): void
@@ -149,6 +160,11 @@ class MarbleServiceProvider extends ServiceProvider
             ->post('/marble-form/{item}', [\Marble\Admin\Http\Controllers\FormController::class, 'submit'])
             ->name('marble.form.submit');
 
+        // Draft preview (public, token-gated)
+        Route::middleware(['web'])
+            ->get('/marble-preview/{token}', [\Marble\Admin\Http\Controllers\PreviewController::class, 'show'])
+            ->name('marble.preview');
+
         // Headless JSON API
         Route::middleware([\Marble\Admin\Http\Middleware\MarbleApiAuth::class])
             ->prefix('api/marble')
@@ -156,6 +172,7 @@ class MarbleServiceProvider extends ServiceProvider
             ->group(function () {
                 Route::get('items/{blueprint}', [\Marble\Admin\Http\Controllers\Api\ItemApiController::class, 'items'])->name('items');
                 Route::get('item/{id}', [\Marble\Admin\Http\Controllers\Api\ItemApiController::class, 'show'])->name('item');
+                Route::get('item/{id}/children', [\Marble\Admin\Http\Controllers\Api\ItemApiController::class, 'children'])->name('item.children');
                 Route::get('resolve', [\Marble\Admin\Http\Controllers\Api\ItemApiController::class, 'resolve'])->name('resolve');
             });
 
@@ -229,6 +246,8 @@ class MarbleServiceProvider extends ServiceProvider
                 \Marble\Admin\Console\SitemapCommand::class,
                 \Marble\Admin\Console\ExportCommand::class,
                 \Marble\Admin\Console\SchedulePublishCommand::class,
+                \Marble\Admin\Console\MakeBlueprintCommand::class,
+                \Marble\Admin\Console\DoctorCommand::class,
             ]);
         }
     }
@@ -280,5 +299,29 @@ class MarbleServiceProvider extends ServiceProvider
         Item::deleted(function (Item $item) {
             $this->app->make('marble')->invalidateItem($item);
         });
+    }
+
+    protected function registerPortalGuard(): void
+    {
+        // Add the portal guard and provider to the auth config at runtime
+        config([
+            'auth.guards.portal' => [
+                'driver'   => 'session',
+                'provider' => 'portal_users',
+            ],
+            'auth.providers.portal_users' => [
+                'driver' => 'eloquent',
+                'model'  => \Marble\Admin\Models\PortalUser::class,
+            ],
+        ]);
+
+        // Portal auth routes (public)
+        Route::middleware(['web'])
+            ->prefix('portal')
+            ->as('marble.portal.')
+            ->group(__DIR__ . '/Http/portal_routes.php');
+
+        // Register middleware alias
+        $this->app['router']->aliasMiddleware('marble.portal.auth', \Marble\Admin\Http\Middleware\RequirePortalAuth::class);
     }
 }

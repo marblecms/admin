@@ -14,21 +14,23 @@ class ItemPolicy
 
     public function view(User $user, Item $item): bool
     {
-        return $user->canUseBlueprint($item->blueprint_id);
+        return $user->canDoWithBlueprint($item->blueprint_id, 'read');
     }
 
     public function create(User $user): bool
     {
+        // Blueprint-specific create check is done at the add/create controller level
+        // using $user->canDoWithBlueprint($blueprintId, 'create')
         return true;
     }
 
     public function update(User $user, Item $item): bool
     {
-        return $user->canUseBlueprint($item->blueprint_id);
+        return $user->canDoWithBlueprint($item->blueprint_id, 'update');
     }
 
     public function delete(User $user, Item $item): bool
     {
-        return $user->canUseBlueprint($item->blueprint_id);
+        return $user->canDoWithBlueprint($item->blueprint_id, 'delete');
     }
 }

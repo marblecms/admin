@@ -66,6 +66,7 @@ class ItemController extends Controller
             'submissions'   => $submissions,
             'breadcrumb'    => \Marble\Admin\Facades\Marble::breadcrumb($item),
             'aliases'       => \Marble\Admin\Models\ItemUrlAlias::where('item_id', $item->id)->with('language')->get(),
+            'mountPoints'   => $item->mountPoints()->with('mountParent.blueprint')->get(),
             'inboundRedirects' => (function () use ($item) {
                 $slugPaths = collect(Language::all())
                     ->map(fn ($l) => $item->slug($l->id))
@@ -111,6 +112,8 @@ class ItemController extends Controller
             $this->snapshotRevision($item, $languages);
         }
 
+        $changedFields = [];
+
         foreach ($item->blueprint->allFields() as $field) {
             if ($field->locked) {
                 continue;
@@ -133,8 +136,15 @@ class ItemController extends Controller
 
                 $oldValue = $itemValue->exists ? $itemValue->raw() : $fieldType->defaultValue();
                 $processed = $fieldType->processInput($oldValue, $newValue, $request, $field->id, $language->id);
+                $serialized = $fieldType->serialize($processed);
 
-                $itemValue->value = $fieldType->serialize($processed);
+                // Track changed fields for webhook payload
+                if ($serialized !== $itemValue->value) {
+                    $key = $field->identifier . ($field->translatable ? '.' . $language->code : '');
+                    $changedFields[$key] = ['old' => $oldValue, 'new' => $serialized];
+                }
+
+                $itemValue->value = $serialized;
                 $itemValue->save();
             }
         }
@@ -145,7 +155,7 @@ class ItemController extends Controller
         $item->touch();
 
         app(ActivityLogService::class)->log('item.saved', $item);
-        app(WebhookService::class)->fire('item.saved', $item);
+        app(WebhookService::class)->fire('item.saved', $item, $changedFields);
 
         return redirect()->route('marble.item.edit', $item);
     }
@@ -160,7 +170,7 @@ class ItemController extends Controller
             ? Blueprint::all()
             : $parentItem->blueprint->allowedChildBlueprints;
 
-        $allowedBlueprints = $allowedBlueprints->filter(fn($bp) => $user->canUseBlueprint($bp->id));
+        $allowedBlueprints = $allowedBlueprints->filter(fn($bp) => $user->canDoWithBlueprint($bp->id, 'create'));
 
         return view('marble::item.add', [
             'parentItem'       => $parentItem,
@@ -171,8 +181,13 @@ class ItemController extends Controller
     public function create(ItemCreateRequest $request)
     {
         $this->authorize('create', Item::class);
-        $parentId   = $request->input('parent_id');
+        $user        = Auth::guard('marble')->user();
+        $parentId    = $request->input('parent_id');
         $blueprintId = $request->input('blueprint_id');
+
+        if (!$user->canDoWithBlueprint((int) $blueprintId, 'create')) {
+            abort(403);
+        }
         $name        = $request->input('name', '');
 
         $blueprint = Blueprint::findOrFail($blueprintId);

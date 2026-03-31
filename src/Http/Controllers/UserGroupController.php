@@ -31,8 +31,17 @@ class UserGroupController extends Controller
     public function edit(UserGroup $group)
     {
         $this->authorize('update', $group);
+
+        // Build a keyed map of blueprintId => pivot row for the view
+        $blueprintPerms = DB::table('user_group_allowed_blueprints')
+            ->where('user_group_id', $group->id)
+            ->whereNotNull('blueprint_id')
+            ->get()
+            ->keyBy('blueprint_id');
+
         return view('marble::usergroup.edit', [
-            'group' => $group,
+            'group'          => $group,
+            'blueprintPerms' => $blueprintPerms,
         ]);
     }
 
@@ -56,23 +65,37 @@ class UserGroupController extends Controller
 
         $group->update($data);
 
-        // Sync allowed blueprints
-        $allowed = $request->input('allowed_blueprints', []);
-
-        // Remove all existing entries (including the allow_all sentinel row)
+        // Sync allowed blueprints with granular CRUD permissions
         DB::table('user_group_allowed_blueprints')
             ->where('user_group_id', $group->id)
             ->delete();
 
-        if (in_array('all', $allowed)) {
+        $allowAll = $request->boolean('allow_all_blueprints');
+
+        if ($allowAll) {
             DB::table('user_group_allowed_blueprints')->insert([
                 'user_group_id' => $group->id,
                 'blueprint_id'  => null,
                 'allow_all'     => true,
+                'can_create'    => true,
+                'can_read'      => true,
+                'can_update'    => true,
+                'can_delete'    => true,
             ]);
         } else {
-            $ids = array_filter($allowed, fn($id) => is_numeric($id));
-            $group->allowedBlueprints()->sync($ids);
+            $blueprintPerms = $request->input('blueprint_perms', []);
+            foreach ($blueprintPerms as $blueprintId => $perms) {
+                if (!is_numeric($blueprintId)) continue;
+                DB::table('user_group_allowed_blueprints')->insert([
+                    'user_group_id' => $group->id,
+                    'blueprint_id'  => (int) $blueprintId,
+                    'allow_all'     => false,
+                    'can_create'    => !empty($perms['can_create']),
+                    'can_read'      => !empty($perms['can_read']),
+                    'can_update'    => !empty($perms['can_update']),
+                    'can_delete'    => !empty($perms['can_delete']),
+                ]);
+            }
         }
 
         return redirect()->route('marble.user-group.edit', $group);

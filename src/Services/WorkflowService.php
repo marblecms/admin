@@ -204,7 +204,7 @@ class WorkflowService
 
             foreach ($toStep->notifiables as $notifiable) {
                 foreach ($notifiable->resolveUsers() as $user) {
-                    if ($user->id === $actor->id || $notified->contains($user->id)) {
+                    if ($notified->contains($user->id)) {
                         continue;
                     }
                     $notified->push($user->id);
@@ -216,7 +216,9 @@ class WorkflowService
                 }
             }
 
-            if ($notified->isNotEmpty()) {
+            // If notifiables are configured, use them exclusively (even if all were deduped).
+            // Only fall back to "all users" when no notifiables are defined on this step.
+            if ($toStep->notifiables->isNotEmpty()) {
                 return;
             }
         }

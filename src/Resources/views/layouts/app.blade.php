@@ -44,7 +44,7 @@
                 @php
                     $isContent   = request()->routeIs('marble.media.*', 'marble.trash.*', 'marble.redirect.*', 'marble.item.import*', 'marble.package.*');
                     $isStructure = request()->routeIs('marble.blueprint.*', 'marble.site.*', 'marble.workflow.*');
-                    $isUsers     = request()->routeIs('marble.user.*', 'marble.user-group.*');
+                    $isUsers     = request()->routeIs('marble.user.*', 'marble.user-group.*', 'marble.portal-user.*');
                     $isSystem    = request()->routeIs('marble.activity-log.*', 'marble.webhook.*', 'marble.api-token.*', 'marble.configuration.*');
                     $isDashboard = request()->routeIs('marble.dashboard');
                 @endphp
@@ -98,6 +98,7 @@
                             <ul class="dropdown-menu">
                                 <li><a href="{{ route('marble.user.index') }}">@include('marble::components.famicon', ['name' => 'status_online']) {{ trans('marble::admin.users') }}</a></li>
                                 <li><a href="{{ route('marble.user-group.index') }}">@include('marble::components.famicon', ['name' => 'group']) {{ trans('marble::admin.usergroups') }}</a></li>
+                                <li><a href="{{ route('marble.portal-user.index') }}">@include('marble::components.famicon', ['name' => 'user']) {{ trans('marble::admin.portal_users') }}</a></li>
                             </ul>
                         </li>
 
@@ -362,7 +363,7 @@
                 });
             }
 
-            $('#notification-bell').on('click', function () {
+            $('#notification-bell-li').on('mouseenter click', function () {
                 $.getJSON(recentUrl, function (items) {
                     renderNotifications(items);
                 });
@@ -385,19 +386,20 @@
         CKEDITOR.plugins.addExternal('marblelink', '{{ asset('vendor/marble/assets/ckeditor/plugins/marblelink/') }}/', 'plugin.js');
 
         CKEDITOR.replaceAll(function(textarea, config) {
-            if ($(textarea).hasClass("rich-text-editor")) {
-                config.extraPlugins = 'marblelink';
-                config.filebrowserImageUploadUrl = '{{ route('marble.media.ckeditor-upload') }}?_token={{ csrf_token() }}';
-                config.toolbar = [
-                    { name: 'clipboard', items: ['Undo', 'Redo'] },
-                    { name: 'styles', items: ['Styles', 'Format'] },
-                    { name: 'basicstyles', items: ['Bold', 'Italic', 'Strike', '-', 'RemoveFormat'] },
-                    { name: 'paragraph', items: ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote'] },
-                    { name: 'links', items: ['Link', 'Unlink', 'MarbleLink'] },
-                    { name: 'insert', items: ['Image', 'Table'] },
-                    { name: 'tools', items: ['Maximize'] },
-                ];
+            if (!$(textarea).hasClass("rich-text-editor")) {
+                return false;
             }
+            config.extraPlugins = 'marblelink';
+            config.filebrowserImageUploadUrl = '{{ route('marble.media.ckeditor-upload') }}?_token={{ csrf_token() }}';
+            config.toolbar = [
+                { name: 'clipboard', items: ['Undo', 'Redo'] },
+                { name: 'styles', items: ['Styles', 'Format'] },
+                { name: 'basicstyles', items: ['Bold', 'Italic', 'Strike', '-', 'RemoveFormat'] },
+                { name: 'paragraph', items: ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote'] },
+                { name: 'links', items: ['Link', 'Unlink', 'MarbleLink'] },
+                { name: 'insert', items: ['Image', 'Table'] },
+                { name: 'tools', items: ['Maximize'] },
+            ];
         });
     </script>
 </body>

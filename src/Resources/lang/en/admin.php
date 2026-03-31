@@ -12,6 +12,8 @@ return [
     'add_classgroup'      => 'Add Blueprint Group',
     'classgroups'         => 'Blueprint Groups',
     'export'              => 'Export',
+    'add'                 => 'Add',
+    'duplicate'           => 'Duplicate',
     'edit'                => 'Edit',
     'edit_attributes'     => 'Edit Attributes',
     'delete'              => 'Delete',
@@ -45,7 +47,14 @@ return [
     'group'               => 'Group',
     'entrypoint'          => 'Entrypoint',
     'parent_item'         => 'Parent Item',
-    'allowed_classes'     => 'Allowed Blueprints',
+    'blueprint'                => 'Blueprint',
+    'blueprint_duplicated'     => 'Blueprint duplicated successfully.',
+    'allowed_classes'          => 'Allowed Blueprints',
+    'allow_all_blueprints'     => 'Allow all blueprints (no restrictions)',
+    'can_create'               => 'Create',
+    'can_read'                 => 'Read',
+    'can_update'               => 'Update',
+    'can_delete'               => 'Delete',
     'attributegroups'     => 'Attributegroups',
     'add_group'           => 'Add group',
     'edit_attributegroup' => 'Edit attributegroup',
@@ -333,6 +342,7 @@ return [
     'workflow_reject_comment_hint'   => 'Explain why this item is being rejected...',
     'workflow_history'               => 'History',
     'workflow_permission_denied'     => 'You do not have permission to advance this item.',
+    'user'                           => 'User',
     'usergroup_singular'             => 'Group',
 
     // Notifications
@@ -340,9 +350,53 @@ return [
     'no_notifications'          => 'No notifications.',
     'mark_all_read'             => 'Mark all read',
 
+    // Mount Points
+    'mount_points'          => 'Mount Points',
+    'mount_points_hint'     => 'This item appears only in its canonical position. Add a mount to make it accessible from a second location in the tree.',
+    'mount_point'           => 'Mount Point',
+    'mount_add'             => 'Add Mount Point',
+    'mount_remove'          => 'Remove',
+    'mount_select_parent'   => 'Select parent item…',
+    'mount_added'           => 'Mount point added.',
+    'mount_removed'         => 'Mount point removed.',
+    'mount_cycle_error'     => 'Cannot mount an item under itself or one of its own descendants.',
+
+    // Reachable via
+    'reachable_via'  => 'Reachable via',
+    'slug'           => 'Slug',
+    'alias'          => 'Alias',
+    'redirect'       => 'Redirect',
+    'mount'          => 'Mount',
+
     // URL Aliases
     'url_aliases'   => 'URL Aliases',
     'add_alias'     => '+ Add Alias',
     'aliases_saved'   => 'URL aliases saved.',
     'alias_conflict'  => 'The alias :alias is already in use by another item.',
+
+    // Portal users (admin)
+    'portal_users'             => 'Portal Users',
+    'portal_user'              => 'Portal User',
+    'add_portal_user'          => 'Add Portal User',
+    'portal_user_created'      => 'Portal user created.',
+    'portal_user_item_hint'    => 'Optionally link this account to an item (e.g. a Member profile).',
+    'linked_item'              => 'Linked Item',
+    'leave_blank_to_keep'      => 'leave blank to keep current',
+    'select_item_placeholder'  => 'No item selected',
+    'no_portal_users'          => 'No portal users yet.',
+
+    // Draft preview
+    'draft_preview'            => 'Draft Preview',
+    'draft_preview_hint'       => 'Generate a secret link to preview unpublished content.',
+    'preview_url_hint'         => 'This link is publicly accessible and shows the current draft.',
+    'generate_preview'         => 'Generate Preview Link',
+    'refresh_preview'          => 'Refresh Preview Link',
+
+    // Copy language
+    'copy_language'            => 'Copy Language',
+    'copy_language_from'       => 'From',
+    'copy_language_to'         => 'To',
+    'copy_language_submit'     => 'Copy',
+    'copy_language_hint'       => 'Overwrites all field values of the target language with values from the source language.',
+    'copy_language_done'       => 'Language content copied successfully.',
 ];

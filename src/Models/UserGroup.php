@@ -60,7 +60,7 @@ class UserGroup extends Model
             'user_group_allowed_blueprints',
             'user_group_id',
             'blueprint_id'
-        );
+        )->withPivot(['allow_all', 'can_create', 'can_read', 'can_update', 'can_delete']);
     }
 
     protected ?bool $allowsAllBlueprintsCache = null;
@@ -81,7 +81,7 @@ class UserGroup extends Model
     }
 
     /**
-     * Check if this group can use a specific blueprint.
+     * Check if this group can use a specific blueprint (any access at all).
      */
     public function canUseBlueprint(int $blueprintId): bool
     {
@@ -90,6 +90,28 @@ class UserGroup extends Model
         }
 
         return $this->allowedBlueprints()->where('blueprint_id', $blueprintId)->exists();
+    }
+
+    /**
+     * Check a granular CRUD permission for a specific blueprint.
+     * $action: 'create' | 'read' | 'update' | 'delete'
+     */
+    public function canDoWithBlueprint(int $blueprintId, string $action): bool
+    {
+        if ($this->allowsAllBlueprints()) {
+            return true;
+        }
+
+        $pivot = \DB::table('user_group_allowed_blueprints')
+            ->where('user_group_id', $this->id)
+            ->where('blueprint_id', $blueprintId)
+            ->first();
+
+        if (!$pivot) {
+            return false;
+        }
+
+        return (bool) ($pivot->{'can_' . $action} ?? false);
     }
 
     /**
