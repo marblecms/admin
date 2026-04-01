@@ -3,20 +3,21 @@
 @php $prefix = config('marble.route_prefix', 'admin'); @endphp
 
 @section('content')
-    <h1>{{ trans('marble::admin.workflows') }}</h1>
-
+    <div class="clearfix">
+        <h1 class="pull-left">{{ trans('marble::admin.workflows') }}</h1>
+        <div class="pull-right">
+            <form method="POST" action="{{ url("{$prefix}/workflow/create") }}">
+                @csrf
+                <button type="submit" class="btn btn-success btn-sm">
+                    @include('marble::components.famicon', ['name' => 'add'])
+                    {{ trans('marble::admin.add_workflow') }}
+                </button>
+            </form>
+        </div>
+    </div>
     <div class="main-box">
-        <header class="main-box-header clearfix">
+        <header class="main-box-header">
             <h2>{{ trans('marble::admin.workflows') }}</h2>
-            <div class="pull-right" style="padding:10px">
-                <form method="POST" action="{{ url("{$prefix}/workflow/create") }}">
-                    @csrf
-                    <button type="submit" class="btn btn-success btn-sm">
-                        @include('marble::components.famicon', ['name' => 'add'])
-                        {{ trans('marble::admin.add_workflow') }}
-                    </button>
-                </form>
-            </div>
         </header>
         <div class="main-box-body clearfix">
             @if($workflows->isEmpty())

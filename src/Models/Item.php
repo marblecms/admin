@@ -456,7 +456,6 @@ class Item extends Model
             ->get()
             ->keyBy('blueprint_field_id');
 
-        // For non-translatable fields, also load the primary language values
         $primaryLanguageId = Marble::primaryLanguageId();
 
         if ($languageId !== $primaryLanguageId) {
@@ -465,15 +464,19 @@ class Item extends Model
                 ->get()
                 ->keyBy('blueprint_field_id');
 
-            // Fill in from primary language:
-            // - non-translatable fields: always
-            // - translatable fields: when no row exists, or the row is empty
             foreach ($this->blueprint->fields as $field) {
                 if (!isset($primaryValues[$field->id])) {
                     continue;
                 }
                 $existing = $values[$field->id] ?? null;
-                if (!$existing || $field->fieldTypeInstance()->isEmpty($existing->value)) {
+                $isEmpty  = !$existing || $field->fieldTypeInstance()->isEmpty($existing->value);
+
+                // Non-translatable fields always come from primary language.
+                // Translatable fields fall back only on the frontend (not in the admin editor,
+                // where empty fields should stay empty so translators see what needs doing).
+                if (!$field->translatable && $isEmpty) {
+                    $values[$field->id] = $primaryValues[$field->id];
+                } elseif ($field->translatable && $isEmpty && Marble::translationFallbackEnabled()) {
                     $values[$field->id] = $primaryValues[$field->id];
                 }
             }

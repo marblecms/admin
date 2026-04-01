@@ -17,6 +17,7 @@ class MarbleManager
     protected FieldTypeRegistry $registry;
     protected ?int $currentLanguageId = null;
     protected ?int $primaryLanguageId = null;
+    protected bool $translationFallback = false;
 
     public function __construct(FieldTypeRegistry $registry)
     {
@@ -102,6 +103,16 @@ class MarbleManager
         return $this->primaryLanguageId;
     }
 
+    public function enableTranslationFallback(): void
+    {
+        $this->translationFallback = true;
+    }
+
+    public function translationFallbackEnabled(): bool
+    {
+        return $this->translationFallback;
+    }
+
     // -------------------------------------------------------------------------
     // Item API (convenience, cached)
     // -------------------------------------------------------------------------
@@ -185,6 +196,7 @@ class MarbleManager
         $pattern = $pattern ? $pattern . '/{path?}' : '{path?}';
 
         Route::get($pattern, function (string $path = '') use ($handler, $prefix) {
+            $this->enableTranslationFallback();
             $fullPath = ($prefix ? rtrim($prefix, '/') : '') . '/' . ltrim($path, '/');
             $item = $this->resolveOrFail($fullPath);
             return $handler($item);
