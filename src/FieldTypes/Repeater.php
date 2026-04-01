@@ -41,4 +41,9 @@ class Repeater extends BaseFieldType
 
         return array_values($raw);
     }
+
+    public function isEmpty(?string $raw): bool
+    {
+        return $raw === null || $raw === '' || $raw === '[]';
+    }
 }

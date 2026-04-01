@@ -117,7 +117,6 @@ h6 { font-size: 11px !important; font-weight: bold !important; text-shadow: none
     color: #344644 !important;
     font-size: 12px !important;
     font-weight: normal !important;
-    height: 36px !important;
     line-height: 36px !important;
     padding: 0 12px 0 10px !important;
     border: none !important;
@@ -1379,4 +1378,35 @@ body.iframe{
     color: #333333 !important;
     box-shadow: none !important;
     outline: none !important;
+}
+
+/* ── Collapsible sidebar boxes ────────────────────────────────────────── */
+.marble-sidebar-header {
+    cursor: pointer;
+    display: flex !important;
+    align-items: center;
+    padding-left: 15px;
+}
+.marble-sidebar-header h2 {
+    flex: 1;
+    margin: 0 !important;
+}
+.marble-sidebar-toggle {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    line-height: 14px;
+    text-align: center;
+    border: 1px solid #bbb;
+    border-radius: 3px;
+    background: #fff;
+    color: #666;
+    font-size: 14px;
+    font-weight: bold;
+    margin-right: 7px;
+    margin-top: 10px;
+    cursor: pointer;
+    vertical-align: middle;
+    user-select: none;
+    flex-shrink: 0;
 }

@@ -389,6 +389,11 @@
             if (!$(textarea).hasClass("rich-text-editor")) {
                 return false;
             }
+            var rows = $(textarea).attr('rows') || 10;
+            
+            // Höhe berechnen: Zeilenanzahl * Pixel pro Zeile (ca. 20-25px ist ein guter Richtwert)
+            config.height = (rows * 20) + "px";
+            
             config.extraPlugins = 'marblelink';
             config.filebrowserImageUploadUrl = '{{ route('marble.media.ckeditor-upload') }}?_token={{ csrf_token() }}';
             config.toolbar = [

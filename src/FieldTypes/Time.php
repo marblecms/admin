@@ -33,4 +33,11 @@ class Time extends BaseFieldType
     {
         return ['hour' => '', 'minute' => ''];
     }
+
+    public function isEmpty(?string $raw): bool
+    {
+        if ($raw === null || $raw === '') return true;
+        $decoded = json_decode($raw, true);
+        return !is_array($decoded) || (($decoded['hour'] ?? '') === '' && ($decoded['minute'] ?? '') === '');
+    }
 }

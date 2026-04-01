@@ -50,19 +50,25 @@ class MarbleRouter
             return null;
         }
 
-        $languageId = Marble::currentLanguageId();
+        $site = Site::current();
 
-        // Find candidates whose leaf slug matches, then verify full path
+        // When uri_locale_prefix = true the locale prefix was already stripped
+        // and the language already set — search only that language.
+        // When false, slugs of all languages share the same URL space — fetch
+        // candidates across all languages in one query, then match by full path.
+        $languageScope = $strippedLocalePrefix
+            ? [Marble::currentLanguageId()]
+            : Language::all()->pluck('id')->all();
+
+        // Single query: candidates whose leaf slug matches in any relevant language
         $query = Item::where('status', 'published')
-            ->whereHas('itemValues', function ($q) use ($leafSlug, $languageId) {
+            ->whereHas('itemValues', function ($q) use ($leafSlug, $languageScope) {
                 $q->where('value', $leafSlug)
-                  ->where('language_id', $languageId)
+                  ->whereIn('language_id', $languageScope)
                   ->whereHas('blueprintField', fn ($q) => $q->where('identifier', 'slug'));
             })
             ->with('blueprint', 'parent');
 
-        // Scope to the current site's content tree if multi-site is in use
-        $site = Site::current();
         if ($site && $site->root_item_id) {
             $rootItem = $site->rootItem;
             if ($rootItem) {
@@ -73,72 +79,85 @@ class MarbleRouter
 
         $candidates = $query->get();
 
-        // When a site is active, slugs are relative to the root item
-        $rootSlug = '';
-        $site = $site ?? Site::current();
-        if ($site?->root_item_id) {
-            $rootSlug = $site->rootItem?->rawValue('slug', $languageId) ?? '';
-            if ($rootSlug) {
-                $rootSlug = '/' . ltrim($rootSlug, '/');
+        foreach ($languageScope as $languageId) {
+            $rootSlug = '';
+            if ($site?->root_item_id) {
+                $rootSlug = $site->rootItem?->rawValue('slug', $languageId) ?? '';
+                if ($rootSlug) {
+                    $rootSlug = '/' . ltrim($rootSlug, '/');
+                }
+            }
+
+            foreach ($candidates as $item) {
+                $absoluteSlug = $item->slug($languageId);
+                if (!$absoluteSlug) {
+                    continue;
+                }
+
+                if ($strippedLocalePrefix && str_starts_with($absoluteSlug, $strippedLocalePrefix)) {
+                    $absoluteSlug = substr($absoluteSlug, strlen($strippedLocalePrefix)) ?: '/';
+                }
+
+                $compareSlug = ($rootSlug && str_starts_with($absoluteSlug, $rootSlug))
+                    ? substr($absoluteSlug, strlen($rootSlug))
+                    : $absoluteSlug;
+
+                if ($compareSlug === $path) {
+                    Marble::setLanguageById($languageId);
+                    static::populateDebugbarContext($item, $languageId, $site);
+                    return $item;
+                }
             }
         }
 
-        foreach ($candidates as $item) {
-            $absoluteSlug = $item->slug($languageId);
-
-            // Strip locale prefix from slug (already stripped from $path above)
-            if ($strippedLocalePrefix && str_starts_with($absoluteSlug, $strippedLocalePrefix)) {
-                $absoluteSlug = substr($absoluteSlug, strlen($strippedLocalePrefix)) ?: '/';
-            }
-
-            // Strip root item slug prefix for site-relative comparison
-            $compareSlug = ($rootSlug && str_starts_with($absoluteSlug, $rootSlug))
-                ? substr($absoluteSlug, strlen($rootSlug))
-                : $absoluteSlug;
-
-            if ($compareSlug === $path) {
-                static::populateDebugbarContext($item, $languageId, $site);
-                return $item;
-            }
-        }
-
-        // Try mount-point paths: find items mounted somewhere whose computed
-        // mount-context slug matches the requested path.
+        // Try mount-point paths
         $mountPoints = ItemMountPoint::with(['item.blueprint', 'mountParent'])->get();
 
-        foreach ($mountPoints as $mount) {
-            $mountedItem = $mount->item;
-            if (!$mountedItem || !$mountedItem->isPublished()) {
-                continue;
+        foreach ($languageScope as $languageId) {
+            $rootSlug = '';
+            if ($site?->root_item_id) {
+                $rootSlug = $site->rootItem?->rawValue('slug', $languageId) ?? '';
+                if ($rootSlug) {
+                    $rootSlug = '/' . ltrim($rootSlug, '/');
+                }
             }
 
-            $mountSlug = $mountedItem->slug($languageId, $mount->mount_parent_id);
-            if (!$mountSlug) {
-                continue;
-            }
+            foreach ($mountPoints as $mount) {
+                $mountedItem = $mount->item;
+                if (!$mountedItem || !$mountedItem->isPublished()) {
+                    continue;
+                }
 
-            if ($strippedLocalePrefix && str_starts_with($mountSlug, $strippedLocalePrefix)) {
-                $mountSlug = substr($mountSlug, strlen($strippedLocalePrefix)) ?: '/';
-            }
+                $mountSlug = $mountedItem->slug($languageId, $mount->mount_parent_id);
+                if (!$mountSlug) {
+                    continue;
+                }
 
-            $compareMountSlug = ($rootSlug && str_starts_with($mountSlug, $rootSlug))
-                ? substr($mountSlug, strlen($rootSlug))
-                : $mountSlug;
+                if ($strippedLocalePrefix && str_starts_with($mountSlug, $strippedLocalePrefix)) {
+                    $mountSlug = substr($mountSlug, strlen($strippedLocalePrefix)) ?: '/';
+                }
 
-            if ($compareMountSlug === $path) {
-                static::populateDebugbarContext($mountedItem, $languageId, $site);
-                return $mountedItem;
+                $compareMountSlug = ($rootSlug && str_starts_with($mountSlug, $rootSlug))
+                    ? substr($mountSlug, strlen($rootSlug))
+                    : $mountSlug;
+
+                if ($compareMountSlug === $path) {
+                    Marble::setLanguageById($languageId);
+                    static::populateDebugbarContext($mountedItem, $languageId, $site);
+                    return $mountedItem;
+                }
             }
         }
 
         // Fall back to URL aliases
         $alias = ItemUrlAlias::where('alias', ltrim($path, '/'))
-            ->where('language_id', $languageId)
-            ->with('item.blueprint')
+            ->whereIn('language_id', $languageScope)
+            ->with('item.blueprint', 'language')
             ->first();
 
         if ($alias && $alias->item?->isPublished()) {
-            static::populateDebugbarContext($alias->item, $languageId, $site);
+            Marble::setLanguageById($alias->language_id);
+            static::populateDebugbarContext($alias->item, $alias->language_id, $site);
             return $alias->item;
         }
 

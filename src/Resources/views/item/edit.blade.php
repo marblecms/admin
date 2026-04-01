@@ -165,6 +165,49 @@
                 }
             });
         });
+
+        // ── Collapsible sidebar boxes ─────────────────────────────────────────
+        (function () {
+            var STORAGE_PREFIX = 'marble_sidebar.{{ $item->id }}.';
+
+            function isCollapsed(key) {
+                try { return localStorage.getItem(STORAGE_PREFIX + key) === '1'; } catch(e) { return false; }
+            }
+            function setCollapsed(key, v) {
+                try { localStorage.setItem(STORAGE_PREFIX + key, v ? '1' : '0'); } catch(e) {}
+            }
+            function applyState(content, toggle, collapsed) {
+                content.style.display = collapsed ? 'none' : '';
+                toggle.textContent    = collapsed ? '+' : '−';
+            }
+
+            $(function () {
+                $('.profile-box-header').each(function () {
+                    var $header  = $(this);
+                    var $box     = $header.closest('.main-box');
+                    var $content = $box.find('.profile-box-content').first();
+                    if (!$content.length) return;
+
+                    var key = ($header.find('h2').text().trim()
+                                .replace(/\s+/g, '_')
+                                .replace(/[^a-z0-9_]/gi, '')
+                                .toLowerCase()) || 'box';
+
+                    var $toggle = $('<span>').addClass('marble-sidebar-toggle');
+
+                    $header.addClass('marble-sidebar-header');
+                    $header.find('h2').before($toggle);
+
+                    applyState($content[0], $toggle[0], isCollapsed(key));
+
+                    $header.on('click', function () {
+                        var collapsed = $content.is(':visible');
+                        setCollapsed(key, collapsed);
+                        applyState($content[0], $toggle[0], collapsed);
+                    });
+                });
+            });
+        })();
     </script>
 @endsection
 
@@ -736,3 +779,4 @@
         <div id="marble-autosave-toast" class="toast-success"></div>
     @endif
 @endsection
+

@@ -67,4 +67,9 @@ class ObjectRelationList extends BaseFieldType
     {
         return ['object-relation-list-edit.js'];
     }
+
+    public function isEmpty(?string $raw): bool
+    {
+        return $raw === null || $raw === '' || $raw === '[]';
+    }
 }

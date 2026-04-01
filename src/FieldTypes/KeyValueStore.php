@@ -39,4 +39,9 @@ class KeyValueStore extends BaseFieldType
 
         return (object) $result;
     }
+
+    public function isEmpty(?string $raw): bool
+    {
+        return $raw === null || $raw === '' || $raw === '[]';
+    }
 }

@@ -20,6 +20,8 @@
 
 A Laravel CMS package built around a flexible Blueprint + Field Type system. Define your content types visually, manage a hierarchical content tree, and deliver content via Blade templates or a headless JSON API.
 
+**[→ Full Documentation](https://github.com/marblecms/admin/wiki)**
+
 ## Requirements
 
 - PHP 8.2+

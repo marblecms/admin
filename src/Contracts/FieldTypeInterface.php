@@ -54,6 +54,12 @@ interface FieldTypeInterface
     public function isStructured(): bool;
 
     /**
+     * Whether the given raw DB value is considered empty (no translation entered).
+     * Used to decide whether to fall back to the primary language.
+     */
+    public function isEmpty(?string $raw): bool;
+
+    /**
      * Whether this field type can be rendered as an input in a public-facing form.
      * ObjectRelation, Media, Repeater etc. return false.
      */

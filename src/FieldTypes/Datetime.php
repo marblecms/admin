@@ -38,4 +38,11 @@ class Datetime extends BaseFieldType
     {
         return ['nullable'];
     }
+
+    public function isEmpty(?string $raw): bool
+    {
+        if ($raw === null || $raw === '') return true;
+        $decoded = json_decode($raw, true);
+        return !is_array($decoded) || (($decoded['date'] ?? '') === '' && ($decoded['time'] ?? '') === '');
+    }
 }

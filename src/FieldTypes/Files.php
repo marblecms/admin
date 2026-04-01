@@ -141,4 +141,9 @@ class Files extends BaseFieldType
 
         return empty($extensions) ? null : 'mimes:' . implode(',', $extensions);
     }
+
+    public function isEmpty(?string $raw): bool
+    {
+        return $raw === null || $raw === '' || $raw === '[]';
+    }
 }

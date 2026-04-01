@@ -28,4 +28,9 @@ class Checkbox extends BaseFieldType
     {
         return '0';
     }
+
+    public function isEmpty(?string $raw): bool
+    {
+        return false; // '0' and '1' are both explicit values, never fall back
+    }
 }

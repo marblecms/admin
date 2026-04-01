@@ -113,4 +113,9 @@ class Images extends BaseFieldType
     {
         return ['images-edit.js'];
     }
+
+    public function isEmpty(?string $raw): bool
+    {
+        return $raw === null || $raw === '' || $raw === '[]';
+    }
 }

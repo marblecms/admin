@@ -50,6 +50,11 @@ abstract class BaseFieldType implements FieldTypeInterface
         return false;
     }
 
+    public function isEmpty(?string $raw): bool
+    {
+        return $raw === null || $raw === '';
+    }
+
     public function adminComponent(): string
     {
         return 'marble::field-types.' . $this->identifier();

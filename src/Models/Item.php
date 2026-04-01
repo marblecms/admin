@@ -465,9 +465,15 @@ class Item extends Model
                 ->get()
                 ->keyBy('blueprint_field_id');
 
-            // Fill in non-translatable fields from primary language
+            // Fill in from primary language:
+            // - non-translatable fields: always
+            // - translatable fields: when no row exists, or the row is empty
             foreach ($this->blueprint->fields as $field) {
-                if (!$field->translatable && !isset($values[$field->id]) && isset($primaryValues[$field->id])) {
+                if (!isset($primaryValues[$field->id])) {
+                    continue;
+                }
+                $existing = $values[$field->id] ?? null;
+                if (!$existing || $field->fieldTypeInstance()->isEmpty($existing->value)) {
                     $values[$field->id] = $primaryValues[$field->id];
                 }
             }
