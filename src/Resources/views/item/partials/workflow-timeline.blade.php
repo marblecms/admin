@@ -21,37 +21,42 @@
 
 <div class="main-box clearfix profile-box-menu">
     <div class="main-box-body clearfix">
-        <div class="profile-box-header gray-bg clearfix" style="padding:0 15px 15px">
+        <div class="profile-box-header gray-bg clearfix">
             <h2>{{ $workflow->name }}</h2>
         </div>
-        <div class="profile-box-content clearfix" style="padding:12px 15px">
+        <div class="profile-box-content clearfix marble-box-body">
 
             {{-- Timeline --}}
-            <div style="position:relative; padding-left:20px; margin-bottom:14px">
-                <div style="position:absolute; left:7px; top:8px; bottom:8px; width:2px; background:#ddd;"></div>
+            <div class="marble-wf-timeline">
+                <div class="marble-wf-line"></div>
 
                 @foreach($steps as $step)
                     @php
-                        $isCurrent = ($currentId === $step->id && !$isPublished);
+                        $isCurrent  = ($currentId === $step->id && !$isPublished);
                         $currentIdx = $currentId ? $steps->search(fn($s) => $s->id === $currentId) : ($isPublished ? $steps->count() : -1);
                         $thisIdx    = $steps->search(fn($s) => $s->id === $step->id);
                         $isPast     = $thisIdx < $currentIdx;
-                        $dotColor   = $isCurrent ? '#337ab7' : ($isPast ? '#5cb85c' : '#ccc');
-                        $textStyle  = $isCurrent ? 'font-weight:bold;color:#337ab7' : ($isPast ? 'color:#5cb85c' : 'color:#999');
+                        $isOverdue  = $isCurrent && $item->isWorkflowOverdue();
+                        $dotClass   = $isOverdue ? 'marble-wf-dot-overdue' : ($isCurrent ? 'marble-wf-dot-current' : ($isPast ? 'marble-wf-dot-done' : 'marble-wf-dot-future'));
+                        $textClass  = $isOverdue ? 'marble-wf-text-overdue' : ($isCurrent ? 'marble-wf-text-current' : ($isPast ? 'marble-wf-text-done' : 'marble-wf-text-future'));
                     @endphp
-                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px; position:relative">
-                        <div style="width:14px; height:14px; border-radius:50%; background:{{ $dotColor }}; flex-shrink:0; position:relative; z-index:1; margin-left:-6px"></div>
-                        <span style="{{ $textStyle }}; font-size:13px">{{ $step->name }}</span>
+                    <div class="marble-wf-step">
+                        <div class="marble-wf-dot {{ $dotClass }}"></div>
+                        <span class="{{ $textClass }}">{{ $step->name }}</span>
+                        @if($isOverdue)
+                            <span class="marble-wf-badge-overdue">{{ trans('marble::admin.workflow_overdue') }}</span>
+                        @elseif($isCurrent && $step->deadline_days)
+                            @php $daysLeft = (int) now()->diffInDays($item->workflow_step_entered_at?->addDays($step->deadline_days), false); @endphp
+                            @if($daysLeft >= 0)
+                                <span class="marble-wf-days-left">{{ $daysLeft }}d left</span>
+                            @endif
+                        @endif
                     </div>
                 @endforeach
 
-                @php
-                    $pubDot  = $isPublished ? '#5cb85c' : '#ccc';
-                    $pubText = $isPublished ? 'font-weight:bold;color:#5cb85c' : 'color:#999';
-                @endphp
-                <div style="display:flex; align-items:center; gap:8px; position:relative">
-                    <div style="width:14px; height:14px; border-radius:50%; background:{{ $pubDot }}; flex-shrink:0; position:relative; z-index:1; margin-left:-6px"></div>
-                    <span style="{{ $pubText }}; font-size:13px">{{ trans('marble::admin.published') }}</span>
+                <div class="marble-wf-step">
+                    <div class="marble-wf-dot {{ $isPublished ? 'marble-wf-dot-done' : 'marble-wf-dot-future' }}"></div>
+                    <span class="{{ $isPublished ? 'marble-wf-text-done' : 'marble-wf-text-future' }}">{{ trans('marble::admin.published') }}</span>
                 </div>
             </div>
 
@@ -88,7 +93,7 @@
 
             {{-- Reject button --}}
             @if($canReject)
-                <div style="clear:both; padding-top:10px">
+                <div class="marble-wf-reject-wrap">
                     <button type="button" class="btn btn-xs btn-block"
                             data-toggle="modal" data-target="#reject-modal-{{ $item->id }}">
                         @include('marble::components.famicon', ['name' => 'cancel'])
@@ -130,24 +135,24 @@
 
             {{-- Transition log --}}
             @if($transitions->isNotEmpty())
-                <div style="clear:both; margin-top:14px; padding-top:10px">
-                    <small style="font-size:11px; text-transform:uppercase; color:#aaa; letter-spacing:.5px">{{ trans('marble::admin.workflow_history') }}</small>
+                <div class="marble-wf-history">
+                    <small class="marble-wf-history-label">{{ trans('marble::admin.workflow_history') }}</small>
                     @foreach($transitions as $t)
-                        <div style="padding:5px 0; border-bottom:1px dotted #f0f0f0; font-size:12px">
-                            <div style="display:flex; justify-content:space-between; align-items:baseline">
+                        <div class="marble-wf-history-row">
+                            <div class="marble-flex-between">
                                 <span>
                                     @if($t->action === 'reject')
-                                        <span style="color:#d9534f">@include('marble::components.famicon', ['name' => 'cancel'])</span>
+                                        <span class="marble-wf-text-overdue">@include('marble::components.famicon', ['name' => 'cancel'])</span>
                                     @else
-                                        <span style="color:#5cb85c">@include('marble::components.famicon', ['name' => 'arrow_right'])</span>
+                                        <span class="marble-wf-text-done">@include('marble::components.famicon', ['name' => 'arrow_right'])</span>
                                     @endif
                                     <strong>{{ $t->user->name ?? '–' }}</strong>:
                                     {{ $t->fromLabel() }} → {{ $t->toLabel() }}
                                 </span>
-                                <small style="color:#aaa; white-space:nowrap; margin-left:8px">{{ $t->created_at->diffForHumans() }}</small>
+                                <small class="marble-meta marble-nowrap marble-mr-xs">{{ $t->created_at->diffForHumans() }}</small>
                             </div>
                             @if($t->comment)
-                                <div style="color:#888; margin-top:2px; padding-left:18px">{{ $t->comment }}</div>
+                                <div class="marble-wf-comment">{{ $t->comment }}</div>
                             @endif
                         </div>
                     @endforeach

@@ -9,7 +9,7 @@
                 <h2>Item</h2>
             </div>
             <div class="profile-box-content clearfix">
-                <table class="table" style="margin-bottom:0">
+                <table class="table"class="marble-table-flush">
                     <tr>
                         <td class="text-muted">Name</td>
                         <td><a href="{{ route('marble.item.edit', $item) }}">{{ $item->name() ?: '—' }}</a></td>
@@ -44,9 +44,9 @@
                     @foreach($revisions as $rev)
                         <li class="{{ $rev->id === $revision->id ? 'active' : '' }}">
                             <a href="{{ route('marble.item.diff', [$item, $rev]) }}"
-                               style="{{ $rev->id === $revision->id ? 'font-weight:bold' : '' }}">
+                               class="{{ $rev->id === $revision->id ? 'marble-fw-bold' : '' }}">
                                 {{ $rev->created_at->format('d.m.Y H:i') }}
-                                @if($rev->user) <small style="color:#999">· {{ $rev->user->name }}</small> @endif
+                                @if($rev->user) <small class="marble-meta">· {{ $rev->user->name }}</small> @endif
                             </a>
                         </li>
                     @endforeach
@@ -64,34 +64,34 @@
 
     {{-- Breadcrumb --}}
     @if($breadcrumb->count() > 1)
-        <div style="margin:-6px 0 12px;font-size:12px;color:#888">
+        <div class="marble-breadcrumb">
             @foreach($breadcrumb as $crumb)
-                <a href="{{ route('marble.item.edit', $crumb) }}" style="color:#5580B0">{{ $crumb->name() ?: '—' }}</a>
-                <span style="margin:0 4px;color:#bbb">›</span>
+                <a href="{{ route('marble.item.edit', $crumb) }}" class="marble-link">{{ $crumb->name() ?: '—' }}</a>
+                <span class="marble-breadcrumb-sep">›</span>
             @endforeach
-            <span style="color:#555">{{ trans('marble::admin.diff') }}</span>
+            <span class="text-muted">{{ trans('marble::admin.diff') }}</span>
         </div>
     @endif
 
     @if(empty($diff))
         <div class="main-box">
             <div class="main-box-body clearfix">
-                <p class="text-muted" style="padding:16px 0">{{ trans('marble::admin.diff_no_changes') }}</p>
+                <p class="text-muted marble-pad-md">{{ trans('marble::admin.diff_no_changes') }}</p>
             </div>
         </div>
     @else
         <div class="main-box">
             <header class="main-box-header clearfix">
                 <h2>
-                    <span style="color:#c0392b">{{ trans('marble::admin.diff_before') }}</span>
+                    <span class="marble-diff-before">{{ trans('marble::admin.diff_before') }}</span>
                     &rarr;
-                    <span style="color:#27ae60">{{ trans('marble::admin.diff_after') }}</span>
+                    <span class="marble-diff-after">{{ trans('marble::admin.diff_after') }}</span>
                     @if($previous)
-                        <small style="font-weight:normal;color:#999;margin-left:10px;font-size:12px">
+                        <small class="marble-fw-normal marble-meta marble-ml-sm">
                             {{ trans('marble::admin.diff_compared_to') }} {{ $previous->created_at->format('d.m.Y H:i') }}
                         </small>
                     @else
-                        <small style="font-weight:normal;color:#999;margin-left:10px;font-size:12px">
+                        <small class="marble-fw-normal marble-meta marble-ml-sm">
                             {{ trans('marble::admin.diff_first_revision') }}
                         </small>
                     @endif
@@ -101,8 +101,8 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <th style="width:140px">{{ trans('marble::admin.name') }}</th>
-                            <th style="width:80px">{{ trans('marble::admin.language') }}</th>
+                            <th class="marble-col-date">{{ trans('marble::admin.name') }}</th>
+                            <th class="marble-col-sm">{{ trans('marble::admin.language') }}</th>
                             <th>{{ trans('marble::admin.diff_before') }}</th>
                             <th>{{ trans('marble::admin.diff_after') }}</th>
                         </tr>
@@ -112,18 +112,18 @@
                             <tr>
                                 <td><b>{{ $change['field'] }}</b></td>
                                 <td class="text-muted">{{ $change['language'] }}</td>
-                                <td style="background:#fff5f5;max-width:300px;word-break:break-word">
+                                <td class="marble-diff-cell-before marble-break-all">
                                     @if($change['old'] === null)
                                         <em class="text-muted">—</em>
                                     @else
-                                        <span style="color:#c0392b">{{ is_array($change['old']) ? json_encode($change['old']) : $change['old'] }}</span>
+                                        <span class="marble-diff-before">{{ is_array($change['old']) ? json_encode($change['old']) : $change['old'] }}</span>
                                     @endif
                                 </td>
-                                <td style="background:#f5fff8;max-width:300px;word-break:break-word">
+                                <td class="marble-diff-cell-after marble-break-all">
                                     @if($change['new'] === null)
                                         <em class="text-muted">—</em>
                                     @else
-                                        <span style="color:#27ae60">{{ is_array($change['new']) ? json_encode($change['new']) : $change['new'] }}</span>
+                                        <span class="marble-diff-after">{{ is_array($change['new']) ? json_encode($change['new']) : $change['new'] }}</span>
                                     @endif
                                 </td>
                             </tr>
@@ -134,7 +134,7 @@
         </div>
     @endif
 
-    <div style="margin-top:8px">
+    <div class="marble-mt-sm">
         <form method="POST" action="{{ route('marble.item.revert', [$item, $revision]) }}" onsubmit="return confirm('{{ trans('marble::admin.are_you_sure') }}')">
             @csrf
             <span class="pull-right">

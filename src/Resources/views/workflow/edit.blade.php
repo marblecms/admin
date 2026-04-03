@@ -29,7 +29,7 @@
                 <h2>{{ trans('marble::admin.workflow_steps') }}</h2>
             </header>
             <div class="main-box-body clearfix">
-                <p class="text-muted" style="margin-bottom:16px">{{ trans('marble::admin.workflow_steps_hint') }}</p>
+                <p class="text-muted marble-mb-md">{{ trans('marble::admin.workflow_steps_hint') }}</p>
 
                 <div id="steps-list">
                     @foreach($workflow->steps as $step)
@@ -44,14 +44,14 @@
                 </div>
 
                 {{-- Terminal published step (always shown, greyed out) --}}
-                <div style="display:flex;align-items:center;gap:8px;margin-top:8px;opacity:0.45;pointer-events:none">
-                    <span style="padding:0 6px;color:#aaa">&#9776;</span>
-                    <input type="text" class="form-control" value="{{ trans('marble::admin.published') }}" disabled style="flex:1" />
-                    <div style="width:30px"></div>
+                <div class="marble-step-terminal">
+                    <span class="marble-step-handle-ghost">&#9776;</span>
+                    <input type="text" class="form-control marble-flex-1" value="{{ trans('marble::admin.published') }}" disabled />
+                    <div class="marble-step-spacer"></div>
                 </div>
                 <small class="text-muted">{{ trans('marble::admin.workflow_published_hint') }}</small>
 
-                <div style="margin-top:16px">
+                <div class="marble-mt-md">
                     <button type="button" class="btn btn-default btn-sm" id="add-step">
                         @include('marble::components.famicon', ['name' => 'add']) {{ trans('marble::admin.workflow_add_step') }}
                     </button>
@@ -66,7 +66,7 @@
         </div>
     </form>
 
-    <form method="POST" action="{{ route('marble.workflow.delete', $workflow) }}" style="margin-top:60px"
+    <form method="POST" action="{{ route('marble.workflow.delete', $workflow) }}" class="marble-mt-xxl"
           onsubmit="return confirm('{{ trans('marble::admin.confirm_delete') }}')">
         @csrf
         @method('DELETE')
@@ -132,13 +132,13 @@
             var stepIdx  = $row.index();
             var $nList   = $row.find('.notifiables-list');
             var nIdx     = $nList.find('.notifiable-row').length;
-            var $n = $('<div class="notifiable-row" style="display:flex;align-items:center;gap:6px;margin-bottom:6px">' +
-                '<select class="form-control input-sm" style="width:70px" data-notifiable-field="type">' +
+            var $n = $('<div class="notifiable-row marble-notifiable-row">' +
+                '<select class="form-control input-sm marble-input-num-xs" data-notifiable-field="type">' +
                 '<option value="user">{{ trans('marble::admin.user') }}</option>' +
                 '<option value="group">{{ trans('marble::admin.usergroup_singular') }}</option>' +
                 '</select>' +
-                '<select class="form-control input-sm notifiable-id-select" data-notifiable-field="id" style="flex:1"></select>' +
-                '<select class="form-control input-sm" style="width:80px" data-notifiable-field="channel">' +
+                '<select class="form-control input-sm notifiable-id-select marble-flex-1" data-notifiable-field="id"></select>' +
+                '<select class="form-control input-sm marble-input-num-sm" data-notifiable-field="channel">' +
                 '<option value="cms">CMS</option>' +
                 '<option value="email">Email</option>' +
                 '<option value="both">Both</option>' +

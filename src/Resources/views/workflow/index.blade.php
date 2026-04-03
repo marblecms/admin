@@ -21,9 +21,9 @@
         </header>
         <div class="main-box-body clearfix">
             @if($workflows->isEmpty())
-                <p class="text-muted" style="padding:20px">{{ trans('marble::admin.no_workflows') }}</p>
+                <p class="text-muted marble-p-20">{{ trans('marble::admin.no_workflows') }}</p>
             @else
-                <table class="table table-hover" style="margin-bottom:0">
+                <table class="table table-hover marble-table-flush">
                     <thead>
                         <tr>
                             <th>{{ trans('marble::admin.name') }}</th>
@@ -39,7 +39,7 @@
                                 </td>
                                 <td>
                                     @foreach($workflow->steps as $step)
-                                        <span class="label label-default" style="margin-right:3px">{{ $step->name }}</span>
+                                        <span class="label label-default marble-mr-xs">{{ $step->name }}</span>
                                     @endforeach
                                     <span class="label label-success">{{ trans('marble::admin.published') }}</span>
                                 </td>
@@ -47,7 +47,7 @@
                                     <a href="{{ route('marble.workflow.edit', $workflow) }}" class="btn btn-xs btn-default">
                                         @include('marble::components.famicon', ['name' => 'pencil']) {{ trans('marble::admin.edit') }}
                                     </a>
-                                    <form method="POST" action="{{ route('marble.workflow.delete', $workflow) }}" style="display:inline" onsubmit="return confirm('{{ trans('marble::admin.confirm_delete') }}')">
+                                    <form method="POST" action="{{ route('marble.workflow.delete', $workflow) }}" class="marble-inline-form" onsubmit="return confirm('{{ trans('marble::admin.confirm_delete') }}')">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-xs btn-danger">

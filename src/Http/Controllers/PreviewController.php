@@ -2,6 +2,7 @@
 
 namespace Marble\Admin\Http\Controllers;
 
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Marble\Admin\Facades\Marble;
@@ -9,11 +10,14 @@ use Marble\Admin\Models\Item;
 
 class PreviewController extends Controller
 {
+    use AuthorizesRequests;
+
     /**
      * Generate or refresh the preview token and return the preview URL.
      */
     public function generate(Item $item)
     {
+        $this->authorize('update', $item);
         $token = $item->generatePreviewToken();
         $frontendUrl = rtrim(config('marble.frontend_url', ''), '/');
 

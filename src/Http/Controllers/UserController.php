@@ -8,6 +8,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Marble\Admin\Http\Requests\UserRequest;
+use Marble\Admin\Models\Language;
 use Marble\Admin\Models\User;
 use Marble\Admin\Models\UserGroup;
 
@@ -40,6 +41,7 @@ class UserController extends Controller
             'email'         => $request->input('email'),
             'password'      => Hash::make($request->input('password')),
             'user_group_id' => $request->input('user_group_id'),
+            'active'        => $request->boolean('active', true),
             'root_item_id'  => $request->input('root_item_id') ?: null,
         ]);
 
@@ -61,6 +63,7 @@ class UserController extends Controller
         $user->name = $request->input('name');
         $user->email = $request->input('email');
         $user->user_group_id = $request->input('user_group_id');
+        $user->active = $request->boolean('active', true);
         $user->root_item_id = $request->input('root_item_id') ?: null;
 
         if ($request->filled('password')) {
@@ -82,7 +85,9 @@ class UserController extends Controller
 
     public function setLanguage(Request $request)
     {
-        $language = $request->input('language', 'en');
+        $request->validate(['language' => 'required|string|exists:languages,code']);
+
+        $language = $request->input('language');
         $user = Auth::guard('marble')->user();
         $user->language = $language;
         $user->save();

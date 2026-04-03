@@ -2,6 +2,7 @@
 
 namespace Marble\Admin\Http\Controllers;
 
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Marble\Admin\Models\Item;
@@ -10,11 +11,14 @@ use Marble\Admin\Models\Language;
 
 class ItemLanguageCopyController extends Controller
 {
+    use AuthorizesRequests;
+
     /**
      * Copy all field values from one language to another.
      */
     public function copy(Request $request, Item $item)
     {
+        $this->authorize('update', $item);
         $request->validate([
             'from_language_id' => 'required|integer|exists:languages,id',
             'to_language_id'   => 'required|integer|exists:languages,id|different:from_language_id',

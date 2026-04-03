@@ -23,4 +23,14 @@ class Textblock extends BaseFieldType
     {
         return 'marble::components.form-fields.textarea';
     }
+
+    public function configComponent(): ?string
+    {
+        return 'marble::field-types.textblock-config';
+    }
+
+    public function defaultConfig(): array
+    {
+        return ['rows' => 5];
+    }
 }

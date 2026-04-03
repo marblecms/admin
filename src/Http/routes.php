@@ -10,6 +10,7 @@ Route::get('dashboard', [\Marble\Admin\Http\Controllers\DashboardController::cla
 Route::prefix('item')->as('item.')->group(function () {
     Route::get('edit/{item}', [\Marble\Admin\Http\Controllers\ItemController::class, 'edit'])->name('edit');
     Route::post('save/{item}', [\Marble\Admin\Http\Controllers\ItemController::class, 'save'])->name('save');
+    Route::post('schedule/{item}', [\Marble\Admin\Http\Controllers\ItemController::class, 'saveSchedule'])->name('schedule');
     Route::get('add/{parentItem}', [\Marble\Admin\Http\Controllers\ItemController::class, 'add'])->name('add');
     Route::post('create', [\Marble\Admin\Http\Controllers\ItemController::class, 'create'])->name('create');
     Route::delete('delete/{item}', [\Marble\Admin\Http\Controllers\ItemController::class, 'delete'])->name('delete');

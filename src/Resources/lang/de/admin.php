@@ -4,6 +4,8 @@ return [
     'children'            => 'Unterpunkte',
     'add_children'        => 'Unterpunkt hinzufügen',
     'add_user'            => 'Benutzer hinzufügen',
+    'last_login'          => 'Letzter Login',
+    'account_disabled'    => 'Dieses Konto wurde deaktiviert.',
     'add_usergroup'       => 'Gruppe hinzufügen',
     'manage_usergroups'   => 'Gruppen verwalten',
     'add_class'           => 'Blueprint hinzufügen',
@@ -23,6 +25,7 @@ return [
     'import'              => 'Importieren',
     'import_json'         => 'Aus JSON importieren',
     'import_success'      => 'Import erfolgreich.',
+    'import_invalid_file' => 'Ungültige Import-Datei. Bitte lade einen gültigen Marble JSON-Export hoch.',
     'file'                => 'Datei',
     'meta_information'    => 'Meta-Informationen',
     'dashboard'           => 'Dashboard',
@@ -112,6 +115,7 @@ return [
     'publish_at'          => 'Veröffentlichen am',
     'expires_at'          => 'Läuft ab am',
     'save_schedule'       => 'Zeitplan speichern',
+    'scheduling_hint'     => 'Datumsangaben gelten erst, sobald der Inhalt veröffentlicht ist.',
     'webhooks'            => 'Webhooks',
     'add_webhook'         => 'Webhook hinzufügen',
     'edit_webhook'        => 'Webhook bearbeiten',
@@ -283,6 +287,7 @@ return [
     'no_portal_users'          => 'Noch keine Portal-Benutzer.',
 
     // Draft preview
+    'preview_not_published_hint' => 'Element muss veröffentlicht sein, um die Vorschau zu öffnen. Nutze den Abschnitt „Entwurfsvorschau" unten, um einen privaten Vorschau-Link zu generieren.',
     'draft_preview'            => 'Entwurfsvorschau',
     'draft_preview_hint'       => 'Geheimen Link generieren, um unveröffentlichte Inhalte vorab anzuzeigen.',
     'preview_url_hint'         => 'Dieser Link ist öffentlich zugänglich und zeigt den aktuellen Entwurf.',

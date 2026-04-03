@@ -6,6 +6,8 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Marble\Admin\Facades\Marble;
 use Marble\Admin\Http\Requests\ItemCreateRequest;
 use Marble\Admin\Http\Requests\ItemUpdateRequest;
@@ -114,48 +116,58 @@ class ItemController extends Controller
 
         $changedFields = [];
 
-        foreach ($item->blueprint->allFields() as $field) {
-            if ($field->locked) {
-                continue;
-            }
-
-            $fieldType = $field->fieldTypeInstance();
-
-            foreach ($languages as $language) {
-                if (!$field->translatable && $language->id !== Marble::primaryLanguageId()) {
+        DB::transaction(function () use ($item, $languages, $attributeValues, $request, &$changedFields) {
+            foreach ($item->blueprint->allFields() as $field) {
+                if ($field->locked) {
                     continue;
                 }
 
-                $newValue = $attributeValues[$field->id][$language->id] ?? null;
+                $fieldType = $field->fieldTypeInstance();
 
-                $itemValue = ItemValue::firstOrNew([
-                    'item_id'            => $item->id,
-                    'blueprint_field_id' => $field->id,
-                    'language_id'        => $language->id,
-                ]);
+                foreach ($languages as $language) {
+                    if (!$field->translatable && $language->id !== Marble::primaryLanguageId()) {
+                        continue;
+                    }
 
-                $oldValue = $itemValue->exists ? $itemValue->raw() : $fieldType->defaultValue();
-                $processed = $fieldType->processInput($oldValue, $newValue, $request, $field->id, $language->id);
-                $serialized = $fieldType->serialize($processed);
+                    $newValue = $attributeValues[$field->id][$language->id] ?? null;
 
-                // Track changed fields for webhook payload
-                if ($serialized !== $itemValue->value) {
-                    $key = $field->identifier . ($field->translatable ? '.' . $language->code : '');
-                    $changedFields[$key] = ['old' => $oldValue, 'new' => $serialized];
+                    $itemValue = ItemValue::firstOrNew([
+                        'item_id'            => $item->id,
+                        'blueprint_field_id' => $field->id,
+                        'language_id'        => $language->id,
+                    ]);
+
+                    $oldValue  = $itemValue->exists ? $itemValue->raw() : $fieldType->defaultValue();
+                    $processed = $fieldType->processInput($oldValue, $newValue, $request, $field->id, $language->id);
+                    $serialized = $fieldType->serialize($processed);
+
+                    // Track changed fields for webhook payload
+                    if ($serialized !== $itemValue->value) {
+                        $key = $field->identifier . ($field->translatable ? '.' . $language->code : '');
+                        $changedFields[$key] = ['old' => $oldValue, 'new' => $serialized];
+                    }
+
+                    $itemValue->value = $serialized;
+                    $itemValue->save();
                 }
-
-                $itemValue->value = $serialized;
-                $itemValue->save();
             }
-        }
+        });
 
-        // Scheduling
-        $item->published_at = $request->input('published_at') ?: null;
-        $item->expires_at   = $request->input('expires_at') ?: null;
         $item->touch();
 
         app(ActivityLogService::class)->log('item.saved', $item);
         app(WebhookService::class)->fire('item.saved', $item, $changedFields);
+
+        return redirect()->route('marble.item.edit', $item);
+    }
+
+    public function saveSchedule(Request $request, Item $item)
+    {
+        $this->authorize('update', $item);
+
+        $item->published_at = $request->input('published_at') ?: null;
+        $item->expires_at   = $request->input('expires_at') ?: null;
+        $item->save();
 
         return redirect()->route('marble.item.edit', $item);
     }
@@ -240,13 +252,13 @@ class ItemController extends Controller
             ]);
         }
 
-        // Handle cascade & detach for relations pointing at these items
-        $this->handleRelationsOnDelete($deletingIds);
+        DB::transaction(function () use ($item, $deletingIds) {
+            $this->handleRelationsOnDelete($deletingIds);
+            Item::where('path', 'like', $item->path . '/%')->delete();
+            $item->delete();
+        });
 
         app(ActivityLogService::class)->log('item.deleted', $item, ['blueprint' => $item->blueprint->identifier]);
-
-        Item::where('path', 'like', $item->path . '/%')->delete();
-        $item->delete();
 
         return redirect()->route('marble.item.edit', $parentId);
     }
@@ -257,6 +269,7 @@ class ItemController extends Controller
             ->whereHas('blueprintField', fn($q) => $q->where('field_type_id',
                 \Marble\Admin\Models\FieldType::where('identifier', 'object_relation')->value('id')
             ))
+            ->with('blueprintField', 'item.blueprint')
             ->get()
             ->filter(function ($iv) use ($deletingIds) {
                 $config = $iv->blueprintField->configuration ?? [];
@@ -274,6 +287,7 @@ class ItemController extends Controller
 
         \Marble\Admin\Models\ItemValue::whereIn('value', $deletingIds->map(fn($id) => (string) $id))
             ->whereHas('blueprintField', fn($q) => $q->where('field_type_id', $objectRelationTypeId))
+            ->with('blueprintField', 'item.blueprint')
             ->get()
             ->each(function ($iv) use ($deletingIds) {
                 if ($deletingIds->contains($iv->item_id)) return; // being deleted anyway
@@ -284,7 +298,7 @@ class ItemController extends Controller
                     $iv->update(['value' => null]);
                 } elseif ($behavior === 'cascade') {
                     $ownerItem = $iv->item;
-                    if ($ownerItem) {
+                    if ($ownerItem && Gate::allows('delete', $ownerItem)) {
                         Item::where('path', 'like', $ownerItem->path . '/%')->delete();
                         $ownerItem->delete();
                     }
@@ -404,7 +418,7 @@ class ItemController extends Controller
 
         // Collect all valid parent candidates: items whose blueprint allows this blueprint as child,
         // excluding the item itself and its own descendants
-        $potentialParents = Item::with('blueprint')
+        $potentialParents = Item::with('blueprint.allowedChildBlueprints')
             ->where('id', '!=', $item->id)
             ->get()
             ->filter(function (Item $candidate) use ($item) {
@@ -442,6 +456,14 @@ class ItemController extends Controller
     public function toggleStatus(Item $item)
     {
         $this->authorize('update', $item);
+
+        // If the blueprint has a workflow, direct publish/draft toggling is not allowed —
+        // the item must go through the workflow steps.
+        $item->load('blueprint.workflow');
+        if ($item->blueprint?->workflow) {
+            return back()->withErrors(['status' => trans('marble::admin.workflow_required')]);
+        }
+
         $item->status = $item->status === 'published' ? 'draft' : 'published';
         $item->save();
 
@@ -530,8 +552,15 @@ class ItemController extends Controller
 
     public function sort(Request $request)
     {
-        foreach ($request->input('items', []) as $itemId => $sortOrder) {
-            Item::where('id', $itemId)->update(['sort_order' => $sortOrder]);
+        $user = Auth::guard('marble')->user();
+        $input = $request->input('items', []);
+        $items = Item::whereIn('id', array_keys($input))->get()->keyBy('id');
+
+        foreach ($input as $itemId => $sortOrder) {
+            $item = $items->get((int) $itemId);
+            if ($item && $user->canDoWithBlueprint($item->blueprint_id, 'update')) {
+                $item->update(['sort_order' => (int) $sortOrder]);
+            }
         }
 
         return response()->json(['success' => true]);
@@ -539,15 +568,19 @@ class ItemController extends Controller
 
     public function searchJson(SearchRequest $request)
     {
+        $user  = Auth::guard('marble')->user();
         $query = substr(strip_tags($request->input('q', '')), 0, 100);
 
         $ids = ItemValue::where('value', 'LIKE', '%' . addcslashes($query, '%_\\') . '%')
             ->select('item_id')
             ->distinct()
-            ->limit(20)
+            ->limit(50)
             ->pluck('item_id');
 
-        $items = Item::with('blueprint')->whereIn('id', $ids)->get();
+        $items = Item::with('blueprint')->whereIn('id', $ids)->get()
+            ->filter(fn($item) => $user->canDoWithBlueprint($item->blueprint_id, 'read'))
+            ->take(20)
+            ->values();
 
         return response()->json(
             $items->map(fn($item) => [
@@ -563,6 +596,8 @@ class ItemController extends Controller
 
     public function ajaxField(ItemValue $itemValue, Language $language, Request $request)
     {
+        $this->authorize('update', $itemValue->item);
+
         $fieldType = $itemValue->blueprintField->fieldTypeInstance();
 
         if (method_exists($fieldType, 'ajaxEndpoint')) {
@@ -578,13 +613,12 @@ class ItemController extends Controller
     {
         $snapshot = [];
 
+        $allValues = $item->itemValues()->get()->keyBy(fn($iv) => $iv->blueprint_field_id . '_' . $iv->language_id);
+
         foreach ($item->blueprint->fields as $field) {
             $snapshot[$field->id] = [];
             foreach ($languages as $language) {
-                $iv = $item->itemValues()
-                    ->where('blueprint_field_id', $field->id)
-                    ->where('language_id', $language->id)
-                    ->first();
+                $iv = $allValues->get($field->id . '_' . $language->id);
                 $snapshot[$field->id][$language->id] = $iv ? $iv->value : null;
             }
         }

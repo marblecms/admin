@@ -1,9 +1,4 @@
 $(function($) {
-    setTimeout(function() {
-        $('#content-wrapper > .row').css({
-            opacity: 1
-        });
-    }, 200);
     // Restore tree collapsed state from localStorage
     var marbleTreeCollapsed = JSON.parse(localStorage.getItem('marble_tree_collapsed') || '[]');
     var marbleActiveAncestors = {};

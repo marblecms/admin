@@ -12,13 +12,12 @@
     @endphp
 
     @if($currentFile)
-    <div class="attribute-file-current" style="display:flex;align-items:center;gap:8px;margin-bottom:6px;padding:6px 10px;background:#f8f8f8;border:1px solid #ddd;border-radius:3px">
+    <div class="attribute-file-current marble-file-current">
         @include('marble::components.famicon', ['name' => 'page_white'])
         <span class="attribute-file-name">{{ $currentFile['original_filename'] }}</span>
         <small class="text-muted">({{ number_format(($currentFile['size'] ?? 0) / 1024, 1) }} KB)</small>
         <button type="button"
-                class="btn btn-default btn-xs attribute-file-remove"
-                style="margin-left:auto"
+                class="btn btn-default btn-xs attribute-file-remove marble-ml-auto"
                 onclick="
                     document.querySelector('#attribute-file-{{ $field->id }}-{{ $languageId }} .attribute-file-input').value = 'remove';
                     this.closest('.attribute-file-current').remove();

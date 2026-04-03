@@ -62,18 +62,18 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label>Icon</label>
-                            <div style="display:flex; align-items:center; gap:10px;">
-                                <div style="position:relative; flex:1">
+                            <div class="marble-flex-center">
+                                <div class="marble-flex-1 marble-relative">
                                     <input type="text" id="icon-search" autocomplete="off" class="form-control"
                                            placeholder="Search icons…"
                                            value="{{ $blueprint->icon ?: '' }}" />
                                     <input type="hidden" name="icon" id="icon-value" value="{{ $blueprint->icon ?: '' }}" />
-                                    <ul id="icon-suggestions" style="display:none; position:absolute; z-index:9999; background:#fff; border:1px solid #c0c0c0; border-radius:3px; margin:0; padding:0; list-style:none; width:100%; max-height:220px; overflow-y:auto; box-shadow:0 3px 8px rgba(0,0,0,.15)"></ul>
+                                    <ul id="icon-suggestions" class="marble-icon-suggestions marble-hidden"></ul>
                                 </div>
                                 <img id="icon-preview"
                                      src="{{ asset('vendor/marble/assets/images/famicons/' . ($blueprint->icon ?: 'page') . '.svg') }}"
                                      width="28" height="28" alt=""
-                                     style="flex-shrink:0; opacity:{{ $blueprint->icon ? '1' : '0.3' }}">
+                                     class="marble-icon-preview {{ $blueprint->icon ? '' : 'marble-icon-preview-empty' }}">
                             </div>
                         </div>
                     </div>
@@ -102,62 +102,62 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label class="checkbox-inline" style="display:flex;align-items:center;gap:8px;font-weight:normal">
+                            <label class="checkbox-inline marble-check-label">
                                 <input type="hidden" name="allow_children" value="0">
                                 <input type="checkbox" name="allow_children" value="1" {{ $blueprint->allow_children ? 'checked' : '' }}>
                                 Allow Children
                             </label>
-                            <small class="text-muted" style="display:block;margin-top:4px">Items of this type can have child items.</small>
+                            <small class="text-muted marble-block marble-mt-xs">Items of this type can have child items.</small>
                         </div>
                         <div class="form-group">
-                            <label class="checkbox-inline" style="display:flex;align-items:center;gap:8px;font-weight:normal">
+                            <label class="checkbox-inline marble-check-label">
                                 <input type="hidden" name="list_children" value="0">
                                 <input type="checkbox" name="list_children" value="1" {{ $blueprint->list_children ? 'checked' : '' }}>
                                 List Children
                             </label>
-                            <small class="text-muted" style="display:block;margin-top:4px">Show child items in the admin sidebar.</small>
+                            <small class="text-muted marble-block marble-mt-xs">Show child items in the admin sidebar.</small>
                         </div>
                         <div class="form-group">
-                            <label class="checkbox-inline" style="display:flex;align-items:center;gap:8px;font-weight:normal">
+                            <label class="checkbox-inline marble-check-label">
                                 <input type="hidden" name="show_in_tree" value="0">
                                 <input type="checkbox" name="show_in_tree" value="1" {{ $blueprint->show_in_tree ? 'checked' : '' }}>
                                 Show in Tree
                             </label>
-                            <small class="text-muted" style="display:block;margin-top:4px">Visible in the navigation tree.</small>
+                            <small class="text-muted marble-block marble-mt-xs">Visible in the navigation tree.</small>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label class="checkbox-inline" style="display:flex;align-items:center;gap:8px;font-weight:normal">
+                            <label class="checkbox-inline marble-check-label">
                                 <input type="hidden" name="locked" value="0">
                                 <input type="checkbox" name="locked" value="1" {{ $blueprint->locked ? 'checked' : '' }}>
                                 Locked
                             </label>
-                            <small class="text-muted" style="display:block;margin-top:4px">Fields cannot be edited in the admin.</small>
+                            <small class="text-muted marble-block marble-mt-xs">Fields cannot be edited in the admin.</small>
                         </div>
                         <div class="form-group">
-                            <label class="checkbox-inline" style="display:flex;align-items:center;gap:8px;font-weight:normal">
+                            <label class="checkbox-inline marble-check-label">
                                 <input type="hidden" name="api_public" value="0">
                                 <input type="checkbox" name="api_public" value="1" {{ $blueprint->api_public ? 'checked' : '' }}>
                                 Public API
                             </label>
-                            <small class="text-muted" style="display:block;margin-top:4px">Expose this blueprint via the public JSON API without authentication.</small>
+                            <small class="text-muted marble-block marble-mt-xs">Expose this blueprint via the public JSON API without authentication.</small>
                         </div>
                         <div class="form-group">
-                            <label class="checkbox-inline" style="display:flex;align-items:center;gap:8px;font-weight:normal">
+                            <label class="checkbox-inline marble-check-label">
                                 <input type="hidden" name="versionable" value="0">
                                 <input type="checkbox" name="versionable" value="1" {{ ($blueprint->versionable ?? true) ? 'checked' : '' }}>
                                 {{ trans('marble::admin.versionable') }}
                             </label>
-                            <small class="text-muted" style="display:block;margin-top:4px">{{ trans('marble::admin.versionable_hint') }}</small>
+                            <small class="text-muted marble-block marble-mt-xs">{{ trans('marble::admin.versionable_hint') }}</small>
                         </div>
                         <div class="form-group">
-                            <label class="checkbox-inline" style="display:flex;align-items:center;gap:8px;font-weight:normal">
+                            <label class="checkbox-inline marble-check-label">
                                 <input type="hidden" name="schedulable" value="0">
                                 <input type="checkbox" name="schedulable" value="1" {{ $blueprint->schedulable ? 'checked' : '' }}>
                                 {{ trans('marble::admin.schedulable') }}
                             </label>
-                            <small class="text-muted" style="display:block;margin-top:4px">{{ trans('marble::admin.schedulable_hint') }}</small>
+                            <small class="text-muted marble-block marble-mt-xs">{{ trans('marble::admin.schedulable_hint') }}</small>
                         </div>
                     </div>
                 </div>
@@ -212,14 +212,14 @@
             </header>
             <div class="main-box-body clearfix">
                 <div class="form-group">
-                    <label class="checkbox-inline" style="display:flex;align-items:center;gap:8px;font-weight:normal">
+                    <label class="checkbox-inline marble-check-label">
                         <input type="hidden" name="is_form" value="0">
                         <input type="checkbox" name="is_form" value="1" id="is_form_checkbox" {{ $blueprint->is_form ? 'checked' : '' }}>
                         {{ trans('marble::admin.is_form') }}
                     </label>
-                    <small class="text-muted" style="display:block;margin-top:4px">{{ trans('marble::admin.is_form_hint') }}</small>
+                    <small class="text-muted marble-block marble-mt-xs">{{ trans('marble::admin.is_form_hint') }}</small>
                 </div>
-                <div id="form-builder-options" style="{{ $blueprint->is_form ? '' : 'display:none' }}">
+                <div id="form-builder-options" class="{{ $blueprint->is_form ? '' : 'marble-hidden' }}">
                     <div class="form-group">
                         <label>{{ trans('marble::admin.form_recipients') }}</label>
                         <input type="text" name="form_recipients" value="{{ $blueprint->form_recipients }}" class="form-control" placeholder="email@example.com, other@example.com" />
@@ -254,7 +254,7 @@
 
     <script>
         document.getElementById('is_form_checkbox').addEventListener('change', function(){
-            document.getElementById('form-builder-options').style.display = this.checked ? '' : 'none';
+            document.getElementById('form-builder-options').classList.toggle('marble-hidden', !this.checked);
         });
 
         // Icon search/autocomplete
@@ -276,17 +276,11 @@
                 if (matches.length === 0) { $list.hide(); return; }
 
                 matches.forEach(function(icon) {
-                    var $li = $('<li>').css({
-                        display: 'flex', alignItems: 'center', gap: '8px',
-                        padding: '5px 10px', cursor: 'pointer', fontSize: '13px'
-                    }).hover(
-                        function() { $(this).css('background', '#e8f0fb'); },
-                        function() { $(this).css('background', ''); }
-                    ).on('mousedown', function(e) {
+                    var $li = $('<li class="marble-icon-suggestion-item">').on('mousedown', function(e) {
                         e.preventDefault();
                         selectIcon(icon);
                     });
-                    $li.append($('<img>').attr('src', baseUrl + icon + '.svg').css({ width: 16, height: 16, flexShrink: 0 }));
+                    $li.append($('<img class="marble-icon-suggestion-thumb">').attr('src', baseUrl + icon + '.svg'));
                     $li.append($('<span>').text(icon));
                     $list.append($li);
                 });
@@ -296,7 +290,7 @@
             function selectIcon(icon) {
                 $hidden.val(icon);
                 $input.val(icon);
-                $preview.attr('src', baseUrl + icon + '.svg').css('opacity', 1);
+                $preview.attr('src', baseUrl + icon + '.svg').removeClass('marble-icon-preview-empty');
                 $list.hide();
             }
 
@@ -312,11 +306,11 @@
                 if (e.key === 'ArrowDown') {
                     e.preventDefault();
                     var $next = $active.length ? $active.removeClass('ac-active').next() : $items.first();
-                    $next.addClass('ac-active').css('background', '#e8f0fb');
+                    $next.addClass('ac-active');
                 } else if (e.key === 'ArrowUp') {
                     e.preventDefault();
                     var $prev = $active.length ? $active.removeClass('ac-active').prev() : $items.last();
-                    $prev.addClass('ac-active').css('background', '#e8f0fb');
+                    $prev.addClass('ac-active');
                 } else if (e.key === 'Enter' && $active.length) {
                     e.preventDefault();
                     selectIcon($active.find('span').text());

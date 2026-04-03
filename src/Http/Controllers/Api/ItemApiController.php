@@ -53,7 +53,9 @@ class ItemApiController extends Controller
 
         $paginator = $query->paginate($perPage);
 
-        $data = $paginator->getCollection()->map(fn (Item $item) => $this->serializeItem($item, $languageId));
+        $collection    = $paginator->getCollection();
+        $relatedCache  = $this->preloadRelated($collection);
+        $data = $collection->map(fn (Item $item) => $this->serializeItem($item, $languageId, $relatedCache));
 
         return response()->json([
             'data' => $data,
@@ -123,7 +125,9 @@ class ItemApiController extends Controller
 
         $paginator = $query->paginate($perPage);
 
-        $data = $paginator->getCollection()->map(fn (Item $child) => $this->serializeItem($child, $languageId));
+        $collection   = $paginator->getCollection();
+        $relatedCache = $this->preloadRelated($collection);
+        $data = $collection->map(fn (Item $child) => $this->serializeItem($child, $languageId, $relatedCache));
 
         return response()->json([
             'data' => $data,
@@ -162,7 +166,7 @@ class ItemApiController extends Controller
         return response()->json($this->serializeItem($item, $languageId));
     }
 
-    private function serializeItem(Item $item, int $languageId): array
+    private function serializeItem(Item $item, int $languageId, array $relatedCache = []): array
     {
         if (!$item->relationLoaded('blueprint')) {
             $item->load(['blueprint.fields.fieldType', 'workflowStep']);
@@ -176,14 +180,17 @@ class ItemApiController extends Controller
 
             if ($fieldTypeIdentifier === 'object_relation') {
                 if ($rawValue) {
-                    $related = Item::with(['blueprint.fields.fieldType'])->find((int) $rawValue);
+                    $related = $relatedCache[(int) $rawValue]
+                        ?? Item::with(['blueprint.fields.fieldType'])->find((int) $rawValue);
                     $fields[$field->identifier] = $related ? $this->serializeItemShallow($related, $languageId) : null;
                 } else {
                     $fields[$field->identifier] = null;
                 }
             } elseif ($fieldTypeIdentifier === 'object_relation_list') {
                 $ids = is_array($rawValue) ? $rawValue : (json_decode($rawValue ?? '[]', true) ?? []);
-                $relatedItems = Item::with(['blueprint.fields.fieldType'])->findMany($ids);
+                $relatedItems = collect($ids)->map(fn ($id) =>
+                    $relatedCache[(int) $id] ?? Item::with(['blueprint.fields.fieldType'])->find((int) $id)
+                )->filter();
                 $fields[$field->identifier] = $relatedItems->map(fn (Item $r) => $this->serializeItemShallow($r, $languageId))->values()->all();
             } else {
                 $fields[$field->identifier] = $item->value($field->identifier, $languageId);
@@ -211,6 +218,39 @@ class ItemApiController extends Controller
             'updated_at'    => $item->updated_at?->toIso8601String(),
             'fields'        => $fields,
         ];
+    }
+
+    /**
+     * Pre-load all items referenced by object_relation / object_relation_list fields
+     * across a collection, keyed by ID, to avoid N+1 queries during serialization.
+     */
+    private function preloadRelated(\Illuminate\Support\Collection $items): array
+    {
+        $ids = collect();
+
+        foreach ($items as $item) {
+            foreach ($item->blueprint->fields as $field) {
+                $identifier = $field->fieldType?->identifier ?? '';
+                $raw = $item->rawValue($field->identifier, 0); // language-agnostic raw lookup
+
+                if ($identifier === 'object_relation' && $raw) {
+                    $ids->push((int) $raw);
+                } elseif ($identifier === 'object_relation_list') {
+                    $decoded = is_array($raw) ? $raw : (json_decode($raw ?? '[]', true) ?? []);
+                    $ids = $ids->merge(array_map('intval', $decoded));
+                }
+            }
+        }
+
+        if ($ids->isEmpty()) {
+            return [];
+        }
+
+        return Item::with(['blueprint.fields.fieldType'])
+            ->whereIn('id', $ids->unique()->all())
+            ->get()
+            ->keyBy('id')
+            ->all();
     }
 
     /**

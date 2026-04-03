@@ -4,6 +4,7 @@ namespace Marble\Admin\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\DB;
 use Marble\Admin\Models\User;
 use Marble\Admin\Models\UserGroup;
 use Marble\Admin\Models\Workflow;
@@ -47,61 +48,70 @@ class WorkflowController extends Controller
             'steps.*.name'               => 'required|string|max:255',
             'steps.*.reject_enabled'     => 'nullable|boolean',
             'steps.*.reject_to_step_id'  => 'nullable|integer',
+            'steps.*.deadline_days'      => 'nullable|integer|min:1|max:3650',
             'steps.*.allowed_groups'     => 'nullable|array',
             'steps.*.notifiables'        => 'nullable|array',
         ]);
 
-        $workflow->update(['name' => $request->input('name')]);
+        DB::transaction(function () use ($request, $workflow) {
+            $workflow->update(['name' => $request->input('name')]);
 
-        $incoming    = collect($request->input('steps', []));
-        $existingIds = $workflow->steps->pluck('id')->toArray();
-        $keptIds     = $incoming->pluck('id')->filter()->map(fn ($id) => (int) $id)->toArray();
-        $toDelete    = array_diff($existingIds, $keptIds);
+            $incoming    = collect($request->input('steps', []));
+            $existingIds = $workflow->steps->pluck('id')->toArray();
+            $keptIds     = $incoming->pluck('id')->filter()->map(fn ($id) => (int) $id)->toArray();
+            $toDelete    = array_diff($existingIds, $keptIds);
 
-        WorkflowStep::whereIn('id', $toDelete)->delete();
+            WorkflowStep::whereIn('id', $toDelete)->delete();
 
-        foreach ($incoming as $i => $stepData) {
-            $rejectEnabled   = !empty($stepData['reject_enabled']);
-            $rejectToStepId  = $rejectEnabled && !empty($stepData['reject_to_step_id'])
-                ? (int) $stepData['reject_to_step_id']
-                : null;
+            foreach ($incoming as $i => $stepData) {
+                $rejectEnabled   = !empty($stepData['reject_enabled']);
+                $rejectToStepId  = $rejectEnabled && !empty($stepData['reject_to_step_id'])
+                    ? (int) $stepData['reject_to_step_id']
+                    : null;
+                $deadlineDays    = !empty($stepData['deadline_days']) ? (int) $stepData['deadline_days'] : null;
 
-            if (!empty($stepData['id'])) {
-                $step = WorkflowStep::find((int) $stepData['id']);
-                $step->update([
-                    'name'              => $stepData['name'],
-                    'sort_order'        => $i,
-                    'reject_enabled'    => $rejectEnabled,
-                    'reject_to_step_id' => $rejectToStepId,
-                ]);
-            } else {
-                $step = WorkflowStep::create([
-                    'workflow_id'       => $workflow->id,
-                    'name'              => $stepData['name'],
-                    'sort_order'        => $i,
-                    'reject_enabled'    => $rejectEnabled,
-                    'reject_to_step_id' => $rejectToStepId,
-                ]);
-            }
-
-            // Sync allowed groups (permissions)
-            $allowedGroups = array_filter((array) ($stepData['allowed_groups'] ?? []), 'is_numeric');
-            $step->allowedGroups()->sync($allowedGroups);
-
-            // Sync notifiables
-            $step->notifiables()->delete();
-            foreach ((array) ($stepData['notifiables'] ?? []) as $n) {
-                if (empty($n['type']) || empty($n['id'])) {
-                    continue;
+                if (!empty($stepData['id'])) {
+                    $step = WorkflowStep::find((int) $stepData['id']);
+                    if (!$step) {
+                        continue;
+                    }
+                    $step->update([
+                        'name'              => $stepData['name'],
+                        'sort_order'        => $i,
+                        'reject_enabled'    => $rejectEnabled,
+                        'reject_to_step_id' => $rejectToStepId,
+                        'deadline_days'     => $deadlineDays,
+                    ]);
+                } else {
+                    $step = WorkflowStep::create([
+                        'workflow_id'       => $workflow->id,
+                        'name'              => $stepData['name'],
+                        'sort_order'        => $i,
+                        'reject_enabled'    => $rejectEnabled,
+                        'reject_to_step_id' => $rejectToStepId,
+                        'deadline_days'     => $deadlineDays,
+                    ]);
                 }
-                WorkflowStepNotifiable::create([
-                    'workflow_step_id' => $step->id,
-                    'notifiable_type'  => $n['type'],
-                    'notifiable_id'    => (int) $n['id'],
-                    'channel'          => in_array($n['channel'] ?? 'cms', ['cms', 'email', 'both']) ? $n['channel'] : 'cms',
-                ]);
+
+                // Sync allowed groups (permissions)
+                $allowedGroups = array_filter((array) ($stepData['allowed_groups'] ?? []), 'is_numeric');
+                $step->allowedGroups()->sync($allowedGroups);
+
+                // Sync notifiables
+                $step->notifiables()->delete();
+                foreach ((array) ($stepData['notifiables'] ?? []) as $n) {
+                    if (empty($n['type']) || empty($n['id'])) {
+                        continue;
+                    }
+                    WorkflowStepNotifiable::create([
+                        'workflow_step_id' => $step->id,
+                        'notifiable_type'  => $n['type'],
+                        'notifiable_id'    => (int) $n['id'],
+                        'channel'          => in_array($n['channel'] ?? 'cms', ['cms', 'email', 'both']) ? $n['channel'] : 'cms',
+                    ]);
+                }
             }
-        }
+        });
 
         return redirect()->route('marble.workflow.edit', $workflow)
             ->with('success', trans('marble::admin.workflow_saved'));
@@ -109,12 +119,14 @@ class WorkflowController extends Controller
 
     public function delete(Workflow $workflow)
     {
-        $workflow->steps()->each(function ($step) {
-            $step->notifiables()->delete();
-            $step->allowedGroups()->detach();
-            $step->delete();
+        DB::transaction(function () use ($workflow) {
+            $workflow->steps()->each(function ($step) {
+                $step->notifiables()->delete();
+                $step->allowedGroups()->detach();
+                $step->delete();
+            });
+            $workflow->delete();
         });
-        $workflow->delete();
 
         return redirect()->route('marble.workflow.index');
     }

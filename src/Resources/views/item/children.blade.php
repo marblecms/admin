@@ -17,26 +17,26 @@
         <div class="table-responsive">
             {{-- Hidden forms for btn-group actions --}}
             @foreach($childItems as $child)
-                <form id="child-duplicate-{{ $child->id }}" method="POST" action="{{ route('marble.item.duplicate', $child) }}" style="display:none">@csrf</form>
-                <form id="child-status-{{ $child->id }}" method="POST" action="{{ route('marble.item.toggle-status', $child) }}" style="display:none">@csrf</form>
-                <form id="child-delete-{{ $child->id }}" method="POST" action="{{ route('marble.item.delete', $child) }}" style="display:none" onsubmit="return confirm('{{ trans('marble::admin.are_you_sure') }}')">@csrf @method('DELETE')</form>
+                <form id="child-duplicate-{{ $child->id }}" method="POST" action="{{ route('marble.item.duplicate', $child) }}" class="marble-hidden">@csrf</form>
+                <form id="child-status-{{ $child->id }}" method="POST" action="{{ route('marble.item.toggle-status', $child) }}" class="marble-hidden">@csrf</form>
+                <form id="child-delete-{{ $child->id }}" method="POST" action="{{ route('marble.item.delete', $child) }}" class="marble-hidden" onsubmit="return confirm('{{ trans('marble::admin.are_you_sure') }}')">@csrf @method('DELETE')</form>
             @endforeach
 
             <table class="table table-striped" id="sortable-children">
                 <tbody>
                     @foreach($childItems as $child)
-                        <tr data-node-id="{{ $child->id }}" onclick="window.location='{{ route('marble.item.edit', $child) }}'" style="cursor:pointer">
+                        <tr data-node-id="{{ $child->id }}" onclick="window.location='{{ route('marble.item.edit', $child) }}'" >
                             <td>
                                 @if($child->blueprint->icon)
                                     @include('marble::components.famicon', ['name' => $child->blueprint->icon])
                                 @endif
                                 {{ $child->name() }}
                                 @if($child->status === 'draft')
-                                    <span class="label label-default" style="font-size:10px;margin-left:4px">{{ trans('marble::admin.draft') }}</span>
+                                    <span class="label label-default marble-text-xs marble-mr-xs">{{ trans('marble::admin.draft') }}</span>
                                 @endif
                             </td>
-                            <td class="text-right" onclick="event.stopPropagation()" style="width:1%;white-space:nowrap">
-                                <div class="btn-group btn-group-xs" style="white-space:nowrap;display:inline-flex;flex-wrap:nowrap">
+                            <td class="text-right marble-cell-right" onclick="event.stopPropagation()">
+                                <div class="btn-group btn-group-xs marble-btn-group-inline">
                                     <a href="{{ route('marble.item.edit', $child) }}" class="btn btn-xs btn-info">
                                         @include('marble::components.famicon', ['name' => 'pencil']) {{ trans('marble::admin.edit') }}
                                     </a>
@@ -71,7 +71,7 @@
             </script>
         </div>
         @else
-            <p class="text-muted" style="padding:10px 0;text-align:center;margin:0">{{ trans('marble::admin.no_children') }}</p>
+            <p class="text-muted text-center marble-mb-0 marble-mt-xs marble-mb-xs">{{ trans('marble::admin.no_children') }}</p>
         @endif
     </div>
 </div>

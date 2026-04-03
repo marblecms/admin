@@ -5,6 +5,7 @@ namespace Marble\Admin\Http\Controllers;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\DB;
 use Marble\Admin\Models\Blueprint;
 use Marble\Admin\Models\Item;
 use Marble\Admin\Models\ItemValue;
@@ -45,10 +46,15 @@ class ImportExportController extends Controller
             'parent_id' => 'required|exists:items,id',
         ]);
 
-        $json    = json_decode(file_get_contents($request->file('file')->getRealPath()), true);
-        $parent  = Item::findOrFail($request->input('parent_id'));
+        $json = json_decode(file_get_contents($request->file('file')->getRealPath()), true);
 
-        $this->importItem($json['item'], $parent->id);
+        if (!is_array($json) || !isset($json['item']) || !is_array($json['item'])) {
+            return redirect()->back()->withErrors(['file' => trans('marble::admin.import_invalid_file')]);
+        }
+
+        $parent = Item::findOrFail($request->input('parent_id'));
+
+        DB::transaction(fn () => $this->importItem($json['item'], $parent->id));
 
         return redirect()->route('marble.item.edit', $parent->id)
             ->with('success', trans('marble::admin.import_success'));
@@ -58,16 +64,14 @@ class ImportExportController extends Controller
 
     protected function serializeItem(Item $item): array
     {
-        $languages = Language::all();
-        $values    = [];
+        $languages  = Language::all();
+        $allValues  = $item->itemValues()->get()->keyBy(fn ($iv) => $iv->blueprint_field_id . '_' . $iv->language_id);
+        $values     = [];
 
         foreach ($item->blueprint->fields as $field) {
             $values[$field->identifier] = [];
             foreach ($languages as $lang) {
-                $iv = $item->itemValues()
-                    ->where('blueprint_field_id', $field->id)
-                    ->where('language_id', $lang->id)
-                    ->first();
+                $iv = $allValues->get($field->id . '_' . $lang->id);
                 $values[$field->identifier][$lang->code] = $iv ? $iv->value : null;
             }
         }

@@ -2,8 +2,7 @@
 
 namespace Marble\Admin\Services;
 
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
+use Marble\Admin\Jobs\SendWebhookJob;
 use Marble\Admin\Models\Item;
 use Marble\Admin\Models\Webhook;
 
@@ -58,23 +57,6 @@ class WebhookService
 
     protected function dispatch(Webhook $webhook, array $payload): void
     {
-        try {
-            $request = Http::timeout(5)->withHeaders($this->headers($webhook, $payload));
-            $request->post($webhook->url, $payload);
-        } catch (\Throwable $e) {
-            Log::warning("Marble webhook [{$webhook->name}] failed: " . $e->getMessage());
-        }
-    }
-
-    protected function headers(Webhook $webhook, array $payload): array
-    {
-        $headers = ['Content-Type' => 'application/json'];
-
-        if ($webhook->secret) {
-            $signature = hash_hmac('sha256', json_encode($payload), $webhook->secret);
-            $headers['X-Marble-Signature'] = $signature;
-        }
-
-        return $headers;
+        SendWebhookJob::dispatch($webhook, $payload);
     }
 }

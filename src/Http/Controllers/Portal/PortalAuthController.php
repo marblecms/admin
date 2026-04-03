@@ -33,6 +33,7 @@ class PortalAuthController extends Controller
         }
 
         Auth::guard('portal')->login($user, $request->boolean('remember'));
+        $request->session()->regenerate();
 
         return redirect()->intended(config('marble.portal_home', '/'));
     }
@@ -77,6 +78,7 @@ class PortalAuthController extends Controller
         ]);
 
         Auth::guard('portal')->login($user);
+        $request->session()->regenerate();
 
         return redirect(config('marble.portal_home', '/'));
     }

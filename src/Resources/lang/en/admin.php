@@ -5,6 +5,8 @@ return [
     'children'            => 'Children',
     'add_children'        => 'Add Child',
     'add_user'            => 'Add User',
+    'last_login'          => 'Last Login',
+    'account_disabled'    => 'This account has been disabled.',
     'add_usergroup'       => 'Add Usergroup',
     'manage_usergroups'   => 'Manage User Groups',
     'add_class'           => 'Add Blueprint',
@@ -24,6 +26,7 @@ return [
     'import'              => 'Import',
     'import_json'         => 'Import from JSON',
     'import_success'      => 'Import successful.',
+    'import_invalid_file' => 'Invalid import file. Please upload a valid Marble JSON export.',
     'file'                => 'File',
     'meta_information'    => 'Meta Information',
     'dashboard'           => 'Dashboard',
@@ -81,6 +84,7 @@ return [
     'draft'               => 'Draft',
     'set_draft'           => 'Set to Draft',
     'set_published'       => 'Publish',
+    'workflow_required'   => 'This item has a workflow — use the workflow actions to publish.',
 
     'show_in_nav'         => 'Show in Navigation',
     'hide_in_nav'         => 'Hide in Navigation',
@@ -141,6 +145,7 @@ return [
     'publish_at'          => 'Publish at',
     'expires_at'          => 'Expires at',
     'save_schedule'       => 'Save schedule',
+    'scheduling_hint'     => 'Dates only take effect once the item is published.',
 
     // Webhooks
     'webhooks'            => 'Webhooks',
@@ -341,6 +346,13 @@ return [
     'workflow_reject_comment'        => 'Reason (optional)',
     'workflow_reject_comment_hint'   => 'Explain why this item is being rejected...',
     'workflow_history'               => 'History',
+    'workflow_deadline'              => 'Deadline',
+    'workflow_deadline_hint'         => 'Number of days before this step is considered overdue.',
+    'workflow_deadline_days'         => 'days',
+    'workflow_overdue'               => 'Overdue',
+    'workflow_deadlines'             => 'Workflow Deadlines',
+    'deadline_today'                 => 'Due today',
+    'deadline_days_left'             => ':days d left',
     'workflow_permission_denied'     => 'You do not have permission to advance this item.',
     'user'                           => 'User',
     'usergroup_singular'             => 'Group',
@@ -386,10 +398,13 @@ return [
     'no_portal_users'          => 'No portal users yet.',
 
     // Draft preview
+    'preview_not_published_hint' => 'Item must be published to preview. Use the Draft Preview section below to generate a private preview link.',
     'draft_preview'            => 'Draft Preview',
     'draft_preview_hint'       => 'Generate a secret link to preview unpublished content.',
     'preview_url_hint'         => 'This link is publicly accessible and shows the current draft.',
     'generate_preview'         => 'Generate Preview Link',
+    'open_preview'             => 'Open Preview',
+    'refresh_preview_token'    => 'Refresh Preview Link',
     'refresh_preview'          => 'Refresh Preview Link',
 
     // Copy language

@@ -18,7 +18,7 @@
                 @endif
                 <ul class="list-unstyled">
                     @foreach(session('import_log') as $line)
-                        <li style="padding:2px 0;border-bottom:1px solid #f0f0f0">
+                        <li class="marble-import-log-item">
                             @if(str_starts_with($line, 'Warning'))
                                 <span class="text-warning">{{ $line }}</span>
                             @elseif(str_starts_with($line, 'Note'))
@@ -49,14 +49,14 @@
 
                 <div class="alert alert-info">
                     <strong>Note:</strong> After importing custom field types, you must manually register them in your application's ServiceProvider:
-                    <pre style="margin-top:8px;background:#f9f9f9;padding:8px;">Marble::registerFieldType(new \App\MarbleFieldTypes\YourType\FieldType());</pre>
+                    <pre class="marble-code-hint">Marble::registerFieldType(new \App\MarbleFieldTypes\YourType\FieldType());</pre>
                 </div>
 
                 <button type="submit" class="btn btn-primary">
                     @include('marble::components.famicon', ['name' => 'box'])
                     Import
                 </button>
-                <a href="{{ route('marble.package.export') }}" class="btn btn-default" style="margin-left:8px">
+                <a href="{{ route('marble.package.export') }}" class="btn btn-default marble-ml-sm">
                     Export Package
                 </a>
             </form>

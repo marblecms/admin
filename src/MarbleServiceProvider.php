@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Marble\Admin\Models\Language;
 use Marble\Admin\MarbleRouter;
 use Marble\Admin\Models\Blueprint;
 use Marble\Admin\Models\MarbleSetting;
@@ -62,6 +63,11 @@ class MarbleServiceProvider extends ServiceProvider
         $this->app['router']->pushMiddlewareToGroup('web', \Marble\Admin\Http\Middleware\DetectMarbleSite::class);
         $this->app['router']->pushMiddlewareToGroup('web', \Marble\Admin\Http\Middleware\HandleMarbleRedirects::class);
         $this->app['router']->pushMiddlewareToGroup('web', \Marble\Admin\Http\Middleware\InjectMarbleDebugbar::class);
+
+        // Flush request-scoped caches after each request (Octane compatibility)
+        $this->app->terminating(function () {
+            Language::flushCache();
+        });
     }
 
     protected function mergeDbSettings(): void
@@ -246,8 +252,10 @@ class MarbleServiceProvider extends ServiceProvider
                 \Marble\Admin\Console\SitemapCommand::class,
                 \Marble\Admin\Console\ExportCommand::class,
                 \Marble\Admin\Console\SchedulePublishCommand::class,
+                \Marble\Admin\Console\WorkflowDeadlineCommand::class,
                 \Marble\Admin\Console\MakeBlueprintCommand::class,
                 \Marble\Admin\Console\DoctorCommand::class,
+                \Marble\Admin\Console\PruneCommand::class,
             ]);
         }
     }

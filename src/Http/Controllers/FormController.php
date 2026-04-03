@@ -41,7 +41,10 @@ class FormController extends Controller
         MarbleFormSubmitted::dispatch($submission, $item, $data);
 
         // Send e-mail notification if recipients configured
-        $recipients = array_filter(array_map('trim', explode(',', $item->blueprint->form_recipients ?? '')));
+        $recipients = array_filter(
+            array_map('trim', explode(',', $item->blueprint->form_recipients ?? '')),
+            fn ($email) => filter_var($email, FILTER_VALIDATE_EMAIL) !== false
+        );
         if (!empty($recipients)) {
             $subject = 'New form submission: ' . $item->name();
             $body = "A new form submission was received.\n\n";
@@ -65,7 +68,7 @@ class FormController extends Controller
         // Redirect to success item if configured
         if ($item->blueprint->form_success_item_id) {
             $successItem = \Marble\Admin\Models\Item::find($item->blueprint->form_success_item_id);
-            if ($successItem) {
+            if ($successItem && $successItem->isPublished()) {
                 return redirect(\Marble\Admin\Facades\Marble::url($successItem));
             }
         }

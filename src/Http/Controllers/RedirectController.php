@@ -19,10 +19,10 @@ class RedirectController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'source_path'  => 'required|string|max:500',
-            'target_path'  => 'nullable|string|max:500',
-            'target_item_id' => 'nullable|exists:items,id',
-            'status_code'  => 'required|in:301,302',
+            'source_path'    => 'required|string|max:500',
+            'target_path'    => 'required_without:target_item_id|nullable|string|max:500',
+            'target_item_id' => 'required_without:target_path|nullable|exists:items,id',
+            'status_code'    => 'required|in:301,302',
         ]);
 
         $source = '/' . ltrim($request->input('source_path'), '/');

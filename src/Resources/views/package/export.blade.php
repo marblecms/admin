@@ -12,7 +12,7 @@
 
                 <div class="form-group">
                     <label>Package Name</label>
-                    <input type="text" name="package_name" class="form-control" value="marble-package" style="max-width:300px" pattern="[a-zA-Z0-9_\-]+" required />
+                    <input type="text" name="package_name" class="form-control marble-input-md-w" value="marble-package" pattern="[a-zA-Z0-9_\-]+" required />
                     <small class="text-muted">Alphanumeric, dashes and underscores only.</small>
                 </div>
 
@@ -24,7 +24,7 @@
                         @else
                             @foreach($blueprints as $blueprint)
                                 <div class="checkbox">
-                                    <label style="font-weight:normal">
+                                    <label class="marble-fw-normal">
                                         <input type="checkbox" name="blueprint_ids[]" value="{{ $blueprint->id }}">
                                         {{ $blueprint->name }}
                                         <small class="text-muted">({{ $blueprint->identifier }})</small>
@@ -40,7 +40,7 @@
                         @else
                             @foreach($customFieldTypes as $ft)
                                 <div class="checkbox">
-                                    <label style="font-weight:normal">
+                                    <label class="marble-fw-normal">
                                         <input type="checkbox" name="field_types[]" value="{{ $ft->identifier() }}">
                                         {{ $ft->name() }}
                                         <small class="text-muted">({{ $ft->identifier() }})</small>
@@ -57,7 +57,7 @@
                     @include('marble::components.famicon', ['name' => 'box'])
                     Download Package
                 </button>
-                <a href="{{ route('marble.package.import') }}" class="btn btn-default" style="margin-left:8px">
+                <a href="{{ route('marble.package.import') }}" class="btn btn-default marble-ml-sm">
                     Import Package
                 </a>
             </form>

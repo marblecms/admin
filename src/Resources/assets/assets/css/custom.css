@@ -54,6 +54,7 @@ h6 { font-size: 11px !important; font-weight: bold !important; text-shadow: none
     min-height: 62px !important;
     padding-top: 0 !important;
     padding-bottom: 0 !important;
+    z-index: 101;
 }
 
 /* x-btn toolbar button style — blue-tinted default, not gray */
@@ -784,8 +785,9 @@ label {
 }
 
 #content-wrapper {
-    margin-left: 320px;
-    border-left: 1px solid #6593CF !important;
+    margin-left: 319px;
+    border-left: 1px solid #8DB2E3 !important;
+    z-index: 100;
 }
 
 .container-login #content-wrapper{
@@ -1410,3 +1412,353 @@ body.iframe{
     user-select: none;
     flex-shrink: 0;
 }
+/* ── Autosave toast ──────────────────────────────────────────────────────── */
+#marble-autosave-toast {
+    display: none;
+    position: fixed;
+    top: 70px;
+    right: 24px;
+    padding: 10px 18px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    z-index: 99999;
+    box-shadow: 0 4px 12px rgba(0,0,0,.2);
+    color: #fff;
+}
+#marble-autosave-toast.toast-success { background: #27ae60; }
+#marble-autosave-toast.toast-error   { background: #c0392b; }
+#marble-autosave-toast.toast-saving  { background: #7f8c8d; }
+
+/* ── Save button spinner ─────────────────────────────────────────────────── */
+.marble-spinner {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border: 2px solid rgba(255,255,255,.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: marble-spin .6s linear infinite;
+    vertical-align: middle;
+}
+@keyframes marble-spin { to { transform: rotate(360deg); } }
+
+.marble-inline-form { display: inline; }
+
+/* ── Marble utility classes — extracted from inline styles ─────────────────── */
+
+/* Sidebar box content padding */
+.marble-box-body { padding: 10px 15px; }
+
+/* Clickable table rows */
+tr[onclick] { cursor: pointer; }
+
+/* Flex utilities */
+.marble-flex-1 { flex: 1; }
+.marble-flex-center { display: flex; align-items: center; gap: 8px; }
+
+/* Checkbox / radio label row */
+.marble-check-label { display: flex; align-items: center; gap: 8px; font-weight: normal; }
+
+/* Hint text below fields */
+.marble-field-hint { display: block; margin-top: 4px; }
+
+/* Text utilities */
+.marble-text-sm  { font-size: 12px; }
+.marble-text-xs  { font-size: 11px; }
+.marble-break-all { word-break: break-all; }
+.marble-nowrap   { white-space: nowrap; }
+
+/* Tables flush to box edges (no bottom margin) */
+.table { margin-bottom: 0 !important; }
+.marble-table-flush { margin-bottom: 0; }
+
+/* Right-aligned cell, vertically centered */
+.marble-cell-right { text-align: right; vertical-align: middle; white-space: nowrap; }
+
+/* Subtle muted label — e.g. for step name, blueprint name under item title */
+.marble-meta { color: #999; font-size: 12px; }
+
+/* Primary link colour used in breadcrumbs and tree */
+.marble-link { color: #5580B0; }
+
+/* ── Additional utility classes ─────────────────────────────────────────────── */
+
+/* Vertical align */
+.marble-vmid { vertical-align: middle; }
+
+/* Flex with smaller gap */
+.marble-flex-center-sm { display: flex; align-items: center; gap: 6px; }
+
+/* Flex with space-between */
+.marble-flex-between { display: flex; align-items: center; justify-content: space-between; }
+
+/* Flex wrap for inline forms */
+.marble-flex-wrap { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end; }
+
+/* Monospace text */
+.marble-mono { font-family: monospace; font-size: 12px; }
+
+/* Uppercase section label (used in workflow config panel headers) */
+.marble-section-label { font-size: 12px; text-transform: uppercase; color: #888; letter-spacing: .5px; }
+
+/* Small form label (above inline inputs) */
+.marble-label-sm { display: block; font-size: 11px; color: #777; margin-bottom: 3px; }
+
+/* Normal font weight */
+.marble-fw-normal { font-weight: normal; }
+
+/* Margin utilities */
+.marble-mt-xxl { margin-top: 60px; }
+.marble-mt-md  { margin-top: 16px; }
+.marble-mt-sm  { margin-top: 8px; }
+.marble-mt-xs  { margin-top: 4px; }
+.marble-mb-md  { margin-bottom: 16px; }
+.marble-mb-sm  { margin-bottom: 8px; }
+.marble-mb-xs  { margin-bottom: 6px; }
+.marble-mb-0   { margin-bottom: 0; }
+.marble-mr-xs  { margin-right: 4px; }
+
+/* Padding utilities */
+.marble-pad-md { padding: 16px; }
+
+/* Display / position */
+.marble-block    { display: block; }
+.marble-hidden   { display: none; }
+.marble-relative { position: relative; }
+
+/* ── Notification bell ───────────────────────────────────────────────────────── */
+.marble-bell-btn { position: relative; }
+#notification-badge {
+    position: absolute; top: 4px; right: 4px;
+    background: #d9534f; color: #fff;
+    border-radius: 50%; width: 16px; height: 16px;
+    font-size: 10px; line-height: 16px; text-align: center; font-weight: bold;
+}
+.marble-notif-dropdown  { min-width: 320px; max-height: 400px; overflow-y: auto; padding: 0; border-radius: 3px; }
+.marble-notif-header    { padding: 10px 15px; border-bottom: 1px solid #eee; }
+.marble-notif-empty     { padding: 20px 15px; text-align: center; color: #999; font-size: 13px; }
+.marble-notif-item      { border-bottom: 1px solid #f0f0f0; }
+.marble-notif-item-unread { background: #f8fbff; }
+.marble-notif-link      { display: block; padding: 10px 15px; white-space: normal; }
+.marble-notif-body      { font-size: 12px; color: #666; margin-top: 2px; }
+
+/* ── Language switcher ───────────────────────────────────────────────────────── */
+.marble-lang-dropdown { min-width: 160px; padding: 0; border-radius: 3px; overflow: hidden; }
+.marble-lang-item     { display: block; border-bottom: 1px solid #e7ebee; margin: 0; }
+.marble-lang-btn      { display: block; width: 100%; text-align: left; padding: 0 20px; height: 40px;
+                         line-height: 40px; border: none; font-size: 12px; cursor: pointer; }
+.marble-lang-btn.is-current { background: #f0f4f8; font-weight: bold; }
+
+/* ── Media library ───────────────────────────────────────────────────────────── */
+.marble-breadcrumb     { margin: -6px 0 12px; font-size: 12px; color: #888; }
+.marble-breadcrumb-sep { margin: 0 4px; color: #bbb; }
+.marble-folder-grid    { display: flex; flex-wrap: wrap; gap: 12px; }
+.marble-folder-wrap    { position: relative; width: 120px; }
+.marble-folder-card    { display: flex; flex-direction: column; align-items: center;
+                          padding: 14px 10px; background: #f8f9fa; border: 1px solid #e9ecef;
+                          border-radius: 6px; text-decoration: none; color: inherit;
+                          transition: background .15s; width: 100%; }
+.marble-folder-card:hover,
+.marble-folder-card:focus { background: #e9ecef; color: inherit; text-decoration: none; }
+.marble-folder-name    { margin-top: 8px; font-size: 12px; text-align: center; word-break: break-word; max-width: 100px; }
+.marble-folder-count   { color: #999; font-size: 11px; }
+.marble-folder-actions { position: absolute; top: 4px; right: 4px; display: flex; gap: 3px;
+                          opacity: 0.5; transition: opacity .15s; z-index: 2; }
+.marble-folder-wrap:hover .marble-folder-actions { opacity: 1; }
+.marble-btn-icon       { padding: 2px 5px; line-height: 1; }
+
+.marble-file-thumb     { display: flex; align-items: center; justify-content: center;
+                          height: 100%; background: #f0f4f8; flex-direction: column; gap: 4px; }
+.marble-file-ext       { font-size: 10px; color: #999; text-transform: uppercase; letter-spacing: .5px; }
+
+.marble-drop-zone      { border: 2px dashed #ccc; border-radius: 6px; padding: 20px;
+                          text-align: center; margin-bottom: 20px; transition: all .2s; background: #fafafa; }
+.marble-drop-zone-label { color: #999; font-size: 13px; }
+
+/* Focal point modal */
+.marble-focal-body    { text-align: center; background: #222; padding: 20px; }
+.marble-focal-wrap    { position: relative; display: inline-block; cursor: crosshair; }
+.marble-focal-img     { max-width: 100%; max-height: 60vh; display: block; }
+.marble-focal-crosshair { position: absolute; width: 24px; height: 24px;
+                           margin-left: -12px; margin-top: -12px; pointer-events: none; }
+.marble-focal-ch-h    { position: absolute; top: 50%; left: 0; right: 0; height: 2px;
+                         background: #fff; margin-top: -1px; box-shadow: 0 0 3px rgba(0,0,0,.8); }
+.marble-focal-ch-v    { position: absolute; left: 50%; top: 0; bottom: 0; width: 2px;
+                         background: #fff; margin-left: -1px; box-shadow: 0 0 3px rgba(0,0,0,.8); }
+.marble-focal-dot     { position: absolute; top: 50%; left: 50%; width: 8px; height: 8px;
+                         background: #e74c3c; border-radius: 50%; margin: -4px 0 0 -4px; border: 2px solid #fff; }
+.marble-focal-hint    { color: #aaa; font-size: 12px; margin-top: 10px; }
+.marble-focal-coords  { color: #999; font-size: 12px; margin-right: auto; }
+.marble-focal-indicator { position: absolute; width: 10px; height: 10px; border-radius: 50%;
+                           background: #e74c3c; border: 2px solid #fff;
+                           box-shadow: 0 0 3px rgba(0,0,0,.5); pointer-events: none; }
+
+/* ── Revision diff ───────────────────────────────────────────────────────────── */
+.marble-diff-before       { color: #c0392b; }
+.marble-diff-after        { color: #27ae60; }
+.marble-diff-cell-before  { background: #fff5f5; max-width: 300px; word-break: break-word; }
+.marble-diff-cell-after   { background: #f5fff8; max-width: 300px; word-break: break-word; }
+.marble-fw-bold           { font-weight: bold; }
+
+/* ── Configuration page ──────────────────────────────────────────────────────── */
+.marble-config-label   { width: 50%; vertical-align: middle; }
+.marble-hint           { font-size: 11px; margin: 2px 0 0; }
+.marble-input-num-sm   { width: 80px; display: inline-block; }
+.marble-input-num-xs   { width: 70px; display: inline-block; }
+/* Table column widths */
+.marble-col-xs { width: 60px; }
+.marble-col-sm { width: 80px; }
+.marble-col-md { width: 120px; }
+/* New row highlight */
+.marble-row-new { background: #f9f9f9; }
+
+/* ── Famicon (icon component used everywhere) ────────────────────────────────── */
+.marble-famicon { vertical-align: middle; margin-right: 2px; position: relative; top: -1px; }
+
+/* ── Dashboard ───────────────────────────────────────────────────────────────── */
+.marble-color-inherit  { color: inherit; }
+.marble-icon-cell      { width: 20px; padding-right: 0; color: #999; }
+
+/* ── Sidebar partials ────────────────────────────────────────────────────────── */
+.marble-pl-lg          { padding-left: 24px; }
+.marble-lang-select     { width: 60px; }
+.marble-lang-name-input { width: 180px; }
+.marble-picker-input   { cursor: pointer; background: #fff; }
+.marble-route-row      { display: flex; align-items: baseline; gap: 6px;
+                          padding: 4px 0; border-bottom: 1px dotted #eee; font-size: 12px; }
+.marble-route-label    { min-width: 42px; }
+.marble-fw-bold        { font-weight: bold; } /* already added above but safe to have once */
+
+/* ── Children table / forms ─────────────────────────────────────────────────── */
+.marble-btn-group-inline { white-space: nowrap; display: inline-flex; flex-wrap: nowrap; }
+
+/* ── Form submissions ────────────────────────────────────────────────────────── */
+.marble-ml-auto  { margin-left: auto; }
+.marble-col-label { width: 200px; font-weight: bold; }
+
+/* ── File / image field types ────────────────────────────────────────────────── */
+.marble-file-current { display: flex; align-items: center; gap: 8px; margin-bottom: 6px;
+                        padding: 6px 10px; background: #f8f8f8; border: 1px solid #ddd; border-radius: 3px; }
+.marble-file-item    { display: flex; align-items: center; gap: 8px; padding: 5px 10px;
+                        background: #f8f8f8; border: 1px solid #ddd; border-radius: 3px; margin-bottom: 4px; }
+.marble-thumb-preview { max-width: 200px; max-height: 150px; border: 1px solid #ddd; }
+
+/* ── Key/value & repeater field panels ──────────────────────────────────────── */
+.marble-kv-panel       { background: #f4f4f4; padding: 15px; border-radius: 3px; }
+.marble-kv-header      { display: flex; gap: 8px; margin-bottom: 4px;
+                          font-size: 11px; color: #777; font-weight: bold; }
+.marble-kv-row         { display: flex; gap: 8px; margin-bottom: 4px; }
+.marble-kv-row-pb      { padding-bottom: 3px; }
+.marble-kv-input-key   { display: inline-block; width: 100px; margin-right: 10px; }
+.marble-kv-input-value { display: inline-block; width: 300px; }
+.marble-remove-row     { color: #c0392b; line-height: 34px; font-size: 18px; }
+
+/* ── Blueprint fields page ───────────────────────────────────────────────────── */
+.marble-type-select    { width: auto; margin-right: 30px; }
+.marble-field-delete-btn { position: absolute; top: 4px; right: 4px; }
+.marble-btn-rules      { height: 30px; }
+.marble-rules-menu     { font-size: 14px; min-width: 140px; }
+.marble-pt-lg          { padding-top: 20px; }
+.marble-mb-xs-form     { margin-bottom: 4px; }
+
+/* ── Redirect page ───────────────────────────────────────────────────────────── */
+.marble-redirect-arrow { line-height: 30px; color: #aaa; margin-top: 16px; }
+.marble-redirect-input { width: 200px; }
+.marble-suggest-list   { position: absolute; top: 100%; left: 0; width: 300px; z-index: 9999;
+                          margin: 0; max-height: 200px; overflow-y: auto;
+                          box-shadow: 0 4px 12px rgba(0,0,0,.15); }
+.marble-suggest-item   { cursor: pointer; font-size: 12px; padding: 6px 10px; }
+
+/* ── Icon picker (blueprint edit) ───────────────────────────────────────────── */
+.marble-icon-suggestions { position: absolute; z-index: 9999; background: #fff;
+                            border: 1px solid #c0c0c0; border-radius: 3px;
+                            margin: 0; padding: 0; list-style: none; width: 100%;
+                            max-height: 220px; overflow-y: auto;
+                            box-shadow: 0 3px 8px rgba(0,0,0,.15); }
+.marble-icon-suggestion-item { display: flex; align-items: center; gap: 8px;
+                                padding: 5px 10px; cursor: pointer; font-size: 13px; }
+.marble-icon-suggestion-item:hover,
+.marble-icon-suggestion-item.ac-active { background: #e8f0fb; }
+.marble-icon-suggestion-thumb { width: 16px; height: 16px; flex-shrink: 0; }
+.marble-icon-preview       { flex-shrink: 0; }
+.marble-icon-preview-empty { opacity: 0.3; }
+
+/* ── Media browser (modal grid) ─────────────────────────────────────────────── */
+.marble-browser-grid    { min-height: 200px; }
+.marble-browser-loading { padding: 40px 0; }
+
+/* ── Workflow timeline ───────────────────────────────────────────────────────── */
+.marble-wf-timeline   { position: relative; padding-left: 20px; margin-bottom: 14px; }
+.marble-wf-line       { position: absolute; left: 7px; top: 8px; bottom: 8px; width: 2px; background: #ddd; }
+.marble-wf-step       { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; position: relative; }
+.marble-wf-dot        { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0;
+                         position: relative; z-index: 1; margin-left: -6px; }
+.marble-wf-dot-overdue { background: #d9534f; }
+.marble-wf-dot-current { background: #337ab7; }
+.marble-wf-dot-done    { background: #5cb85c; }
+.marble-wf-dot-future  { background: #ccc; }
+.marble-wf-text-overdue { font-weight: bold; color: #d9534f; font-size: 13px; }
+.marble-wf-text-current { font-weight: bold; color: #337ab7; font-size: 13px; }
+.marble-wf-text-done    { color: #5cb85c; font-size: 13px; }
+.marble-wf-text-future  { color: #999; font-size: 13px; }
+.marble-wf-badge-overdue { font-size: 10px; background: #d9534f; color: #fff;
+                            border-radius: 3px; padding: 1px 5px; line-height: 16px; }
+.marble-wf-days-left    { font-size: 10px; color: #aaa; }
+.marble-wf-reject-wrap  { clear: both; padding-top: 10px; }
+.marble-wf-history      { clear: both; margin-top: 14px; padding-top: 10px; }
+.marble-wf-history-label { font-size: 11px; text-transform: uppercase; color: #aaa; letter-spacing: .5px; }
+.marble-wf-history-row  { padding: 5px 0; border-bottom: 1px dotted #f0f0f0; font-size: 12px; }
+.marble-wf-comment      { color: #888; margin-top: 2px; padding-left: 18px; }
+
+/* ── Workflow step row ───────────────────────────────────────────────────────── */
+.marble-step-row    { margin-bottom: 8px; border: 1px solid #e0e0e0; border-radius: 3px; background: #fff; }
+.marble-step-header { display: flex; align-items: center; gap: 8px; padding: 8px 10px; }
+.marble-step-handle { cursor: grab; color: #aaa; padding: 0 4px; font-size: 16px; }
+.marble-step-config { border-top: 1px solid #eee; padding: 12px 16px; background: #fafafa; }
+.marble-step-terminal { display: flex; align-items: center; gap: 8px; margin-top: 8px; opacity: 0.45; pointer-events: none; }
+.marble-step-handle-ghost { padding: 0 6px; color: #aaa; }
+.marble-step-spacer   { width: 30px; }
+.marble-notifiable-row { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+
+/* Spacing utilities */
+.marble-ml-xs  { margin-left: 4px; }
+.marble-ml-sm  { margin-left: 8px; }
+.marble-ml-md  { margin-left: 10px; }
+.marble-p-0    { padding: 0; }
+.marble-p-20   { padding: 20px; }
+.marble-invisible { visibility: hidden; }
+.marble-gap-xs { gap: 4px; }
+
+/* Column width utilities */
+.marble-col-xxs  { width: 24px; padding-right: 0; }
+.marble-col-date { width: 140px; }
+.marble-col-lg   { width: 160px; }
+
+/* States */
+.marble-empty-state  { padding: 20px 0; text-align: center; }
+.marble-sidebar-empty { padding: 10px 15px; margin: 0; }
+
+/* Blueprint/tree icons */
+.marble-icon-preview-wrap { position: relative; display: inline-block; margin-right: 6px; vertical-align: middle; }
+.marble-mount-badge       { opacity: 0.5; margin-left: 3px; font-size: 10px; }
+
+/* Date/time field inputs */
+.marble-date-wrap   { width: 100px; float: left; }
+.marble-date-input  { width: 100px; display: inline-block; }
+.marble-time-input  { width: 80px; display: inline-block; }
+.marble-hour-input  { width: 50px; display: inline-block; }
+
+/* API Token */
+.marble-token-code    { font-size: 1.1em; word-break: break-all; }
+.marble-ability-label { display: inline-flex; align-items: center; gap: 6px; margin-right: 16px; font-weight: normal; }
+.marble-input-date    { max-width: 200px; }
+.marble-input-md-w   { max-width: 300px; }
+
+/* Package import/export */
+.marble-import-log-item { padding: 2px 0; border-bottom: 1px solid #f0f0f0; }
+.marble-code-hint       { margin-top: 8px; background: #f9f9f9; padding: 8px; }
+
+/* Portal user */
+.marble-page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+.marble-alert-sm    { padding: 8px 14px; margin-bottom: 12px; }

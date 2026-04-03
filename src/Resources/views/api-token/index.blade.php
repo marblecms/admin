@@ -8,7 +8,7 @@
             <strong>Token created successfully!</strong>
             Copy this token now &mdash; it won't be shown again:
             <br><br>
-            <code style="font-size:1.1em;word-break:break-all;">{{ session('new_token') }}</code>
+            <code class="marble-token-code">{{ session('new_token') }}</code>
         </div>
     @endif
 
@@ -75,11 +75,11 @@
                 <div class="form-group">
                     <label>Abilities</label>
                     <div>
-                        <label style="display:inline-flex;align-items:center;gap:6px;margin-right:16px;font-weight:normal">
+                        <label class="marble-ability-label">
                             <input type="checkbox" name="abilities[]" value="read" checked>
                             read
                         </label>
-                        <label style="display:inline-flex;align-items:center;gap:6px;margin-right:16px;font-weight:normal">
+                        <label class="marble-ability-label">
                             <input type="checkbox" name="abilities[]" value="write">
                             write
                         </label>
@@ -88,7 +88,7 @@
 
                 <div class="form-group">
                     <label>Expires At <small class="text-muted">(optional)</small></label>
-                    <input type="date" name="expires_at" class="form-control" style="max-width:200px" />
+                    <input type="date" name="expires_at" class="form-control marble-input-date" />
                 </div>
 
                 <button type="submit" class="btn btn-success">

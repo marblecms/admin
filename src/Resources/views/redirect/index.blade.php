@@ -14,32 +14,32 @@
         <header class="main-box-header clearfix">
             <h2>@include('marble::components.famicon', ['name' => 'add']) {{ trans('marble::admin.add_redirect') }}</h2>
         </header>
-        <div class="main-box-body clearfix" style="padding:16px">
-            <form method="POST" action="{{ route('marble.redirect.store') }}" class="form-inline" style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
+        <div class="main-box-body clearfix marble-pad-md">
+            <form method="POST" action="{{ route('marble.redirect.store') }}" class="marble-flex-wrap">
                 @csrf
                 <div class="form-group">
-                    <label style="display:block;font-size:11px;color:#777;margin-bottom:3px">{{ trans('marble::admin.source_path') }}</label>
-                    <input type="text" name="source_path" class="form-control input-sm" placeholder="/old-page" style="width:200px" required value="{{ old('source_path') }}" />
+                    <label class="marble-label-sm">{{ trans('marble::admin.source_path') }}</label>
+                    <input type="text" name="source_path" class="form-control input-sm" placeholder="/old-page" class="marble-redirect-input" required value="{{ old('source_path') }}" />
                 </div>
-                <div style="line-height:30px;color:#aaa;margin-top:16px">→</div>
-                <div class="form-group" style="position:relative">
-                    <label style="display:block;font-size:11px;color:#777;margin-bottom:3px">{{ trans('marble::admin.target_path') }}</label>
-                    <input type="text" name="target_path" id="target-path-input" class="form-control input-sm" placeholder="/new-page" style="width:200px" value="{{ old('target_path') }}" autocomplete="off" />
-                    <ul id="target-path-suggestions" class="list-group" style="display:none;position:absolute;top:100%;left:0;width:300px;z-index:9999;margin:0;max-height:200px;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,.15)"></ul>
+                <div class="marble-redirect-arrow">→</div>
+                <div class="form-group marble-relative">
+                    <label class="marble-label-sm">{{ trans('marble::admin.target_path') }}</label>
+                    <input type="text" name="target_path" id="target-path-input" class="form-control input-sm" placeholder="/new-page" class="marble-redirect-input" value="{{ old('target_path') }}" autocomplete="off" />
+                    <ul id="target-path-suggestions" class="list-group marble-suggest-list marble-hidden"></ul>
                 </div>
                 <div class="form-group">
-                    <label style="display:block;font-size:11px;color:#777;margin-bottom:3px">{{ trans('marble::admin.status_code') }}</label>
+                    <label class="marble-label-sm">{{ trans('marble::admin.status_code') }}</label>
                     <select name="status_code" class="form-control input-sm">
                         <option value="301">301 Permanent</option>
                         <option value="302">302 Temporary</option>
                     </select>
                 </div>
-                <button type="submit" class="btn btn-success btn-sm" style="margin-top:16px">
+                <button type="submit" class="btn btn-success btn-sm marble-mt-md">
                     @include('marble::components.famicon', ['name' => 'add']) {{ trans('marble::admin.save') }}
                 </button>
             </form>
             @if($errors->any())
-                <div class="alert alert-danger" style="margin-top:10px;margin-bottom:0">{{ $errors->first() }}</div>
+                <div class="alert alert-danger marble-mt-sm marble-mb-0">{{ $errors->first() }}</div>
             @endif
         </div>
     </div>
@@ -49,31 +49,31 @@
         <header class="main-box-header clearfix">
             <h2>
                 @include('marble::components.famicon', ['name' => 'arrow_right']) {{ trans('marble::admin.redirects') }}
-                <span class="badge" style="margin-left:6px">{{ $redirects->total() }}</span>
+                <span class="badge marble-mr-xs">{{ $redirects->total() }}</span>
             </h2>
         </header>
         <div class="main-box-body clearfix">
             @if($redirects->isEmpty())
-                <p class="text-muted" style="padding:16px 0;text-align:center">{{ trans('marble::admin.no_redirects') }}</p>
+                <p class="text-muted text-center marble-mt-sm marble-mb-sm">{{ trans('marble::admin.no_redirects') }}</p>
             @else
-                <table class="table table-hover" style="margin-bottom:0">
+                <table class="table table-hover marble-table-flush">
                     <thead>
                         <tr>
                             <th>{{ trans('marble::admin.source_path') }}</th>
                             <th>{{ trans('marble::admin.target_path') }}</th>
-                            <th style="width:80px">{{ trans('marble::admin.status_code') }}</th>
-                            <th style="width:60px">{{ trans('marble::admin.hits') }}</th>
-                            <th style="width:70px">{{ trans('marble::admin.active') }}</th>
-                            <th style="width:80px"></th>
+                            <th class="marble-col-sm">{{ trans('marble::admin.status_code') }}</th>
+                            <th class="marble-col-xs">{{ trans('marble::admin.hits') }}</th>
+                            <th class="marble-col-sm">{{ trans('marble::admin.active') }}</th>
+                            <th class="marble-col-sm"></th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($redirects as $redirect)
                             <tr>
-                                <td style="font-family:monospace;font-size:12px">{{ $redirect->source_path }}</td>
-                                <td style="font-family:monospace;font-size:12px;color:#5580B0">
+                                <td class="marble-mono">{{ $redirect->source_path }}</td>
+                                <td class="marble-mono marble-link">
                                     @if($redirect->target_item_id && $redirect->targetItem)
-                                        <a href="{{ route('marble.item.edit', $redirect->targetItem) }}" style="color:#5580B0">
+                                        <a href="{{ route('marble.item.edit', $redirect->targetItem) }}" class="marble-link">
                                             @include('marble::components.famicon', ['name' => 'page_white'])
                                             {{ $redirect->targetItem->name() ?: '—' }}
                                         </a>
@@ -108,7 +108,7 @@
                         @endforeach
                     </tbody>
                 </table>
-                <div class="text-center" style="margin:12px 0">
+                <div class="text-center marble-mt-sm marble-mb-sm">
                     {{ $redirects->links() }}
                 </div>
             @endif
@@ -131,7 +131,7 @@ $(function() {
             if (!items.length) { $list.hide(); return; }
             $.each(items, function(i, item) {
                 var slug = item.slug || '/';
-                var $li = $('<li class="list-group-item" style="cursor:pointer;font-size:12px;padding:6px 10px"></li>')
+                var $li = $('<li class="list-group-item marble-suggest-item"></li>')
                     .text(item.name + ' — ' + slug)
                     .on('click', function() {
                         $input.val(slug);

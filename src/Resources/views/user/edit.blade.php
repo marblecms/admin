@@ -37,6 +37,18 @@
                         @endforeach
                     </select>
                 </div>
+                <div class="form-group">
+                    <label class="marble-check-label">
+                        <input type="checkbox" name="active" value="1" {{ old('active', $user?->active ?? true) ? 'checked' : '' }}>
+                        {{ trans('marble::admin.active') }}
+                    </label>
+                </div>
+                @if(!$isNew && $user->last_login_at)
+                <div class="form-group">
+                    <label>{{ trans('marble::admin.last_login') }}</label>
+                    <p class="form-control-static text-muted">{{ $user->last_login_at->format('d.m.Y H:i') }}</p>
+                </div>
+                @endif
             </div>
         </div>
 

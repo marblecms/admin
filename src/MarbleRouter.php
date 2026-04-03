@@ -26,7 +26,7 @@ class MarbleRouter
         // Strip locale prefix if configured
         $strippedLocalePrefix = null;
         if (config('marble.uri_locale_prefix', false)) {
-            foreach (Language::all() as $lang) {
+            foreach (Language::allCached() as $lang) {
                 $prefix = '/' . $lang->code;
                 if (str_starts_with($path, $prefix . '/') || $path === $prefix) {
                     $strippedLocalePrefix = $prefix;
@@ -58,7 +58,7 @@ class MarbleRouter
         // candidates across all languages in one query, then match by full path.
         $languageScope = $strippedLocalePrefix
             ? [Marble::currentLanguageId()]
-            : Language::all()->pluck('id')->all();
+            : Language::allCached()->pluck('id')->all();
 
         // Single query: candidates whose leaf slug matches in any relevant language
         $query = Item::where('status', 'published')
@@ -156,6 +156,12 @@ class MarbleRouter
             ->first();
 
         if ($alias && $alias->item?->isPublished()) {
+            if ($site?->root_item_id) {
+                $rootItem = $site->rootItem;
+                if ($rootItem && !str_starts_with($alias->item->path, $rootItem->path)) {
+                    return null;
+                }
+            }
             Marble::setLanguageById($alias->language_id);
             static::populateDebugbarContext($alias->item, $alias->language_id, $site);
             return $alias->item;

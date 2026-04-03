@@ -9,10 +9,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class WorkflowStep extends Model
 {
-    protected $fillable = ['workflow_id', 'name', 'sort_order', 'reject_enabled', 'reject_to_step_id'];
+    protected $fillable = ['workflow_id', 'name', 'sort_order', 'reject_enabled', 'reject_to_step_id', 'deadline_days'];
 
     protected $casts = [
         'reject_enabled' => 'boolean',
+        'deadline_days'  => 'integer',
     ];
 
     public function workflow(): BelongsTo

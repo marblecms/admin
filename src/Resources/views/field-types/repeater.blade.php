@@ -3,17 +3,17 @@
     $rows = is_array($value) ? array_values($value) : [];
 @endphp
 
-<div id="repeater-{{ $field->id }}-{{ $languageId }}" style="margin-bottom:8px">
+<div id="repeater-{{ $field->id }}-{{ $languageId }}" class="marble-mb-sm">
     @if(empty($subFields))
-        <p class="text-muted" style="font-size:12px">{{ trans('marble::admin.no_repeater_fields') }}</p>
+        <p class="text-muted marble-text-sm">{{ trans('marble::admin.no_repeater_fields') }}</p>
     @else
-        <table class="table table-condensed table-bordered" style="margin-bottom:8px">
+        <table class="table table-condensed table-bordered marble-mb-sm">
             <thead>
                 <tr>
                     @foreach($subFields as $sf)
-                        <th style="font-size:12px">{{ $sf['name'] }}</th>
+                        <th class="marble-text-sm">{{ $sf['name'] }}</th>
                     @endforeach
-                    <th style="width:40px"></th>
+                    <th class="marble-col-xs"></th>
                 </tr>
             </thead>
             <tbody class="repeater-rows">

@@ -14,8 +14,7 @@ class ItemUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'fields'         => ['sometimes', 'array'],
-            'fields.*.*.\'name\'' => ['sometimes', 'string', 'max:255'],
+            'fields' => ['sometimes', 'array'],
         ];
     }
 }

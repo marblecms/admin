@@ -5,7 +5,7 @@
 @section('sidebar')
     <div class="main-box clearfix profile-box-menu">
         <div class="main-box-body clearfix">
-            <div class="profile-box-header gray-bg clearfix" style="padding:0 15px 15px">
+            <div class="profile-box-header gray-bg clearfix">
                 <h2>{{ trans('marble::admin.usergroups') }}</h2>
             </div>
             <div class="profile-box-content clearfix">
@@ -45,22 +45,28 @@
         </header>
         <div class="main-box-body clearfix">
             @if($group->users->isEmpty())
-                <p class="text-muted" style="padding:10px 0;text-align:center;margin:0">No users in this group.</p>
+                <p class="text-muted text-center marble-mt-xs marble-mb-0">No users in this group.</p>
             @else
-            <table class="table table-striped" style="margin-bottom:0">
+            <table class="table table-striped marble-table-flush">
                 <tbody>
                     @foreach($group->users as $user)
-                    <tr>
-                        <td style="width:24px;padding-right:0">
-                            @include('marble::components.famicon', ['name' => 'status_online'])
+                    <tr class="{{ $user->active ? '' : 'text-muted' }}">
+                        <td class="marble-col-xxs">
+                            @include('marble::components.famicon', ['name' => $user->active ? 'status_online' : 'status_offline'])
                         </td>
                         <td>
-                            <a href="{{ url("{$prefix}/user/edit/{$user->id}") }}">{{ $user->name }}</a>
-                            <small class="text-muted" style="margin-left:6px">{{ $user->email }}</small>
+                            <a href="{{ url("{$prefix}/user/edit/{$user->id}") }}" class="{{ $user->active ? '' : 'text-muted' }}">{{ $user->name }}</a>
+                            <small class="text-muted marble-ml-xs">{{ $user->email }}</small>
+                            @if(!$user->active)
+                                <span class="label label-default marble-ml-xs">{{ trans('marble::admin.inactive') }}</span>
+                            @endif
+                        </td>
+                        <td class="text-muted marble-text-sm">
+                            {{ $user->last_login_at ? $user->last_login_at->diffForHumans() : '—' }}
                         </td>
                         <td class="text-right">
                             <a href="{{ url("{$prefix}/user/edit/{$user->id}") }}" class="btn btn-info btn-xs">@include('marble::components.famicon', ['name' => 'pencil'])</a>
-                            <form method="POST" action="{{ url("{$prefix}/user/delete/{$user->id}") }}" style="display:inline" onsubmit="return confirm('{{ trans('marble::admin.are_you_sure') }}')">
+                            <form method="POST" action="{{ url("{$prefix}/user/delete/{$user->id}") }}" class="marble-inline-form" onsubmit="return confirm('{{ trans('marble::admin.are_you_sure') }}')">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-xs btn-danger">@include('marble::components.famicon', ['name' => 'bin'])</button>

@@ -45,8 +45,8 @@
 
                 <div class="form-group">
                     <label>{{ trans('marble::admin.root_node') }}</label>
-                    <small class="text-muted" style="display:block;margin-bottom:4px">{{ trans('marble::admin.root_node_hint') }}</small>
-                    <div style="display:flex;gap:8px;align-items:center">
+                    <small class="text-muted marble-block marble-mb-xs">{{ trans('marble::admin.root_node_hint') }}</small>
+                    <div class="marble-flex-center">
                         <input type="hidden" name="entry_item_id" id="group_entry_item_id_input" value="{{ old('entry_item_id', $group->entry_item_id) }}" />
                         <input type="text" class="form-control" id="group_entry_item_id_display"
                                value="{{ $group->entryItem?->name() }}"
@@ -65,13 +65,13 @@
 
                 <div class="form-group">
                     <label>{{ trans('marble::admin.allowed_classes') }}</label>
-                    <label class="perm-checkbox-label" style="margin-bottom:10px;display:block">
+                    <label class="perm-checkbox-label marble-mb-sm marble-block">
                         <input type="checkbox" name="allow_all_blueprints" value="1" id="allow_all_blueprints_chk"
                                {{ $group->allowsAllBlueprints() ? 'checked' : '' }}>
                         {{ trans('marble::admin.allow_all_blueprints') }}
                     </label>
-                    <div id="blueprint-perms-table" style="{{ $group->allowsAllBlueprints() ? 'display:none' : '' }}">
-                        <table class="table table-bordered table-sm" style="font-size:13px">
+                    <div id="blueprint-perms-table" class="{{ $group->allowsAllBlueprints() ? 'marble-hidden' : '' }}">
+                        <table class="table table-bordered table-sm marble-text-sm">
                             <thead>
                                 <tr>
                                     <th>{{ trans('marble::admin.blueprint') }}</th>
@@ -102,7 +102,7 @@
                 </div>
                 <script>
                     document.getElementById('allow_all_blueprints_chk').addEventListener('change', function() {
-                        document.getElementById('blueprint-perms-table').style.display = this.checked ? 'none' : '';
+                        document.getElementById('blueprint-perms-table').classList.toggle('marble-hidden', this.checked);
                     });
                 </script>
             </div>

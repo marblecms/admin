@@ -2,17 +2,23 @@
 
 namespace Marble\Admin\Http\Controllers;
 
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Marble\Admin\Models\Blueprint;
 use Marble\Admin\Models\BlueprintField;
 use Marble\Admin\Models\BlueprintFieldGroup;
+use Illuminate\Support\Str;
 use Marble\Admin\Models\FieldType;
 
 class BlueprintFieldController extends Controller
 {
+    use AuthorizesRequests;
+
     public function edit(Blueprint $blueprint)
     {
+        $this->authorize('update', $blueprint);
+
         return view('marble::blueprint.fields', [
             'blueprint' => $blueprint,
             'fields' => $blueprint->fields()->with('fieldType', 'fieldGroup')->get(),
@@ -24,11 +30,13 @@ class BlueprintFieldController extends Controller
 
     public function add(Request $request, Blueprint $blueprint)
     {
+        $this->authorize('update', $blueprint);
+
         $fieldType = FieldType::findOrFail($request->input('type'));
 
         BlueprintField::create([
             'name' => 'New Field',
-            'identifier' => 'new_field_' . time(),
+            'identifier' => 'field_' . Str::random(6),
             'blueprint_id' => $blueprint->id,
             'field_type_id' => $fieldType->id,
             'sort_order' => $blueprint->fields()->max('sort_order') + 1,
@@ -41,6 +49,8 @@ class BlueprintFieldController extends Controller
 
     public function delete(Blueprint $blueprint, BlueprintField $field)
     {
+        $this->authorize('update', $blueprint);
+
         $field->delete();
 
         return redirect()->route('marble.blueprint.field.edit', $blueprint);
@@ -48,6 +58,8 @@ class BlueprintFieldController extends Controller
 
     public function save(Request $request, Blueprint $blueprint)
     {
+        $this->authorize('update', $blueprint);
+
         $names = $request->input('name', []);
         $identifiers = $request->input('identifier', []);
         $translatable = $request->input('translatable', []);

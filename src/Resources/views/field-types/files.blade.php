@@ -9,14 +9,14 @@
            class="attribute-files-order-input"
            value="{{ is_array($value) ? implode(',', array_keys($value)) : '' }}" />
 
-    <div class="attribute-files-list" style="margin-bottom:6px">
+    <div class="attribute-files-list marble-mb-xs">
         @if(is_array($value) && $fileCount > 0)
             @foreach($value as $key => $file)
-            <div class="attribute-files-item" data-index="{{ $key }}" style="display:flex;align-items:center;gap:8px;padding:5px 10px;background:#f8f8f8;border:1px solid #ddd;border-radius:3px;margin-bottom:4px">
+            <div class="attribute-files-item marble-file-item" data-index="{{ $key }}">
                 @include('marble::components.famicon', ['name' => 'page_white'])
                 <span>{{ $file['original_filename'] }}</span>
                 <small class="text-muted">({{ number_format(($file['size'] ?? 0) / 1024, 1) }} KB)</small>
-                <div style="margin-left:auto;display:flex;gap:4px">
+                <div class="marble-ml-auto marble-flex-center marble-gap-xs">
                     @if($fileCount > 1)
                     <button type="button" class="btn btn-default btn-xs marble-files-up"
                             @if($loop->first) disabled @endif

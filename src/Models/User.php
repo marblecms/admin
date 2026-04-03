@@ -14,8 +14,15 @@ class User extends Authenticatable
         'email',
         'password',
         'user_group_id',
+        'active',
+        'last_login_at',
         'language',
         'root_item_id',
+    ];
+
+    protected $casts = [
+        'active'        => 'boolean',
+        'last_login_at' => 'datetime',
     ];
 
     protected $hidden = [

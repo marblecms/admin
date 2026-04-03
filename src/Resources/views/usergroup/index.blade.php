@@ -30,7 +30,7 @@
                             <td class="text-right">
                                 <div class="btn-group">
                                     <a href="{{ url("{$prefix}/user-group/edit/{$group->id}") }}" class="btn btn-info btn-xs">@include('marble::components.famicon', ['name' => 'pencil']) {{ trans('marble::admin.edit') }}</a>
-                                    <form method="POST" action="{{ url("{$prefix}/user-group/delete/{$group->id}") }}" style="display:inline" onsubmit="return confirm('{{ trans('marble::admin.are_you_sure') }}')">
+                                    <form method="POST" action="{{ url("{$prefix}/user-group/delete/{$group->id}") }}" class="marble-inline-form" onsubmit="return confirm('{{ trans('marble::admin.are_you_sure') }}')">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-xs btn-danger">@include('marble::components.famicon', ['name' => 'bin']) {{ trans('marble::admin.delete') }}</button>

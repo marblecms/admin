@@ -291,15 +291,15 @@ class MarbleSeeder extends Seeder
             'tagline'             => 'A powerful, tree-based CMS built for developers',
             'meta_title_template' => '%title% | Marble CMS Demo',
             'robots'              => 'index, follow',
-            'phone'               => '+43 1 234 56 789',
-            'email'               => 'hello@marble-cms.dev',
+            'phone'               => '+1 800 000 0000',
+            'email'               => 'hello@example.com',
             'instagram_url'       => 'https://instagram.com/marblecms',
             'facebook_url'        => 'https://facebook.com/marblecms',
             'linkedin_url'        => 'https://linkedin.com/company/marblecms',
             'copyright'           => '© ' . date('Y') . ' Marble CMS Demo. All rights reserved.',
         ]);
         $this->html($siteSettingsItem, $siteSettings, 'meta_description', 'Marble CMS is a flexible, tree-based content management system built on Laravel. It supports multi-site, multi-language, workflows, portal users and headless API.', $this->textblock);
-        $this->html($siteSettingsItem, $siteSettings, 'address', "Marble Street 1\n1010 Vienna, Austria", $this->textblock);
+        $this->html($siteSettingsItem, $siteSettings, 'address', "123 Demo Street\nSample City, 10000", $this->textblock);
 
         // ── Startpage (Homepage) ──────────────────────────────────────────────
         $startpage = $this->item($home, $contentFolder->id, 0, null, false);
@@ -325,7 +325,7 @@ class MarbleSeeder extends Seeder
         $this->vals($aboutUs, ['name' => 'About Us', 'slug' => 'about-us']);
         $this->html($aboutUs, $simplePage, 'content',
             '<p>We are a small, passionate team of developers and designers who believe content management should be simple, powerful, and developer-friendly.</p>'
-            . '<p>Founded in Vienna in 2009, Marble CMS has been continuously refined over 15 years — from vanilla PHP to CodeIgniter to Laravel — always keeping the same core philosophy: <strong>everything is an Item in a tree.</strong></p>'
+            . '<p>Marble CMS has been continuously refined over many years — from early PHP projects to a modern Laravel package — always keeping the same core philosophy: <strong>everything is an Item in a tree.</strong></p>'
             . '<p>Today, Marble powers dozens of websites ranging from small corporate sites to large intranet portals with thousands of content nodes.</p>'
         );
 
@@ -339,8 +339,8 @@ class MarbleSeeder extends Seeder
         $alice = $this->item($teamMember, $ourTeam->id, 0);
         $this->vals($alice, ['name' => 'Alice Schmidt', 'slug' => 'alice-schmidt', 'role' => 'Lead Developer', 'linkedin_url' => 'https://linkedin.com']);
         $this->html($alice, $teamMember, 'bio',
-            '<p>Alice has been writing PHP since PHP 4 and still loves it. She architected the Marble field-type system and leads the backend team.</p>'
-            . '<p>When not coding, she organizes the Vienna PHP Meetup and contributes to open source projects.</p>'
+            '<p>Alice has been writing PHP for over a decade and still loves it. She architected the Marble field-type system and leads the backend team.</p>'
+            . '<p>When not coding, she speaks at developer conferences and contributes to open source projects.</p>'
         );
 
         $bob = $this->item($teamMember, $ourTeam->id, 1);
@@ -362,11 +362,11 @@ class MarbleSeeder extends Seeder
         $this->vals($ourStory, ['name' => 'Our Story', 'slug' => 'our-story']);
         $this->html($ourStory, $simplePage, 'content',
             '<h2>How it all started</h2>'
-            . '<p>In 2009, we needed a CMS for a client project. Nothing on the market felt right — they were either too rigid or too complex. So we built our own.</p>'
+            . '<p>We needed a CMS for a client project. Nothing on the market felt right — they were either too rigid or too complex. So we built our own.</p>'
             . '<h2>The tree concept</h2>'
             . '<p>The core insight was simple: all content is hierarchical. Pages, folders, products, news articles — they all live in a tree. This single idea unlocked enormous flexibility.</p>'
             . '<h2>Open source</h2>'
-            . '<p>In 2024, we decided to open-source Marble. The community response has been incredible. Today, Marble has hundreds of stars on GitHub and a growing ecosystem of plugins and integrations.</p>'
+            . '<p>We decided to open-source Marble and the community response has been great. Today, Marble has a growing ecosystem of users, plugins, and integrations.</p>'
         );
 
         // ── Blog ──────────────────────────────────────────────────────────────
@@ -524,11 +524,11 @@ class MarbleSeeder extends Seeder
         );
 
         $newOffice = $this->item($intranetPage, $internalNews->id, 1);
-        $this->vals($newOffice, ['name' => 'New Vienna Office', 'slug' => 'new-vienna-office']);
+        $this->vals($newOffice, ['name' => 'New Office Space', 'slug' => 'new-office-space']);
         $this->html($newOffice, $intranetPage, 'content',
             '<h2>We\'re moving!</h2>'
-            . '<p>Starting June 1st, the team will be based at our new office in Vienna\'s 7th district. The new space is twice the size of our current office and includes a dedicated meeting room and a proper kitchen.</p>'
-            . '<p><strong>New address:</strong> Kirchengasse 42, 1070 Vienna</p>'
+            . '<p>Starting June 1st, the team will be based at our new office location. The new space is twice the size of our current office and includes a dedicated meeting room and a proper kitchen.</p>'
+            . '<p><strong>New address:</strong> 456 Business Park Drive, Suite 200</p>'
             . '<p>The office warming party is scheduled for June 7th — details to follow via email.</p>'
         );
 
@@ -541,7 +541,7 @@ class MarbleSeeder extends Seeder
             . '<li>📊 Q1 2025 Financial Report</li>'
             . '<li>📋 Project Proposal Template</li>'
             . '<li>🔒 Security Policy</li>'
-            . '<li>📅 2025 Holiday Calendar — Austria</li>'
+            . '<li>📅 2025 Holiday Calendar</li>'
             . '</ul>'
             . '<p><em>Contact HR to request edit access to any document.</em></p>'
         );

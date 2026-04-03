@@ -6,14 +6,14 @@
     <div class="main-box">
         <div class="main-box-body clearfix">
             @if($logs->isEmpty())
-                <p class="text-muted" style="padding:20px 0; text-align:center">{{ trans('marble::admin.no_activity') }}</p>
+                <p class="text-muted marble-empty-state">{{ trans('marble::admin.no_activity') }}</p>
             @else
                 <table class="table table-striped table-hover">
                     <thead>
                         <tr>
-                            <th style="width:140px">{{ trans('marble::admin.date') }}</th>
-                            <th style="width:120px">{{ trans('marble::admin.users') }}</th>
-                            <th style="width:160px">{{ trans('marble::admin.action') }}</th>
+                            <th class="marble-col-date">{{ trans('marble::admin.date') }}</th>
+                            <th class="marble-col-md">{{ trans('marble::admin.users') }}</th>
+                            <th class="marble-col-lg">{{ trans('marble::admin.action') }}</th>
                             <th>{{ trans('marble::admin.name') }}</th>
                         </tr>
                     </thead>
@@ -42,7 +42,7 @@
                     </tbody>
                 </table>
 
-                <div style="padding:10px 0">
+                <div class="marble-mt-xs marble-mb-xs">
                     {{ $logs->links() }}
                 </div>
             @endif

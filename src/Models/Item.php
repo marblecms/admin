@@ -25,14 +25,16 @@ class Item extends Model
         'published_at',
         'expires_at',
         'current_workflow_step_id',
+        'workflow_step_entered_at',
         'preview_token',
     ];
 
     protected $casts = [
-        'sort_order'   => 'integer',
-        'show_in_nav'  => 'boolean',
-        'published_at' => 'datetime',
-        'expires_at'   => 'datetime',
+        'sort_order'               => 'integer',
+        'show_in_nav'              => 'boolean',
+        'published_at'             => 'datetime',
+        'expires_at'               => 'datetime',
+        'workflow_step_entered_at' => 'datetime',
     ];
 
     /**
@@ -122,6 +124,24 @@ class Item extends Model
         }
 
         return $this->current_workflow_step_id === $steps->last()->id;
+    }
+
+    /**
+     * Returns true when the item has been sitting at its current workflow step
+     * longer than the step's deadline_days allows.
+     */
+    public function isWorkflowOverdue(): bool
+    {
+        if (!$this->current_workflow_step_id || !$this->workflow_step_entered_at) {
+            return false;
+        }
+
+        $step = $this->workflowStep;
+        if (!$step || !$step->deadline_days) {
+            return false;
+        }
+
+        return $this->workflow_step_entered_at->addDays($step->deadline_days)->isPast();
     }
 
     // -------------------------------------------------------------------------
@@ -273,7 +293,7 @@ class Item extends Model
      */
     public function allValues(): array
     {
-        $languages = Language::all();
+        $languages = Language::allCached();
         $result = [];
 
         foreach ($this->blueprint->fields as $field) {
@@ -345,7 +365,7 @@ class Item extends Model
     public function slugs(): array
     {
         $slugs = [];
-        foreach (Language::all() as $lang) {
+        foreach (Language::allCached() as $lang) {
             $slugs[$lang->code] = $this->slug($lang->id);
         }
         return $slugs;
@@ -361,7 +381,7 @@ class Item extends Model
         $mounts = $this->mountPoints()->with('mountParent')->get();
         $result = [];
 
-        foreach (Language::all() as $lang) {
+        foreach (Language::allCached() as $lang) {
             $paths = [];
 
             $canonical = $this->slug($lang->id);
@@ -429,7 +449,7 @@ class Item extends Model
         }
 
         // It's a language code like 'de', 'en'
-        $lang = Language::where('code', $language)->first();
+        $lang = Language::allCached()->firstWhere('code', $language);
 
         return $lang ? $lang->id : Marble::currentLanguageId();
     }

@@ -45,7 +45,7 @@
                             <label>{{ trans('marble::admin.webhook_events') }}</label>
                             @foreach($availableEvents as $event)
                                 <div>
-                                    <label style="font-weight:normal">
+                                    <label class="marble-fw-normal">
                                         <input type="checkbox" name="events[]" value="{{ $event }}"
                                             {{ in_array($event, old('events', $webhook?->events ?? [])) ? 'checked' : '' }} />
                                         <code>{{ $event }}</code>

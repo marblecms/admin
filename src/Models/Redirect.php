@@ -15,6 +15,7 @@ class Redirect extends Model
         'target_item_id',
         'status_code',
         'active',
+        'hits',
     ];
 
     protected $casts = [

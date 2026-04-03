@@ -48,6 +48,23 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
+        $deadlineItems = Item::where('status', 'draft')
+            ->whereNotNull('current_workflow_step_id')
+            ->whereNotNull('workflow_step_entered_at')
+            ->whereHas('workflowStep', fn ($q) => $q->whereNotNull('deadline_days'))
+            ->with(['workflowStep', 'blueprint'])
+            ->get()
+            ->map(fn ($item) => [
+                'item'      => $item,
+                'days_left' => (int) now()->diffInDays(
+                    $item->workflow_step_entered_at->addDays($item->workflowStep->deadline_days),
+                    false
+                ),
+            ])
+            ->sortBy('days_left')
+            ->values()
+            ->take(15);
+
         return view('marble::dashboard.view', [
             'blueprints'        => Blueprint::all(),
             'users'             => User::all(),
@@ -57,6 +74,7 @@ class DashboardController extends Controller
             'stats'             => $stats,
             'upcomingItems'     => $upcomingItems,
             'unreadSubmissions' => $unreadSubmissions,
+            'deadlineItems'     => $deadlineItems,
         ]);
     }
 }

@@ -3,6 +3,7 @@
 namespace Marble\Admin\Traits;
 
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
 
 trait HasPath
 {
@@ -63,11 +64,14 @@ trait HasPath
      */
     protected function updateDescendantPaths(string $oldPath, string $newPath): void
     {
-        static::where('path', 'LIKE', $oldPath . '/%')
-            ->each(function ($descendant) use ($oldPath, $newPath) {
-                $descendant->path = str_replace($oldPath, $newPath, $descendant->path);
-                $descendant->saveQuietly();
-            });
+        $table = $this->getTable();
+        $oldPrefix = $oldPath . '/';
+
+        DB::table($table)
+            ->where('path', 'LIKE', $oldPrefix . '%')
+            ->update(['path' => DB::raw(
+                "REPLACE(path, " . DB::getPdo()->quote($oldPath) . ", " . DB::getPdo()->quote($newPath) . ")"
+            )]);
     }
 
     /**

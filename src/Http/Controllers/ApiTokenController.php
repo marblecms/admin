@@ -4,6 +4,7 @@ namespace Marble\Admin\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Auth;
 use Marble\Admin\Models\ApiToken;
 
 class ApiTokenController extends Controller
@@ -31,7 +32,7 @@ class ApiTokenController extends Controller
         ApiToken::create([
             'name'       => $request->input('name'),
             'token'      => $hash,
-            'user_id'    => null,
+            'user_id'    => Auth::guard('marble')->id(),
             'abilities'  => $request->input('abilities', ['read']),
             'expires_at' => $request->input('expires_at') ?: null,
         ]);

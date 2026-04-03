@@ -28,7 +28,14 @@ class ItemWorkflowController extends Controller
 
     public function retreat(Item $item)
     {
-        $this->workflow->retreat($item, Auth::guard('marble')->user());
+        $actor = Auth::guard('marble')->user();
+
+        if (!$this->workflow->canRetreat($item, $actor)) {
+            return redirect()->route('marble.item.edit', $item)
+                ->with('error', trans('marble::admin.workflow_permission_denied'));
+        }
+
+        $this->workflow->retreat($item, $actor);
 
         return redirect()->route('marble.item.edit', $item);
     }

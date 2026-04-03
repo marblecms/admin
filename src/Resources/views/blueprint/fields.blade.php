@@ -5,7 +5,7 @@
 @section('sidebar')
     <div class="main-box clearfix profile-box-menu">
         <div class="main-box-body clearfix">
-            <div class="profile-box-header gray-bg clearfix" style="padding:0 15px 15px">
+            <div class="profile-box-header gray-bg clearfix">
                 <h2>{{ trans('marble::admin.attributegroups') }}</h2>
                 <div class="job-position">{{ $blueprint->name }}</div>
             </div>
@@ -16,7 +16,7 @@
                             <div class="pull-left">
                                 @include('marble::components.famicon', ['name' => 'folder']) {{ $group->name }}
                             </div>
-                            <form method="POST" action="{{ url("{$prefix}/blueprint/{$blueprint->id}/field-group/delete/{$group->id}") }}" style="display:inline" onsubmit="return confirm('{{ trans('marble::admin.are_you_sure') }}')">
+                            <form method="POST" action="{{ url("{$prefix}/blueprint/{$blueprint->id}/field-group/delete/{$group->id}") }}" class="marble-inline-form" onsubmit="return confirm('{{ trans('marble::admin.are_you_sure') }}')">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn pull-right btn-danger btn-xs">@include('marble::components.famicon', ['name' => 'bin'])</button>
@@ -54,10 +54,10 @@
     <h1>
         <span class="pull-left">{{ $blueprint->name }}</span>
         <div class="pull-right">
-            <form action="{{ url("{$prefix}/blueprint/{$blueprint->id}/field/add") }}" method="post" style="display:inline">
+            <form action="{{ url("{$prefix}/blueprint/{$blueprint->id}/field/add") }}" method="post" class="marble-inline-form">
                 @csrf
                 <button type="submit" class="btn btn-lg btn-success pull-right">@include('marble::components.famicon', ['name' => 'add']) {{ trans('marble::admin.add_class') }}</button>
-                <select name="type" class="form-control pull-right" style="width: auto; margin-right: 30px">
+                <select name="type" class="form-control pull-right marble-type-select">
                     @foreach($fieldTypes as $ft)
                         <option value="{{ $ft->id }}">{{ $ft->name }}</option>
                     @endforeach
@@ -99,7 +99,7 @@
         @foreach($groupedFields as $group)
             <div class="class-attribute-sortable">
                 @foreach($group['fields'] as $field)
-                    <div class="main-box" data-attribute-id="{{ $field->id }}" style="position: relative">
+                    <div class="main-box marble-relative" data-attribute-id="{{ $field->id }}">
                         <input type="hidden" name="sort_order[{{ $field->id }}]" value="{{ $field->sort_order }}" class="input-sort-order"/>
 
                         <header class="main-box-header clearfix">
@@ -107,7 +107,7 @@
                         </header>
                         <div class="main-box-body clearfix">
                             @if($field->identifier !== 'name')
-                                <div style="position: absolute; top: 4px; right: 4px">
+                                <div class="marble-field-delete-btn">
                                     <button type="button" class="btn btn-xs btn-danger"
                                         onclick="marbleDeleteField('{{ url("{$prefix}/blueprint/{$blueprint->id}/field/delete/{$field->id}") }}')">
                                         @include('marble::components.famicon', ['name' => 'bin']) {{ trans('marble::admin.delete') }}
@@ -142,15 +142,15 @@
                                     </label>
                                 </div>
                             </div>
-                            <div class="row form-group" style="margin-top:8px">
+                            <div class="row form-group marble-mt-sm">
                                 <div class="col-md-6">
-                                    <div class="form-group" style="margin-bottom:4px">
-                                        <label style="color:#777">{{ trans('marble::admin.validation_rules') }}</label>
-                                        <div class="input-group input-group-sm">
+                                    <div class="form-group marble-mb-xs">
+                                        <label class="text-muted">{{ trans('marble::admin.validation_rules') }}</label>
+                                        <div class="input-group">
                                             <input type="text" name="validation_rules[{{ $field->id }}]" id="vr-input-{{ $field->id }}" value="{{ $field->validation_rules ?? '' }}" class="form-control" placeholder="e.g. required|max:255" />
                                             <div class="input-group-btn">
-                                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" style="height:30px">+ <span class="caret"></span></button>
-                                                <ul class="dropdown-menu dropdown-menu-right" style="font-size:14px;min-width:140px">
+                                                <button type="button" class="btn btn-default dropdown-toggle marble-btn-rules" data-toggle="dropdown">+ <span class="caret"></span></button>
+                                                <ul class="dropdown-menu dropdown-menu-right marble-rules-menu">
                                                     @foreach(['required','nullable','string','integer','numeric','email','url','min:1','max:255','unique:items'] as $rule)
                                                         <li><a href="#" onclick="event.preventDefault();(function(r,id){var inp=document.getElementById('vr-input-'+id);inp.value=inp.value?(inp.value+'|'+r):r;}('{{ $rule }}','{{ $field->id }}'))">{{ $rule }}</a></li>
                                                     @endforeach
@@ -159,7 +159,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-3" style="padding-top:20px">
+                                <div class="col-md-3 marble-pt-lg">
                                     <select name="group_id[{{ $field->id }}]" class="form-control">
                                         <option value="0">{{ trans('marble::admin.no_group') }}</option>
                                         @foreach($fieldGroups as $fg)
@@ -201,7 +201,7 @@
     </form>
 
     {{-- Standalone delete form (outside save form to avoid nesting) --}}
-    <form id="field-delete-form" method="POST" style="display:none">
+    <form id="field-delete-form" method="POST" class="marble-hidden">
         @csrf
         @method('DELETE')
     </form>

@@ -13,7 +13,6 @@
     <link rel="stylesheet" href="{{ asset('vendor/marble/assets/css/cropper.css') }}"/>
     <link rel="stylesheet" href="{{ asset('vendor/marble/assets/css/custom.css') }}"/>
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link href="//fonts.googleapis.com/css?family=Open+Sans:400,600,700,300|Titillium+Web:200,300,400" rel="stylesheet" type="text/css">
     <script type="text/javascript" src="{{ asset('vendor/marble/assets/javascript/jquery.js') }}"></script>
     <script type="text/javascript" src="{{ asset('vendor/marble/assets/js/jquery-ui.js') }}"></script>
     <script type="text/javascript" src="{{ asset('vendor/marble/assets/js/object-browser.js') }}"></script>
@@ -37,7 +36,7 @@
     <header class="navbar" id="header-navbar">
         <div class="container">
             <a href="{{ url("{$prefix}/item/edit/{$entryItemId}") }}" id="logo" class="navbar-brand">
-                <img src="{{ asset('vendor/marble/assets/images/logo.png') }}" style="margin-right: 10px" /> 
+                <img src="{{ asset('vendor/marble/assets/images/logo.png') }}" class="marble-mr-xs" />
                 Marble
             </a>
             <div class="clearfix">
@@ -128,16 +127,16 @@
                         </li>
                         {{-- Notification bell --}}
                         <li class="dropdown" id="notification-bell-li">
-                            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#" id="notification-bell" style="position:relative">
+                            <a class="btn dropdown-toggle marble-bell-btn" data-toggle="dropdown" href="#" id="notification-bell">
                                 @include('marble::components.famicon', ['name' => 'bell'])
-                                <span id="notification-badge" style="display:none; position:absolute; top:4px; right:4px; background:#d9534f; color:#fff; border-radius:50%; width:16px; height:16px; font-size:10px; line-height:16px; text-align:center; font-weight:bold"></span>
+                                <span id="notification-badge" class="marble-hidden"></span>
                             </a>
-                            <ul class="dropdown-menu dropdown-menu-right" id="notification-dropdown" style="min-width:320px; max-height:400px; overflow-y:auto; padding:0; border-radius:3px">
-                                <li style="padding:10px 15px; border-bottom:1px solid #eee; display:flex; align-items:center; justify-content:space-between">
-                                    <strong style="font-size:13px">{{ trans('marble::admin.notifications') }}</strong>
-                                    <a href="#" id="mark-all-read" style="font-size:12px; color:#999">{{ trans('marble::admin.mark_all_read') }}</a>
+                            <ul class="dropdown-menu dropdown-menu-right marble-notif-dropdown" id="notification-dropdown">
+                                <li class="marble-notif-header marble-flex-between">
+                                    <strong class="marble-text-sm">{{ trans('marble::admin.notifications') }}</strong>
+                                    <a href="#" id="mark-all-read" class="marble-meta">{{ trans('marble::admin.mark_all_read') }}</a>
                                 </li>
-                                <li id="notification-list-empty" style="padding:20px 15px; text-align:center; color:#999; font-size:13px">
+                                <li id="notification-list-empty" class="marble-notif-empty">
                                     {{ trans('marble::admin.no_notifications') }}
                                 </li>
                             </ul>
@@ -151,13 +150,13 @@
                                 {{ strtoupper($currentUser->language ?? 'en') }}
                                 <span class="caret"></span>
                             </a>
-                            <ul class="dropdown-menu dropdown-menu-right" style="min-width:160px;padding:0;border-radius:3px;overflow:hidden">
+                            <ul class="dropdown-menu dropdown-menu-right marble-lang-dropdown">
                                 @foreach($adminLanguages as $lang)
-                                    <li style="display:block;border-bottom:1px solid #e7ebee;margin:0">
-                                        <form method="POST" action="{{ route('marble.user.set-language') }}" style="margin:0">
+                                    <li class="marble-lang-item">
+                                        <form method="POST" action="{{ route('marble.user.set-language') }}" class="marble-mb-0">
                                             @csrf
                                             <input type="hidden" name="language" value="{{ $lang->code }}">
-                                            <button type="submit" style="display:block;width:100%;text-align:left;padding:0 20px;height:40px;line-height:40px;border:none;background:{{ ($currentUser->language ?? 'en') === $lang->code ? '#f0f4f8' : 'none' }};font-size:12px;cursor:pointer;font-weight:{{ ($currentUser->language ?? 'en') === $lang->code ? 'bold' : 'normal' }}">
+                                            <button type="submit" class="marble-lang-btn {{ ($currentUser->language ?? 'en') === $lang->code ? 'is-current' : '' }}">
                                                 {{ $lang->name }} ({{ strtoupper($lang->code) }})
                                             </button>
                                         </form>
@@ -168,11 +167,11 @@
 
                         {{-- User dropdown --}}
                         <li class="dropdown">
-                            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#" style="padding-top:8px;padding-bottom:8px">
+                            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
                                 @include('marble::components.famicon', ['name' => 'user'])
-                                <span style="margin-left:4px">{{ $currentUser->name }}</span>
-                                <small class="text-muted" style="margin-left:4px">{{ $currentUser->userGroup?->name ?? 'Admin' }}</small>
-                                <span class="caret" style="margin-left:4px"></span>
+                                <span class="marble-mr-xs">{{ $currentUser->name }}</span>
+                                <small class="text-muted marble-mr-xs">{{ $currentUser->userGroup?->name ?? 'Admin' }}</small>
+                                <span class="caret"></span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-right">
                                 <li><a href="{{ url("{$prefix}/user/edit/{$currentUser->id}") }}">@include('marble::components.famicon', ['name' => 'user_edit']) {{ trans('marble::admin.profile') }}</a></li>
@@ -223,7 +222,7 @@
                     <h4 class="modal-title">{{ trans('marble::admin.select_object') }}</h4>
                 </div>
                 <div class="modal-body">
-                    <div class="collapse navbar-collapse navbar-ex1-collapse" id="sidebar-nav" style="background:#2c3e50">
+                    <div class="collapse navbar-collapse navbar-ex1-collapse" id="sidebar-nav">
                         @include('marble::layouts.tree', ['nodes' => \Marble\Admin\Helpers\TreeHelper::generate(), 'isRoot' => true, 'isModal' => true, 'selectedItem' => null])
                     </div>
                 </div>
@@ -264,8 +263,8 @@
                     <h4 class="modal-title">{{ trans('marble::admin.select_from_library') }}</h4>
                 </div>
                 <div class="modal-body">
-                    <div id="media-browser-grid" class="media-library-grid" style="min-height:200px">
-                        <p class="text-muted text-center" style="padding:40px 0">Loading...</p>
+                    <div id="media-browser-grid" class="media-library-grid marble-browser-grid">
+                        <p class="text-muted text-center marble-browser-loading">Loading...</p>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -293,15 +292,15 @@
             open: function(callback) {
                 this._callback = callback;
                 var $grid = $('#media-browser-grid');
-                $grid.html('<p class="text-muted text-center" style="padding:40px 0">Loading...</p>');
+                $grid.html('<p class="text-muted text-center marble-browser-loading">Loading...</p>');
                 $.getJSON('{{ route('marble.media.json') }}', function(items) {
                     $grid.html('');
                     if (!items.length) {
-                        $grid.html('<p class="text-muted text-center" style="padding:40px 0">{{ trans('marble::admin.no_media') }}</p>');
+                        $grid.html('<p class="text-muted text-center marble-browser-loading">{{ trans('marble::admin.no_media') }}</p>');
                         return;
                     }
                     $.each(items, function(i, media) {
-                        var $item = $('<div class="media-library-item media-browser-selectable" style="cursor:pointer"></div>');
+                        var $item = $('<div class="media-library-item media-browser-selectable" ></div>');
                         $item.append('<div class="media-library-thumb"><img src="' + media.thumbnail + '" loading="lazy" /></div>');
                         $item.append('<div class="media-library-info"><div class="media-library-name" title="' + media.original_filename + '">' + media.original_filename + '</div></div>');
                         $item.data('media', media);
@@ -338,14 +337,13 @@
                 $empty.hide();
 
                 items.forEach(function (n) {
-                    var $li = $('<li class="notif-item" style="border-bottom:1px solid #f0f0f0">')
-                        .css('background', n.read ? '' : '#f8fbff');
-                    var inner = '<a href="' + (n.url || '#') + '" style="display:block; padding:10px 15px; white-space:normal">' +
-                        '<div style="display:flex; justify-content:space-between; gap:8px">' +
-                        '<strong style="font-size:13px">' + $('<div>').text(n.title).html() + '</strong>' +
-                        '<small style="color:#aaa; white-space:nowrap">' + n.created_at + '</small>' +
+                    var $li = $('<li class="notif-item marble-notif-item' + (n.read ? '' : ' marble-notif-item-unread') + '">');
+                    var inner = '<a href="' + (n.url || '#') + '" class="marble-notif-link">' +
+                        '<div class="marble-flex-between">' +
+                        '<strong class="marble-text-sm">' + $('<div>').text(n.title).html() + '</strong>' +
+                        '<small class="marble-meta marble-nowrap">' + n.created_at + '</small>' +
                         '</div>' +
-                        (n.body ? '<div style="font-size:12px; color:#666; margin-top:2px">' + $('<div>').text(n.body).html() + '</div>' : '') +
+                        (n.body ? '<div class="marble-notif-body">' + $('<div>').text(n.body).html() + '</div>' : '') +
                         '</a>';
                     $li.html(inner);
                     $list.append($li);

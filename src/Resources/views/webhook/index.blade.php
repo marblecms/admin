@@ -14,7 +14,7 @@
     @if($webhooks->isEmpty())
         <div class="main-box">
             <div class="main-box-body clearfix">
-                <p class="text-muted" style="padding:20px 0; text-align:center">{{ trans('marble::admin.no_webhooks') }}</p>
+                <p class="text-muted marble-empty-state">{{ trans('marble::admin.no_webhooks') }}</p>
             </div>
         </div>
     @else
@@ -51,7 +51,7 @@
                                     <a href="{{ route('marble.webhook.edit', $webhook) }}" class="btn btn-xs btn-info">
                                         @include('marble::components.famicon', ['name' => 'pencil']) {{ trans('marble::admin.edit') }}
                                     </a>
-                                    <form method="POST" action="{{ route('marble.webhook.delete', $webhook) }}" style="display:inline" onsubmit="return confirm('{{ trans('marble::admin.are_you_sure') }}')">
+                                    <form method="POST" action="{{ route('marble.webhook.delete', $webhook) }}" class="marble-inline-form" onsubmit="return confirm('{{ trans('marble::admin.are_you_sure') }}')">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-xs btn-danger">

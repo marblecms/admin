@@ -1,7 +1,7 @@
 @extends('marble::layouts.app')
 
 @section('content')
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px">
+    <div class="marble-page-header">
         <h1>{{ trans('marble::admin.portal_users') }}</h1>
         <a href="{{ route('marble.portal-user.create') }}" class="btn btn-success btn-sm">
             @include('marble::components.famicon', ['name' => 'plus']) {{ trans('marble::admin.add') }}
@@ -29,7 +29,7 @@
                                 <td>{{ $pu->email }}</td>
                                 <td>{{ $pu->item?->name() ?? '-' }}</td>
                                 <td>
-                                    <form method="POST" action="{{ route('marble.portal-user.toggle', $pu) }}" style="display:inline">
+                                    <form method="POST" action="{{ route('marble.portal-user.toggle', $pu) }}" class="marble-inline-form">
                                         @csrf
                                         <button type="submit" class="btn btn-xs {{ $pu->enabled ? 'btn-success' : 'btn-default' }}">
                                             {{ $pu->enabled ? trans('marble::admin.active') : trans('marble::admin.inactive') }}
@@ -41,7 +41,7 @@
                                     <a href="{{ route('marble.portal-user.edit', $pu) }}" class="btn btn-xs btn-default">
                                         @include('marble::components.famicon', ['name' => 'pencil'])
                                     </a>
-                                    <form method="POST" action="{{ route('marble.portal-user.delete', $pu) }}" style="display:inline"
+                                    <form method="POST" action="{{ route('marble.portal-user.delete', $pu) }}" class="marble-inline-form"
                                           onsubmit="return confirm('{{ trans('marble::admin.confirm_delete') }}')">
                                         @csrf @method('DELETE')
                                         <button type="submit" class="btn btn-xs btn-danger">

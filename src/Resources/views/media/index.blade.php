@@ -51,21 +51,20 @@
     <h1>
         {{ trans('marble::admin.media_library') }}
         @if($currentFolder)
-            <small style="font-size:14px;font-weight:normal;color:#999">/ {{ $currentFolder->name }}</small>
+            <small class="marble-meta marble-fw-normal">/ {{ $currentFolder->name }}</small>
         @endif
     </h1>
 
-
     {{-- Breadcrumb --}}
     @if(!empty($breadcrumb))
-    <div style="margin:-6px 0 12px;font-size:12px;color:#888">
-        <a href="{{ route('marble.media.index') }}" style="color:#5580B0">@include('marble::components.famicon', ['name' => 'folder']) {{ trans('marble::admin.all_files') }}</a>
+    <div class="marble-breadcrumb">
+        <a href="{{ route('marble.media.index') }}" class="marble-link">@include('marble::components.famicon', ['name' => 'folder']) {{ trans('marble::admin.all_files') }}</a>
         @foreach($breadcrumb as $crumb)
-            <span style="margin:0 4px;color:#bbb">›</span>
+            <span class="marble-breadcrumb-sep">›</span>
             @if($crumb->id === $currentFolder?->id)
-                <span style="color:#555">{{ $crumb->name }}</span>
+                <span class="text-muted">{{ $crumb->name }}</span>
             @else
-                <a href="{{ route('marble.media.index', ['folder' => $crumb->id]) }}" style="color:#5580B0">{{ $crumb->name }}</a>
+                <a href="{{ route('marble.media.index', ['folder' => $crumb->id]) }}" class="marble-link">{{ $crumb->name }}</a>
             @endif
         @endforeach
     </div>
@@ -81,33 +80,30 @@
                 </button>
             </h2>
         </header>
-        <div class="main-box-body clearfix" style="padding:16px">
+        <div class="main-box-body clearfix marble-pad-md">
             @if($folders->isEmpty())
-                <p class="text-muted" style="margin:0;font-size:13px">{{ trans('marble::admin.no_subfolders') }}</p>
+                <p class="text-muted marble-mb-0">{{ trans('marble::admin.no_subfolders') }}</p>
             @else
-                <div style="display:flex;flex-wrap:wrap;gap:12px">
+                <div class="marble-folder-grid">
                     @foreach($folders as $folder)
-                        <div class="marble-folder-wrap" style="position:relative;width:120px"
-                             onmouseover="this.querySelector('.folder-actions').style.opacity='1'"
-                             onmouseout="this.querySelector('.folder-actions').style.opacity='0.5'">
+                        <div class="marble-folder-wrap">
                             <a href="{{ route('marble.media.index', ['folder' => $folder->id]) }}"
-                               style="display:flex;flex-direction:column;align-items:center;padding:14px 10px;background:#f8f9fa;border:1px solid #e9ecef;border-radius:6px;text-decoration:none;color:inherit;transition:background .15s;width:100%;position:relative"
-                               onmouseover="this.style.background='#e9ecef'" onmouseout="this.style.background='#f8f9fa'">
+                               class="marble-folder-card">
                                 <img src="{{ asset('vendor/marble/assets/images/famicons/folder.svg') }}" width="40" height="40" alt="">
-                                <span style="margin-top:8px;font-size:12px;text-align:center;word-break:break-word;max-width:100px">{{ $folder->name }}</span>
-                                <small style="color:#999;font-size:11px">{{ $folder->media()->count() }} files</small>
+                                <span class="marble-folder-name">{{ $folder->name }}</span>
+                                <small class="marble-folder-count">{{ $folder->media()->count() }} files</small>
                             </a>
                             {{-- Rename + Delete actions overlay --}}
-                            <div class="folder-actions" style="position:absolute;top:4px;right:4px;display:flex;gap:3px;opacity:0.5;transition:opacity .15s;z-index:2">
+                            <div class="marble-folder-actions">
                                 <button type="button"
                                     onclick="event.stopPropagation();marbleRenameFolder({{ $folder->id }}, '{{ addslashes($folder->name) }}', '{{ route('marble.media.folder.rename', $folder) }}')"
-                                    class="btn btn-xs btn-default" title="Rename" style="padding:2px 5px;line-height:1">
+                                    class="btn btn-xs btn-default marble-btn-icon" title="Rename">
                                     @include('marble::components.famicon', ['name' => 'pencil'])
                                 </button>
                                 <form method="POST" action="{{ route('marble.media.folder.delete', $folder) }}"
                                       onsubmit="return confirm('{{ trans('marble::admin.are_you_sure') }}')">
                                     @csrf @method('DELETE')
-                                    <button type="submit" class="btn btn-xs btn-danger" title="{{ trans('marble::admin.delete') }}" style="padding:2px 5px;line-height:1">
+                                    <button type="submit" class="btn btn-xs btn-danger marble-btn-icon" title="{{ trans('marble::admin.delete') }}">
                                         @include('marble::components.famicon', ['name' => 'bin'])
                                     </button>
                                 </form>
@@ -127,19 +123,19 @@
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                     <h4 class="modal-title">{{ trans('marble::admin.set_focal_point') }}</h4>
                 </div>
-                <div class="modal-body" style="text-align:center;background:#222;padding:20px">
-                    <div id="focal-point-container" style="position:relative;display:inline-block;cursor:crosshair">
-                        <img id="focal-point-image" src="" style="max-width:100%;max-height:60vh;display:block" />
-                        <div id="focal-point-crosshair" style="position:absolute;width:24px;height:24px;margin-left:-12px;margin-top:-12px;pointer-events:none">
-                            <div style="position:absolute;top:50%;left:0;right:0;height:2px;background:#fff;margin-top:-1px;box-shadow:0 0 3px rgba(0,0,0,.8)"></div>
-                            <div style="position:absolute;left:50%;top:0;bottom:0;width:2px;background:#fff;margin-left:-1px;box-shadow:0 0 3px rgba(0,0,0,.8)"></div>
-                            <div style="position:absolute;top:50%;left:50%;width:8px;height:8px;background:#e74c3c;border-radius:50%;margin:-4px 0 0 -4px;border:2px solid #fff"></div>
+                <div class="modal-body marble-focal-body">
+                    <div id="focal-point-container" class="marble-focal-wrap">
+                        <img id="focal-point-image" src="" class="marble-focal-img" />
+                        <div id="focal-point-crosshair" class="marble-focal-crosshair">
+                            <div class="marble-focal-ch-h"></div>
+                            <div class="marble-focal-ch-v"></div>
+                            <div class="marble-focal-dot"></div>
                         </div>
                     </div>
-                    <p style="color:#aaa;font-size:12px;margin-top:10px">{{ trans('marble::admin.focal_point_hint') }}</p>
+                    <p class="marble-focal-hint">{{ trans('marble::admin.focal_point_hint') }}</p>
                 </div>
                 <div class="modal-footer">
-                    <span id="focal-point-coords" style="color:#999;font-size:12px;margin-right:auto"></span>
+                    <span id="focal-point-coords" class="marble-focal-coords"></span>
                     <button type="button" class="btn btn-default" data-dismiss="modal">{{ trans('marble::admin.cancel') }}</button>
                     <button type="button" class="btn btn-success" id="focal-point-save">
                         @include('marble::components.famicon', ['name' => 'disk']) {{ trans('marble::admin.save') }}
@@ -157,40 +153,40 @@
         <div class="main-box-body clearfix">
 
             {{-- Drop Zone --}}
-            <div id="media-drop-zone" style="border:2px dashed #ccc;border-radius:6px;padding:20px;text-align:center;margin-bottom:20px;transition:all .2s;background:#fafafa">
+            <div id="media-drop-zone" class="marble-drop-zone">
                 <form id="media-upload-form" action="{{ route('marble.media.upload') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <input type="hidden" name="folder_id" value="{{ $currentFolder?->id }}">
-                    <input type="file" name="file" id="media-file-input" style="display:none" />
+                    <input type="file" name="file" id="media-file-input" class="marble-hidden" />
                 </form>
-                <span id="drop-zone-label" style="color:#999;font-size:13px">
+                <span id="drop-zone-label" class="marble-drop-zone-label">
                     @include('marble::components.famicon', ['name' => 'image'])
                     Drop file here or <a href="javascript:;" onclick="document.getElementById('media-file-input').click()">browse</a>
                 </span>
-                <div id="drop-zone-progress" style="display:none;margin-top:10px">
-                    <div class="progress" style="margin-bottom:0">
+                <div id="drop-zone-progress" class="marble-hidden marble-mt-sm">
+                    <div class="progress"class="marble-table-flush">
                         <div class="progress-bar progress-bar-striped active" style="width:100%">Uploading…</div>
                     </div>
                 </div>
             </div>
 
             @if($media->isEmpty())
-                <p class="text-muted" style="padding:10px 0;text-align:center">{{ trans('marble::admin.no_media') }}</p>
+                <p class="text-muted text-center marble-mt-xs marble-mb-xs">{{ trans('marble::admin.no_media') }}</p>
             @else
                 <div class="media-library-grid">
                     @foreach($media as $item)
                         <div class="media-library-item">
-                            <div class="media-library-thumb" style="position:relative">
+                            <div class="media-library-thumb marble-relative">
                                 @if($item->isImage())
                                     <img src="{{ url('/image/160/120/' . $item->filename) }}" alt="{{ $item->original_filename }}" loading="lazy" />
                                     {{-- Focal point indicator dot --}}
                                     @if($item->focal_x !== 50 || $item->focal_y !== 50)
-                                        <div style="position:absolute;width:10px;height:10px;border-radius:50%;background:#e74c3c;border:2px solid #fff;box-shadow:0 0 3px rgba(0,0,0,.5);pointer-events:none;left:calc({{ $item->focal_x }}% - 5px);top:calc({{ $item->focal_y }}% - 5px)"></div>
+                                        <div class="marble-focal-indicator" style="left:calc({{ $item->focal_x }}% - 5px);top:calc({{ $item->focal_y }}% - 5px)"></div>
                                     @endif
                                 @else
-                                    <div style="display:flex;align-items:center;justify-content:center;height:100%;background:#f0f4f8;flex-direction:column;gap:4px">
+                                    <div class="marble-file-thumb">
                                         @include('marble::components.famicon', ['name' => 'attachment'])
-                                        <span style="font-size:10px;color:#999;text-transform:uppercase;letter-spacing:.5px">{{ strtoupper(pathinfo($item->original_filename, PATHINFO_EXTENSION)) }}</span>
+                                        <span class="marble-file-ext">{{ strtoupper(pathinfo($item->original_filename, PATHINFO_EXTENSION)) }}</span>
                                     </div>
                                 @endif
                             </div>
@@ -218,7 +214,7 @@
                                     @include('marble::components.famicon', ['name' => 'target'])
                                 </button>
                                 @endif
-                                <form method="POST" action="{{ route('marble.media.delete', $item) }}" style="display:inline" onsubmit="return confirm('{{ trans('marble::admin.are_you_sure') }}')">
+                                <form method="POST" action="{{ route('marble.media.delete', $item) }}" class="marble-inline-form" onsubmit="return confirm('{{ trans('marble::admin.are_you_sure') }}')">
                                     @csrf @method('DELETE')
                                     <button type="submit" class="btn btn-xs btn-danger">
                                         @include('marble::components.famicon', ['name' => 'bin'])
@@ -228,13 +224,12 @@
                         </div>
                     @endforeach
                 </div>
-                <div class="text-center" style="margin-top:16px">
+                <div class="text-center marble-mt-md">
                     {{ $media->appends(request()->query())->links() }}
                 </div>
             @endif
 
-
-            <div class="alert alert-warning" style="padding:8px 14px;font-size:12px;margin-bottom:12px">
+            <div class="alert alert-warning marble-text-sm marble-alert-sm">
                 @include('marble::components.famicon', ['name' => 'error'])
                 {{ trans('marble::admin.media_public_notice') }}
             </div>
@@ -317,17 +312,14 @@ function marbleRenameFolder(id, currentName, url) {
 
     zone.addEventListener('dragover', function(e){
         e.preventDefault();
-        zone.style.borderColor = '#27ae60';
-        zone.style.background = '#f0fff4';
+        zone.classList.add('dragging');
     });
     zone.addEventListener('dragleave', function(){
-        zone.style.borderColor = '#ccc';
-        zone.style.background = '#fafafa';
+        zone.classList.remove('dragging');
     });
     zone.addEventListener('drop', function(e){
         e.preventDefault();
-        zone.style.borderColor = '#ccc';
-        zone.style.background = '#fafafa';
+        zone.classList.remove('dragging');
         if (e.dataTransfer.files.length) uploadFile(e.dataTransfer.files[0]);
     });
     input.addEventListener('change', function(){
@@ -338,8 +330,8 @@ function marbleRenameFolder(id, currentName, url) {
     function uploadFile(file) {
         var fd = new FormData(form);
         fd.set('file', file);
-        label.style.display = 'none';
-        progress.style.display = 'block';
+        label.classList.add('marble-hidden');
+        progress.classList.remove('marble-hidden');
 
         var xhr = new XMLHttpRequest();
         xhr.open('POST', form.action, true);

@@ -22,7 +22,7 @@
         </header>
         <div class="main-box-body clearfix">
             @if($items->isEmpty())
-                <p class="text-muted" style="padding:20px">{{ trans('marble::admin.trash_empty') }}</p>
+                <p class="text-muted marble-p-20">{{ trans('marble::admin.trash_empty') }}</p>
             @else
                 <table class="table table-striped">
                     <thead>
@@ -46,13 +46,13 @@
                                 <td>{{ $item->deleted_at->format('d.m.Y H:i') }}</td>
                                 <td class="text-right">
                                     <div class="btn-group">
-                                        <form method="POST" action="{{ route('marble.trash.restore', $item->id) }}" style="display:inline">
+                                        <form method="POST" action="{{ route('marble.trash.restore', $item->id) }}" class="marble-inline-form">
                                             @csrf
                                             <button type="submit" class="btn btn-xs btn-info">
                                                 @include('marble::components.famicon', ['name' => 'arrow_rotate_cw']) {{ trans('marble::admin.restore') }}
                                             </button>
                                         </form>
-                                        <form method="POST" action="{{ route('marble.trash.force-delete', $item->id) }}" style="display:inline" onsubmit="return confirm('{{ trans('marble::admin.are_you_sure') }}')">
+                                        <form method="POST" action="{{ route('marble.trash.force-delete', $item->id) }}" class="marble-inline-form" onsubmit="return confirm('{{ trans('marble::admin.are_you_sure') }}')">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-xs btn-danger">
@@ -65,7 +65,7 @@
                         @endforeach
                     </tbody>
                 </table>
-                <div style="padding:10px 15px">
+                <div class="marble-box-body">
                     {{ $items->links() }}
                 </div>
             @endif

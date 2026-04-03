@@ -1,17 +1,18 @@
 @php
-    $stepId       = $step?->id ?? '';
-    $stepName     = $step?->name ?? '';
-    $rejectEnabled = $step?->reject_enabled ?? false;
-    $rejectToId   = $step?->reject_to_step_id ?? '';
+    $stepId          = $step?->id ?? '';
+    $stepName        = $step?->name ?? '';
+    $rejectEnabled   = $step?->reject_enabled ?? false;
+    $rejectToId      = $step?->reject_to_step_id ?? '';
+    $deadlineDays    = $step?->deadline_days ?? '';
     $existingNotifiables = $step?->notifiables ?? collect();
     $allowedGroupIds = $step ? $step->allowedGroups->pluck('id')->toArray() : [];
 @endphp
 
-<div class="step-row" style="margin-bottom:8px; border:1px solid #e0e0e0; border-radius:3px; background:#fff">
+<div class="step-row marble-step-row">
 
     {{-- Header row --}}
-    <div style="display:flex; align-items:center; gap:8px; padding:8px 10px">
-        <span class="step-handle" style="cursor:grab; color:#aaa; padding:0 4px; font-size:16px">&#9776;</span>
+    <div class="marble-step-header">
+        <span class="step-handle marble-step-handle">&#9776;</span>
 
         <input type="hidden" name="steps[{{ $idx }}][id]" data-step-field="id" value="{{ $stepId }}" />
 
@@ -19,8 +20,7 @@
                name="steps[{{ $idx }}][name]"
                data-step-field="name"
                value="{{ $stepName }}"
-               class="form-control input-sm"
-               style="flex:1"
+               class="form-control input-sm marble-flex-1"
                placeholder="{{ trans('marble::admin.workflow_step_name') }}"
                required />
 
@@ -35,26 +35,24 @@
     </div>
 
     {{-- Config panel --}}
-    <div class="step-config-panel" style="{{ ($rejectEnabled || count($allowedGroupIds) || $existingNotifiables->count()) ? '' : 'display:none' }}; border-top:1px solid #eee; padding:12px 16px; background:#fafafa">
+    <div class="step-config-panel marble-step-config{{ ($rejectEnabled || count($allowedGroupIds) || $existingNotifiables->count()) ? '' : ' marble-hidden' }}">
 
         <div class="row">
             {{-- Left: Notifications --}}
             <div class="col-md-6">
-                <strong style="font-size:12px; text-transform:uppercase; color:#888; letter-spacing:.5px">
-                    {{ trans('marble::admin.workflow_notify') }}
-                </strong>
-                <small class="text-muted" style="display:block; margin-bottom:8px">{{ trans('marble::admin.workflow_notify_hint') }}</small>
+                <strong class="marble-section-label">{{ trans('marble::admin.workflow_notify') }}</strong>
+                <small class="text-muted marble-block marble-mb-sm">{{ trans('marble::admin.workflow_notify_hint') }}</small>
 
-                <div class="notifiables-list" style="margin-bottom:8px">
+                <div class="notifiables-list marble-mb-sm">
                     @foreach($existingNotifiables as $n)
-                        <div class="notifiable-row" style="display:flex; align-items:center; gap:6px; margin-bottom:6px">
-                            <select class="form-control input-sm" style="width:70px"
+                        <div class="notifiable-row marble-notifiable-row">
+                            <select class="form-control input-sm marble-input-num-xs"
                                     name="steps[{{ $idx }}][notifiables][{{ $loop->index }}][type]"
                                     data-notifiable-field="type">
                                 <option value="user" {{ $n->notifiable_type === 'user' ? 'selected' : '' }}>{{ trans('marble::admin.user') }}</option>
                                 <option value="group" {{ $n->notifiable_type === 'group' ? 'selected' : '' }}>{{ trans('marble::admin.usergroup_singular') }}</option>
                             </select>
-                            <select class="form-control input-sm" style="flex:1"
+                            <select class="form-control input-sm marble-flex-1"
                                     name="steps[{{ $idx }}][notifiables][{{ $loop->index }}][id]"
                                     data-notifiable-field="id">
                                 @if($n->notifiable_type === 'user')
@@ -67,7 +65,7 @@
                                     @endforeach
                                 @endif
                             </select>
-                            <select class="form-control input-sm" style="width:80px"
+                            <select class="form-control input-sm marble-input-num-sm"
                                     name="steps[{{ $idx }}][notifiables][{{ $loop->index }}][channel]"
                                     data-notifiable-field="channel">
                                 <option value="cms"   {{ $n->channel === 'cms'   ? 'selected' : '' }}>CMS</option>
@@ -88,13 +86,11 @@
             <div class="col-md-6">
 
                 {{-- Permissions --}}
-                <strong style="font-size:12px; text-transform:uppercase; color:#888; letter-spacing:.5px">
-                    {{ trans('marble::admin.workflow_allowed_groups') }}
-                </strong>
-                <small class="text-muted" style="display:block; margin-bottom:8px">{{ trans('marble::admin.workflow_allowed_groups_hint') }}</small>
+                <strong class="marble-section-label">{{ trans('marble::admin.workflow_allowed_groups') }}</strong>
+                <small class="text-muted marble-block marble-mb-sm">{{ trans('marble::admin.workflow_allowed_groups_hint') }}</small>
 
                 @foreach($allGroups as $g)
-                    <label style="display:flex; align-items:center; gap:6px; font-weight:normal; margin-bottom:4px">
+                    <label class="marble-check-label marble-mb-xs">
                         <input type="checkbox"
                                name="steps[{{ $idx }}][allowed_groups][]"
                                data-step-field="allowed_groups[]"
@@ -107,19 +103,35 @@
                     <small class="text-muted">{{ trans('marble::admin.workflow_no_groups') }}</small>
                 @endif
 
+                {{-- Deadline --}}
+                <div class="marble-mt-md">
+                    <strong class="marble-section-label">{{ trans('marble::admin.workflow_deadline') }}</strong>
+                    <small class="text-muted marble-block marble-mb-xs">{{ trans('marble::admin.workflow_deadline_hint') }}</small>
+                    <div class="marble-flex-center-sm">
+                        <input type="number"
+                               name="steps[{{ $idx }}][deadline_days]"
+                               data-step-field="deadline_days"
+                               value="{{ $deadlineDays }}"
+                               class="form-control input-sm marble-input-num-sm"
+                               min="1" max="3650"
+                               placeholder="–" />
+                        <span class="text-muted marble-text-sm">{{ trans('marble::admin.workflow_deadline_days') }}</span>
+                    </div>
+                </div>
+
                 {{-- Reject --}}
-                <div style="margin-top:16px">
-                    <label style="display:flex; align-items:center; gap:8px; font-weight:normal">
+                <div class="marble-mt-md">
+                    <label class="marble-check-label">
                         <input type="hidden"   name="steps[{{ $idx }}][reject_enabled]" data-step-field="reject_enabled" value="0" />
                         <input type="checkbox" name="steps[{{ $idx }}][reject_enabled]" data-step-field="reject_enabled"
                                value="1" class="reject-toggle"
                                {{ $rejectEnabled ? 'checked' : '' }} />
                         <strong>{{ trans('marble::admin.workflow_reject_enabled') }}</strong>
                     </label>
-                    <small class="text-muted" style="display:block; margin-bottom:8px">{{ trans('marble::admin.workflow_reject_hint') }}</small>
+                    <small class="text-muted marble-block marble-mb-sm">{{ trans('marble::admin.workflow_reject_hint') }}</small>
 
-                    <div class="reject-options" style="{{ $rejectEnabled ? '' : 'display:none' }}">
-                        <label style="font-size:12px; margin-bottom:4px">{{ trans('marble::admin.workflow_reject_to') }}</label>
+                    <div class="reject-options{{ $rejectEnabled ? '' : ' marble-hidden' }}">
+                        <label class="marble-text-sm marble-mb-xs">{{ trans('marble::admin.workflow_reject_to') }}</label>
                         <select name="steps[{{ $idx }}][reject_to_step_id]" data-step-field="reject_to_step_id" class="form-control input-sm">
                             <option value="">— {{ trans('marble::admin.workflow_reject_to_prev') }} —</option>
                             @if(isset($allSteps))

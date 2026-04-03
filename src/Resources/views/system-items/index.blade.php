@@ -9,21 +9,21 @@
     <div class="main-box">
         <div class="main-box-body clearfix">
             @if($blueprints->isEmpty())
-                <p class="text-muted" style="padding:20px 0;text-align:center">
+                <p class="text-muted marble-empty-state">
                     No system blueprints yet. Create a Blueprint with <strong>Hide system fields</strong> enabled.
                 </p>
             @else
-                <table class="table table-hover" style="font-size:13px">
+                <table class="table table-hover marble-text-sm">
                     <thead>
                         <tr>
                             <th>{{ trans('marble::admin.classes') }}</th>
-                            <th style="width:60px"></th>
+                            <th class="marble-col-sm"></th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($blueprints as $blueprint)
                             @php $item = $items[$blueprint->id] ?? null; @endphp
-                            <tr onclick="window.location='{{ $item ? route('marble.item.edit', $item) : '#' }}'" style="cursor:pointer">
+                            <tr onclick="window.location='{{ $item ? route('marble.item.edit', $item) : '#' }}'" >
                                 <td>
                                     @include('marble::components.famicon', ['name' => $blueprint->effectiveIcon()])
                                     {{ $blueprint->name }}

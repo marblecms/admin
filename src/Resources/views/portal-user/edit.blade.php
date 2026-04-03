@@ -29,8 +29,8 @@
 
                 <div class="form-group">
                     <label>{{ trans('marble::admin.linked_item') }}</label>
-                    <small class="text-muted" style="display:block;margin-bottom:4px">{{ trans('marble::admin.portal_user_item_hint') }}</small>
-                    <div style="display:flex;gap:8px;align-items:center">
+                    <small class="text-muted marble-block marble-mb-xs">{{ trans('marble::admin.portal_user_item_hint') }}</small>
+                    <div class="marble-flex-center">
                         <input type="hidden" name="item_id" id="pu_item_id_input" value="{{ old('item_id', $portalUser->item_id) }}" />
                         <input type="text" class="form-control" id="pu_item_id_display"
                                value="{{ $portalUser->item?->name() }}"

@@ -4,8 +4,8 @@
 
     <input type="hidden" name="fields[{{ $field->id }}][{{ $languageId }}]" class="attribute-image-input" value="noop" />
 
-    <div style="display:flex; gap:8px; align-items:center; margin-top:6px;">
-        <input type="file" name="file_{{ $field->id }}_{{ $languageId }}" class="form-control" style="flex:1" />
+    <div class="marble-flex-center marble-mt-xs">
+        <input type="file" name="file_{{ $field->id }}_{{ $languageId }}" class="form-control marble-flex-1" />
         <button type="button" class="btn btn-default btn-sm media-library-picker"
                 data-field="{{ $field->id }}" data-lang="{{ $languageId }}">
             @include('marble::components.famicon', ['name' => 'pictures'])
@@ -57,8 +57,8 @@
             var $container = $('#attribute-image-{{ $field->id }}-{{ $languageId }}');
             $container.find('.attribute-image-input').val('library:' + media.id);
             $container.find('.attribute-image-view').html(
-                '<div style="margin:6px 0">' +
-                '<img src="' + media.thumbnail + '" style="max-width:200px;max-height:150px;border:1px solid #ddd;" />' +
+                '<div class="marble-mt-xs marble-mb-xs">' +
+                '<img src="' + media.thumbnail + '" class="marble-thumb-preview" />' +
                 '<br><small>' + media.original_filename + '</small>' +
                 '</div>'
             );

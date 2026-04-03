@@ -83,8 +83,10 @@ class ConfigurationController extends Controller
             }
         }
 
-        ItemValue::where('language_id', $language->id)->delete();
-        $language->delete();
+        DB::transaction(function () use ($language) {
+            ItemValue::where('language_id', $language->id)->delete();
+            $language->delete();
+        });
 
         return redirect()->route('marble.configuration.index')->with('success', trans('marble::admin.language_deleted'));
     }

@@ -2,6 +2,7 @@
 
 namespace Marble\Admin\Services;
 
+use Illuminate\Support\Facades\DB;
 use Marble\Admin\Models\Item;
 use Marble\Admin\Models\User;
 use Marble\Admin\Models\WorkflowStep;
@@ -14,6 +15,35 @@ class WorkflowService
     // -------------------------------------------------------------------------
     // Permission check
     // -------------------------------------------------------------------------
+
+    /**
+     * Returns true if the actor is allowed to retreat the item from its current step.
+     * Uses the same group-restriction logic as canAdvance.
+     */
+    public function canRetreat(Item $item, User $actor): bool
+    {
+        // Retreating a published item back to the last workflow step
+        if ($item->status === 'published') {
+            $item->loadMissing('blueprint.workflow.steps.allowedGroups');
+            $last = $item->blueprint?->workflow?->steps->last();
+            if (!$last || $last->allowedGroups->isEmpty()) {
+                return true;
+            }
+            return $last->allowedGroups->contains('id', $actor->user_group_id);
+        }
+
+        $stepId = $item->current_workflow_step_id;
+        if (!$stepId) {
+            return false; // Already at beginning — nowhere to retreat to
+        }
+
+        $step = WorkflowStep::with('allowedGroups')->find($stepId);
+        if (!$step || $step->allowedGroups->isEmpty()) {
+            return true;
+        }
+
+        return $step->allowedGroups->contains('id', $actor->user_group_id);
+    }
 
     /**
      * Returns true if the actor is allowed to advance the item from its current step.
@@ -55,25 +85,28 @@ class WorkflowService
             ? WorkflowStep::find($item->current_workflow_step_id)
             : null;
 
-        if ($item->isAtFinalWorkflowStep()) {
-            $item->status = 'published';
-            $item->current_workflow_step_id = null;
-            $item->save();
+        DB::transaction(function () use ($item, $actor, $fromStep) {
+            if ($item->isAtFinalWorkflowStep()) {
+                $item->status = 'published';
+                $item->current_workflow_step_id = null;
+                $item->save();
 
-            $this->logTransition($item, $actor, $fromStep, null, 'advance');
-            $this->sendNotificationsForStep($item, $actor, null, 'advance', null);
-        } else {
-            $next = $item->nextWorkflowStep();
-            if (!$next) {
-                return;
+                $this->logTransition($item, $actor, $fromStep, null, 'advance');
+                $this->sendNotificationsForStep($item, $actor, null, 'advance', null);
+            } else {
+                $next = $item->nextWorkflowStep();
+                if (!$next) {
+                    return;
+                }
+
+                $item->current_workflow_step_id   = $next->id;
+                $item->workflow_step_entered_at   = now();
+                $item->save();
+
+                $this->logTransition($item, $actor, $fromStep, $next, 'advance');
+                $this->sendNotificationsForStep($item, $actor, $next, 'advance', null);
             }
-
-            $item->current_workflow_step_id = $next->id;
-            $item->save();
-
-            $this->logTransition($item, $actor, $fromStep, $next, 'advance');
-            $this->sendNotificationsForStep($item, $actor, $next, 'advance', null);
-        }
+        });
     }
 
     /**
@@ -91,33 +124,35 @@ class WorkflowService
 
         $steps = $workflow->steps;
 
-        if (!$item->current_workflow_step_id) {
-            // Was published — go back to last step as draft
-            $last = $steps->last();
-            if ($last) {
-                $fromStep = null; // "published" has no step record
-                $item->status = 'draft';
-                $item->current_workflow_step_id = $last->id;
-                $item->save();
+        DB::transaction(function () use ($item, $actor, $steps) {
+            if ($item->status === 'published') {
+                // Was published — go back to last step as draft
+                $last = $steps->last();
+                if ($last) {
+                    $item->status                   = 'draft';
+                    $item->current_workflow_step_id = $last->id;
+                    $item->workflow_step_entered_at = now();
+                    $item->save();
 
-                $this->logTransition($item, $actor, null, $last, 'advance');
+                    $this->logTransition($item, $actor, null, $last, 'retreat');
+                }
+                return;
             }
-            return;
-        }
 
-        $idx = $steps->search(fn ($s) => $s->id === $item->current_workflow_step_id);
+            $idx = $steps->search(fn ($s) => $s->id === $item->current_workflow_step_id);
 
-        if ($idx === false || $idx === 0) {
-            // Already at the first step — nowhere to retreat to
-            return;
-        }
+            if ($idx === false || $idx === 0) {
+                return;
+            }
 
-        $fromStep = $steps->get($idx);
-        $prev     = $steps->get($idx - 1);
-        $item->current_workflow_step_id = $prev->id;
-        $item->save();
+            $fromStep = $steps->get($idx);
+            $prev     = $steps->get($idx - 1);
+            $item->current_workflow_step_id = $prev->id;
+            $item->workflow_step_entered_at = now();
+            $item->save();
 
-        $this->logTransition($item, $actor, $fromStep, $prev, 'advance');
+            $this->logTransition($item, $actor, $fromStep, $prev, 'retreat');
+        });
     }
 
     /**
@@ -149,6 +184,7 @@ class WorkflowService
         $this->logTransition($item, $actor, $currentStep, $toStep, 'reject', $comment);
 
         $item->current_workflow_step_id = $toStep->id;
+        $item->workflow_step_entered_at = now();
         $item->save();
 
         $this->sendNotificationsForStep($item, $actor, $toStep, 'reject', $comment);

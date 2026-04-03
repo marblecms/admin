@@ -4,6 +4,8 @@ return [
     'children'            => 'Podpoložky',
     'add_children'        => 'Pridať podpoložku',
     'add_user'            => 'Pridať používateľa',
+    'last_login'          => 'Posledné prihlásenie',
+    'account_disabled'    => 'Tento účet bol deaktivovaný.',
     'add_usergroup'       => 'Pridať skupinu',
     'manage_usergroups'   => 'Spravovať skupiny',
     'add_class'           => 'Pridať blueprint',
@@ -23,6 +25,7 @@ return [
     'import'              => 'Importovať',
     'import_json'         => 'Importovať z JSON',
     'import_success'      => 'Import úspešný.',
+    'import_invalid_file' => 'Neplatný súbor importu. Nahrajte platný Marble JSON export.',
     'file'                => 'Súbor',
     'meta_information'    => 'Meta informácie',
     'dashboard'           => 'Prehľad',
@@ -112,6 +115,7 @@ return [
     'publish_at'          => 'Publikovať o',
     'expires_at'          => 'Expiruje o',
     'save_schedule'       => 'Uložiť plán',
+    'scheduling_hint'     => 'Dátumy nadobudnú účinnosť až po publikovaní obsahu.',
     'webhooks'            => 'Webhooky',
     'add_webhook'         => 'Pridať webhook',
     'edit_webhook'        => 'Upraviť webhook',
@@ -283,6 +287,7 @@ return [
     'no_portal_users'          => 'Zatiaľ žiadni portáloví používatelia.',
 
     // Draft preview
+    'preview_not_published_hint' => 'Položka musí byť zverejnená, aby bolo možné zobraziť náhľad. Použite sekciu „Náhľad konceptu" nižšie na vygenerovanie súkromného odkazu.',
     'draft_preview'            => 'Náhľad konceptu',
     'draft_preview_hint'       => 'Vygenerujte tajný odkaz na zobrazenie neuverejneného obsahu.',
     'preview_url_hint'         => 'Tento odkaz je verejne dostupný a zobrazuje aktuálny koncept.',

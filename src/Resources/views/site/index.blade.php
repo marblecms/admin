@@ -12,7 +12,7 @@
     <div class="main-box">
         <div class="main-box-body clearfix">
             @if($sites->isEmpty())
-                <p class="text-muted" style="padding:20px 0;text-align:center">{{ trans('marble::admin.no_sites') }}</p>
+                <p class="text-muted marble-empty-state">{{ trans('marble::admin.no_sites') }}</p>
             @else
                 <table class="table table-striped table-hover">
                     <thead>
@@ -28,7 +28,7 @@
                     <tbody>
                         @foreach($sites as $site)
                             <tr>
-                                <td>{{ $site->name }}</td>
+                                <td><a href="{{ route('marble.site.edit', $site) }}">{{ $site->name }}</a></td>
                                 <td>
                                     @if($site->domain)
                                         <code>{{ $site->domain }}</code>
@@ -36,7 +36,7 @@
                                         <span class="text-muted">—</span>
                                     @endif
                                     @if($site->is_default)
-                                        <span class="label label-primary" style="margin-left:4px">{{ trans('marble::admin.default') }}</span>
+                                        <span class="label label-primary marble-ml-xs">{{ trans('marble::admin.default') }}</span>
                                     @endif
                                 </td>
                                 <td>{{ $site->rootItem?->name() ?? '—' }}</td>
@@ -52,7 +52,7 @@
                                     <a href="{{ route('marble.site.edit', $site) }}" class="btn btn-xs btn-info">
                                         @include('marble::components.famicon', ['name' => 'pencil']) {{ trans('marble::admin.edit') }}
                                     </a>
-                                    <form method="POST" action="{{ route('marble.site.delete', $site) }}" style="display:inline" onsubmit="return confirm('{{ trans('marble::admin.are_you_sure') }}')">
+                                    <form method="POST" action="{{ route('marble.site.delete', $site) }}" class="marble-inline-form" onsubmit="return confirm('{{ trans('marble::admin.are_you_sure') }}')">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-xs btn-danger">

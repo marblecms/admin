@@ -1,14 +1,15 @@
 @php $rows = is_array($value) ? $value : []; @endphp
 
-<div id="kv-store-{{ $field->id }}-{{ $languageId }}" style="background: #f4f4f4;padding: 15px;border-radius: 3px">
-    <div style="width: 120px; display:inline-block;">Key</div>
-    <div style="width: 300px; display:inline-block;">Value</div>
-    <br />
+<div id="kv-store-{{ $field->id }}-{{ $languageId }}" class="marble-kv-panel">
+    <div class="marble-kv-header">
+        <div class="marble-kv-input-key">Key</div>
+        <div class="marble-kv-input-value">Value</div>
+    </div>
     <div class="rows">
         @foreach($rows as $key => $row)
-            <div style="padding-bottom: 3px">
-                <input type="text" name="fields[{{ $field->id }}][{{ $languageId }}][{{ $key }}][key]" value="{{ $row['key'] ?? '' }}" class="form-control" style="display: inline-block; width:100px; margin-right:10px" />
-                <input type="text" name="fields[{{ $field->id }}][{{ $languageId }}][{{ $key }}][value]" value="{{ $row['value'] ?? '' }}" class="form-control" style="display: inline-block; width:300px" />
+            <div class="marble-kv-row-pb">
+                <input type="text" name="fields[{{ $field->id }}][{{ $languageId }}][{{ $key }}][key]" value="{{ $row['key'] ?? '' }}" class="form-control marble-kv-input-key" />
+                <input type="text" name="fields[{{ $field->id }}][{{ $languageId }}][{{ $key }}][value]" value="{{ $row['value'] ?? '' }}" class="form-control marble-kv-input-value" />
                 <a href="javascript:;" class="cancel remove-row">&times;</a>
             </div>
         @endforeach
@@ -24,9 +25,9 @@
         container.find(".add-row").click(function(){
             i++;
             container.find(".rows").append(
-                '<div style="padding-bottom: 3px">' +
-                    '<input type="text" name="fields[{{ $field->id }}][{{ $languageId }}][' + i + '][key]" value="" class="form-control" style="display: inline-block; width:100px; margin-right:10px" /> ' +
-                    '<input type="text" name="fields[{{ $field->id }}][{{ $languageId }}][' + i + '][value]" value="" class="form-control" style="display: inline-block; width:300px" /> ' +
+                '<div class="marble-kv-row-pb">' +
+                    '<input type="text" name="fields[{{ $field->id }}][{{ $languageId }}][' + i + '][key]" value="" class="form-control marble-kv-input-key" /> ' +
+                    '<input type="text" name="fields[{{ $field->id }}][{{ $languageId }}][' + i + '][value]" value="" class="form-control marble-kv-input-value" /> ' +
                     '<a href="javascript:;" class="cancel remove-row">&times;</a>' +
                 '</div>'
             );
