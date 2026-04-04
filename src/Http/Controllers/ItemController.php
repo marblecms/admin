@@ -158,7 +158,8 @@ class ItemController extends Controller
         app(ActivityLogService::class)->log('item.saved', $item);
         app(WebhookService::class)->fire('item.saved', $item, $changedFields);
 
-        return redirect()->route('marble.item.edit', $item);
+        return redirect()->route('marble.item.edit', $item)
+            ->with('success', trans('marble::admin.item_saved'));
     }
 
     public function saveSchedule(Request $request, Item $item)
@@ -169,7 +170,8 @@ class ItemController extends Controller
         $item->expires_at   = $request->input('expires_at') ?: null;
         $item->save();
 
-        return redirect()->route('marble.item.edit', $item);
+        return redirect()->route('marble.item.edit', $item)
+            ->with('success', trans('marble::admin.saved'));
     }
 
     public function add(Item $parentItem)

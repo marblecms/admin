@@ -12,6 +12,31 @@
     <link rel="stylesheet" href="{{ asset('vendor/marble/assets/css/jquery-ui.css') }}"/>
     <link rel="stylesheet" href="{{ asset('vendor/marble/assets/css/cropper.css') }}"/>
     <link rel="stylesheet" href="{{ asset('vendor/marble/assets/css/custom.css') }}"/>
+    @php $adminTheme = Auth::guard('marble')->user()?->theme ?? 'xp'; @endphp
+    <link rel="stylesheet" href="{{ asset('vendor/marble/assets/css/admin-theme-' . $adminTheme . '.css') }}"/>
+    <style>
+        #marble-toast {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            z-index: 9999;
+            background: #27ae60;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 10px 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 16px rgba(0,0,0,.25);
+            opacity: 0;
+            transform: translateY(12px);
+            transition: opacity .25s, transform .25s;
+            pointer-events: none;
+        }
+        #marble-toast.marble-toast-show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <script type="text/javascript" src="{{ asset('vendor/marble/assets/javascript/jquery.js') }}"></script>
     <script type="text/javascript" src="{{ asset('vendor/marble/assets/js/jquery-ui.js') }}"></script>
@@ -405,5 +430,18 @@
             ];
         });
     </script>
+
+    {{-- Toast notification --}}
+    <div id="marble-toast"></div>
+    @if(session('success'))
+    <script>
+        $(function() {
+            var $t = $('#marble-toast');
+            $t.text({{ Js::from(session('success')) }});
+            $t.addClass('marble-toast-show');
+            setTimeout(function() { $t.removeClass('marble-toast-show'); }, 3500);
+        });
+    </script>
+    @endif
 </body>
 </html>

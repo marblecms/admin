@@ -44,7 +44,8 @@ class WebhookController extends Controller
             Webhook::create($data);
         }
 
-        return redirect()->route('marble.webhook.index');
+        return redirect()->route('marble.webhook.index')
+            ->with('success', trans('marble::admin.webhook_saved'));
     }
 
     public function delete(Webhook $webhook)

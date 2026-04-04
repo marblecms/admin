@@ -1,4 +1,14 @@
-@php $prefix = config('marble.route_prefix', 'admin'); @endphp
+@php
+$prefix = config('marble.route_prefix', 'admin');
+$adminTheme = Auth::guard('marble')->user()?->theme ?? 'xp';
+$iconMinus = $adminTheme === '98'
+    ? asset('vendor/marble/assets/images/win98icons/minus.png')
+    : asset('vendor/marble/assets/images/elbow-minus-nl.gif');
+$iconPlus = $adminTheme === '98'
+    ? asset('vendor/marble/assets/images/win98icons/plus.png')
+    : asset('vendor/marble/assets/images/elbow-plus-nl.gif');
+$iconSize = $adminTheme === '98' ? 10 : 20;
+@endphp
 
 @if($isRoot)
     <ul class="nav nav-pills nav-stacked sidebar-tree">
@@ -16,12 +26,12 @@
             @endif
                 @if($hasChildren)
                     <img class="tree-expand-icon"
-                         src="{{ asset('vendor/marble/assets/images/elbow-minus-nl.gif') }}"
-                         data-minus="{{ asset('vendor/marble/assets/images/elbow-minus-nl.gif') }}"
-                         data-plus="{{ asset('vendor/marble/assets/images/elbow-plus-nl.gif') }}"
-                         width="20" height="20" alt="">
+                         src="{{ $iconMinus }}"
+                         data-minus="{{ $iconMinus }}"
+                         data-plus="{{ $iconPlus }}"
+                         width="{{ $iconSize }}" height="{{ $iconSize }}" alt="">
                 @else
-                    <img src="{{ asset('vendor/marble/assets/images/elbow-plus-nl.gif') }}" width="20" height="20" alt="" class="marble-invisible">
+                    <img src="{{ $iconPlus }}" width="{{ $iconSize }}" height="{{ $iconSize }}" alt="" class="marble-invisible">
                 @endif
                 @if($node->blueprint)
                     <img src="{{ asset('vendor/marble/assets/images/famicons/' . $node->blueprint->effectiveIcon() . '.svg') }}" width="16" height="16" alt="" class="marble-vmid marble-mr-xs">

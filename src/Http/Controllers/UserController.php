@@ -43,9 +43,11 @@ class UserController extends Controller
             'user_group_id' => $request->input('user_group_id'),
             'active'        => $request->boolean('active', true),
             'root_item_id'  => $request->input('root_item_id') ?: null,
+            'theme'         => in_array($request->input('theme'), ['xp', '98']) ? $request->input('theme') : 'xp',
         ]);
 
-        return redirect()->route('marble.user.edit', $user);
+        return redirect()->route('marble.user.edit', $user)
+            ->with('success', trans('marble::admin.user_saved'));
     }
 
     public function edit(User $user)
@@ -65,6 +67,7 @@ class UserController extends Controller
         $user->user_group_id = $request->input('user_group_id');
         $user->active = $request->boolean('active', true);
         $user->root_item_id = $request->input('root_item_id') ?: null;
+        $user->theme = in_array($request->input('theme'), ['xp', '98']) ? $request->input('theme') : 'xp';
 
         if ($request->filled('password')) {
             $user->password = Hash::make($request->input('password'));
@@ -72,7 +75,8 @@ class UserController extends Controller
 
         $user->save();
 
-        return redirect()->route('marble.user.edit', $user);
+        return redirect()->route('marble.user.edit', $user)
+            ->with('success', trans('marble::admin.user_saved'));
     }
 
     public function delete(User $user)

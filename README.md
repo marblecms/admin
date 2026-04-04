@@ -13,8 +13,8 @@
 </tr>
 <tr>
   <td width="33%"><img src="Screenshot7.png" alt="Site settings"></td>
-  <td></td>
-  <td></td>
+  <td width="33%"><img src="Screenshot8.png" alt="Dashboard activity"></td>
+  <td width="33%"><img src="Screenshot9.png" alt="Multi-language item editor"></td>
 </tr>
 </table>
 

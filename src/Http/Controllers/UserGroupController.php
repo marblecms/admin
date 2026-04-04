@@ -98,7 +98,8 @@ class UserGroupController extends Controller
             }
         }
 
-        return redirect()->route('marble.user-group.edit', $group);
+        return redirect()->route('marble.user-group.edit', $group)
+            ->with('success', trans('marble::admin.group_saved'));
     }
 
     public function delete(UserGroup $group)

@@ -17,6 +17,7 @@ class User extends Authenticatable
         'active',
         'last_login_at',
         'language',
+        'theme',
         'root_item_id',
     ];
 

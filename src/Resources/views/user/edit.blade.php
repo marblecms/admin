@@ -3,7 +3,7 @@
 @php
     $prefix  = config('marble.route_prefix', 'admin');
     $isNew   = $user === null;
-    $saveUrl = $isNew ? url("{$prefix}/user/create") : url("{$prefix}/user/save/{$user->id}");
+    $saveUrl = $isNew ? route('marble.user.create') : route('marble.user.save', $user);
 @endphp
 
 @section('content')
@@ -11,6 +11,16 @@
 
     <form action="{{ $saveUrl }}" method="post">
         @csrf
+
+        @if($errors->any())
+            <div class="alert alert-danger">
+                <ul class="marble-mb-0" style="padding-left:18px">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
         <div class="main-box">
             <header class="main-box-header clearfix">
@@ -25,9 +35,13 @@
                     <label>{{ trans('marble::admin.email') }}</label>
                     <input type="text" class="form-control" name="email" value="{{ old('email', $user?->email) }}" required />
                 </div>
-                <div class="form-group">
+                <div class="form-group @error('password') has-error @enderror">
                     <label>{{ $isNew ? trans('marble::admin.password') : trans('marble::admin.new_password') }}</label>
-                    <input type="password" class="form-control" name="password" value="" {{ $isNew ? 'required' : '' }} />
+                    <input type="password" class="form-control" name="password" value="" {{ $isNew ? 'required' : '' }} autocomplete="new-password" />
+                    @if(!$isNew)
+                        <span class="help-block">{{ trans('marble::admin.password_leave_blank') }}</span>
+                    @endif
+                    @error('password')<span class="help-block text-danger">{{ $message }}</span>@enderror
                 </div>
                 <div class="form-group">
                     <label>{{ trans('marble::admin.group') }}</label>
@@ -35,6 +49,13 @@
                         @foreach($userGroups as $group)
                             <option value="{{ $group->id }}" {{ old('user_group_id', $user?->user_group_id) == $group->id ? 'selected' : '' }}>{{ $group->name }}</option>
                         @endforeach
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>{{ trans('marble::admin.theme') }}</label>
+                    <select name="theme" class="form-control">
+                        <option value="xp" {{ old('theme', $user?->theme ?? 'xp') === 'xp' ? 'selected' : '' }}>XP (default)</option>
+                        <option value="98" {{ old('theme', $user?->theme ?? 'xp') === '98' ? 'selected' : '' }}>Windows 98</option>
                     </select>
                 </div>
                 <div class="form-group">

@@ -20,6 +20,7 @@ class UserRequest extends FormRequest
             'password'      => $this->routeIs('marble.user.create')
                                 ? ['required', 'string', 'min:8']
                                 : ['sometimes', 'nullable', 'string', 'min:8'],
+            'theme'         => ['sometimes', 'string', 'in:xp,98'],
         ];
     }
 }

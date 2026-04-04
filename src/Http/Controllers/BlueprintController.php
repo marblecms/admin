@@ -47,7 +47,8 @@ class BlueprintController extends Controller
 
         $this->createDefaultFields($blueprint);
 
-        return redirect()->route('marble.blueprint.edit', $blueprint);
+        return redirect()->route('marble.blueprint.edit', $blueprint)
+            ->with('success', trans('marble::admin.blueprint_saved'));
     }
 
     private function createDefaultFields(Blueprint $blueprint): void
@@ -137,7 +138,8 @@ class BlueprintController extends Controller
             $blueprint->allowedChildBlueprints()->sync($ids);
         }
 
-        return redirect()->route('marble.blueprint.edit', $blueprint);
+        return redirect()->route('marble.blueprint.edit', $blueprint)
+            ->with('success', trans('marble::admin.blueprint_saved'));
     }
 
     public function duplicate(Blueprint $blueprint)

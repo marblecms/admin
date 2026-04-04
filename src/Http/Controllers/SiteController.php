@@ -71,7 +71,8 @@ class SiteController extends Controller
             $site->setAsDefault();
         }
 
-        return redirect()->route('marble.site.index');
+        return redirect()->route('marble.site.index')
+            ->with('success', trans('marble::admin.site_saved'));
     }
 
     public function delete(Site $site)
