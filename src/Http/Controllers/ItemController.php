@@ -262,7 +262,8 @@ class ItemController extends Controller
 
         app(ActivityLogService::class)->log('item.deleted', $item, ['blueprint' => $item->blueprint->identifier]);
 
-        return redirect()->route('marble.item.edit', $parentId);
+        return redirect()->route('marble.item.edit', $parentId)
+            ->with('success', trans('marble::admin.item_deleted'));
     }
 
     private function findRestrictingRelations(\Illuminate\Support\Collection $deletingIds): \Illuminate\Support\Collection

@@ -310,4 +310,11 @@ return [
     'copy_language_submit'     => 'Kopieren',
     'copy_language_hint'       => 'Überschreibt alle Feldwerte der Zielsprache mit den Werten der Quellsprache.',
     'copy_language_done'       => 'Sprachinhalte erfolgreich kopiert.',
+
+    'item_deleted'      => 'Eintrag gelöscht.',
+    'user_deleted'      => 'Benutzer gelöscht.',
+    'blueprint_deleted' => 'Blueprint gelöscht.',
+    'group_deleted'     => 'Gruppe gelöscht.',
+    'webhook_deleted'   => 'Webhook gelöscht.',
+    'site_deleted'      => 'Website gelöscht.',
 ];

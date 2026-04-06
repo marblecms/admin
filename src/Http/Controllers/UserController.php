@@ -84,7 +84,8 @@ class UserController extends Controller
         $this->authorize('delete', $user);
         $user->delete();
 
-        return redirect()->route('marble.user.index');
+        return redirect()->route('marble.user.index')
+            ->with('success', trans('marble::admin.user_deleted'));
     }
 
     public function setLanguage(Request $request)

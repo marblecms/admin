@@ -107,6 +107,7 @@ class UserGroupController extends Controller
         $this->authorize('delete', $group);
         $group->delete();
 
-        return redirect()->route('marble.user-group.index');
+        return redirect()->route('marble.user-group.index')
+            ->with('success', trans('marble::admin.group_deleted'));
     }
 }

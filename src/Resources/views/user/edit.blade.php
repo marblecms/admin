@@ -14,7 +14,7 @@
 
         @if($errors->any())
             <div class="alert alert-danger">
-                <ul class="marble-mb-0" style="padding-left:18px">
+                <ul class="marble-mb-0 marble-error-list">
                     @foreach($errors->all() as $error)
                         <li>{{ $error }}</li>
                     @endforeach
@@ -54,8 +54,8 @@
                 <div class="form-group">
                     <label>{{ trans('marble::admin.theme') }}</label>
                     <select name="theme" class="form-control">
-                        <option value="xp" {{ old('theme', $user?->theme ?? 'xp') === 'xp' ? 'selected' : '' }}>XP (default)</option>
-                        <option value="98" {{ old('theme', $user?->theme ?? 'xp') === '98' ? 'selected' : '' }}>Windows 98</option>
+                        <option value="98" {{ old('theme', $user?->theme ?? 'xp') === '98' ? 'selected' : '' }}>1998</option>
+                        <option value="xp" {{ old('theme', $user?->theme ?? 'xp') === 'xp' ? 'selected' : '' }}>2000</option>
                     </select>
                 </div>
                 <div class="form-group">

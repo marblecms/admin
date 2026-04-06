@@ -406,6 +406,13 @@ return [
     'select_item_placeholder'  => 'No item selected',
     'no_portal_users'          => 'No portal users yet.',
 
+    'item_deleted'      => 'Item deleted.',
+    'user_deleted'      => 'User deleted.',
+    'blueprint_deleted' => 'Blueprint deleted.',
+    'group_deleted'     => 'Group deleted.',
+    'webhook_deleted'   => 'Webhook deleted.',
+    'site_deleted'      => 'Site deleted.',
+
     // Draft preview
     'preview_not_published_hint' => 'Item must be published to preview. Use the Draft Preview section below to generate a private preview link.',
     'draft_preview'            => 'Draft Preview',

@@ -310,4 +310,11 @@ return [
     'copy_language_submit'     => 'Kopírovať',
     'copy_language_hint'       => 'Prepíše všetky hodnoty polí cieľového jazyka hodnotami zdrojového jazyka.',
     'copy_language_done'       => 'Obsah jazyka úspešne skopírovaný.',
+
+    'item_deleted'      => 'Položka vymazaná.',
+    'user_deleted'      => 'Používateľ vymazaný.',
+    'blueprint_deleted' => 'Blueprint vymazaný.',
+    'group_deleted'     => 'Skupina vymazaná.',
+    'webhook_deleted'   => 'Webhook vymazaný.',
+    'site_deleted'      => 'Web vymazaný.',
 ];

@@ -1,7 +1,6 @@
 @php
 $prefix = config('marble.route_prefix', 'admin');
 if (!isset($iconMinus)) {
-    $adminTheme = Auth::guard('marble')->user()?->theme ?? 'xp';
     $iconMinus = $adminTheme === '98'
         ? asset('vendor/marble/assets/images/win98icons/minus.png')
         : asset('vendor/marble/assets/images/elbow-minus-nl.gif');

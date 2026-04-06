@@ -602,8 +602,8 @@ label {
 }
 
 .lang-switch.active {
-    background: #FFFFFF !important;
-    border-bottom-color: #FFFFFF !important;
+    background: #F4F8FE !important;
+    border-bottom-color: #F4F8FE !important;
     color: #15428B !important;
     font-weight: bold !important;
 }
@@ -1762,3 +1762,25 @@ tr[onclick] { cursor: pointer; }
 /* Portal user */
 .marble-page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
 .marble-alert-sm    { padding: 8px 14px; margin-bottom: 12px; }
+
+/* ── Flash toast ─────────────────────────────────────────────────────────── */
+#marble-toast {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    z-index: 9999;
+    background: #27ae60;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 10px 20px;
+    border-radius: 5px;
+    box-shadow: 0 4px 16px rgba(0,0,0,.25);
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity .25s, transform .25s;
+    pointer-events: none;
+}
+#marble-toast.marble-toast-show  { opacity: 1; transform: translateY(0); }
+#marble-toast.marble-toast-error { background: #c0392b; }
+.marble-error-list { padding-left: 18px; }

@@ -208,6 +208,10 @@ class MarbleServiceProvider extends ServiceProvider
     protected function registerViews(): void
     {
         $this->loadViewsFrom(__DIR__ . '/Resources/views', 'marble');
+
+        \Illuminate\Support\Facades\View::composer('marble::*', function ($view) {
+            $view->with('adminTheme', \Illuminate\Support\Facades\Auth::guard('marble')->user()?->theme ?? 'xp');
+        });
     }
 
     protected function registerTranslations(): void
