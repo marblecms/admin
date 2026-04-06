@@ -5,6 +5,7 @@ namespace Marble\Admin\Http\Controllers;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\DB;
 use Marble\Admin\Models\Item;
 
 class ItemMoveController extends Controller
@@ -15,15 +16,20 @@ class ItemMoveController extends Controller
     {
         $this->authorize('update', $item);
 
-        $potentialParents = Item::with('blueprint.allowedChildBlueprints')
-            ->where('id', '!=', $item->id)
-            ->get()
-            ->filter(function (Item $candidate) use ($item) {
-                if (str_starts_with($candidate->path, $item->path . '/')) {
-                    return false;
-                }
-                return $candidate->blueprint->allowsChild($item->blueprint);
+        // Find blueprint IDs that explicitly allow the item's blueprint as a child,
+        // plus any that allow all children.
+        $allowingBlueprintIds = DB::table('blueprint_allowed_children')
+            ->where(function ($q) use ($item) {
+                $q->where('child_blueprint_id', $item->blueprint_id)
+                  ->orWhere('allow_all', true);
             })
+            ->pluck('blueprint_id');
+
+        $potentialParents = Item::with('blueprint')
+            ->where('id', '!=', $item->id)
+            ->whereIn('blueprint_id', $allowingBlueprintIds)
+            ->whereNotLike('path', $item->path . '/%')
+            ->get()
             ->values();
 
         return view('marble::item.move', compact('item', 'potentialParents'));

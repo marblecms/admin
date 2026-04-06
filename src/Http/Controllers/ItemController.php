@@ -21,6 +21,7 @@ use Marble\Admin\Models\FormSubmission;
 use Marble\Admin\Models\Language;
 use Marble\Admin\Models\Redirect;
 use Marble\Admin\Services\ActivityLogService;
+use Marble\Admin\Services\ItemRevisionService;
 use Marble\Admin\Services\WebhookService;
 
 class ItemController extends Controller
@@ -29,11 +30,13 @@ class ItemController extends Controller
 
     private ActivityLogService $activityLog;
     private WebhookService $webhooks;
+    private ItemRevisionService $revisions;
 
-    public function __construct(ActivityLogService $activityLog, WebhookService $webhooks)
+    public function __construct(ActivityLogService $activityLog, WebhookService $webhooks, ItemRevisionService $revisions)
     {
         $this->activityLog = $activityLog;
         $this->webhooks    = $webhooks;
+        $this->revisions   = $revisions;
     }
 
     public function edit(Item $item)
@@ -118,7 +121,7 @@ class ItemController extends Controller
         }
 
         if ($item->blueprint->versionable) {
-            $this->snapshotRevision($item, $languages);
+            $this->revisions->snapshot($item, $languages, Auth::guard('marble')->id());
         }
 
         $changedFields = [];
@@ -406,28 +409,4 @@ class ItemController extends Controller
             });
     }
 
-    private function snapshotRevision(Item $item, $languages): void
-    {
-        $allValues = $item->itemValues()->get()->keyBy(fn($iv) => $iv->blueprint_field_id . '_' . $iv->language_id);
-        $snapshot  = [];
-
-        foreach ($item->blueprint->fields as $field) {
-            $snapshot[$field->id] = [];
-            foreach ($languages as $language) {
-                $iv = $allValues->get($field->id . '_' . $language->id);
-                $snapshot[$field->id][$language->id] = $iv ? $iv->value : null;
-            }
-        }
-
-        ItemRevision::create([
-            'item_id' => $item->id,
-            'user_id' => Auth::guard('marble')->id(),
-            'values'  => $snapshot,
-        ]);
-
-        $keepIds = ItemRevision::where('item_id', $item->id)->orderByDesc('id')->limit(20)->pluck('id');
-        if ($keepIds->isNotEmpty()) {
-            ItemRevision::where('item_id', $item->id)->whereNotIn('id', $keepIds)->delete();
-        }
-    }
 }

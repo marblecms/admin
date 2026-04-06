@@ -10,10 +10,18 @@ use Marble\Admin\Models\Item;
 use Marble\Admin\Models\ItemRevision;
 use Marble\Admin\Models\ItemValue;
 use Marble\Admin\Models\Language;
+use Marble\Admin\Services\ItemRevisionService;
 
 class ItemRevisionController extends Controller
 {
     use AuthorizesRequests;
+
+    private ItemRevisionService $revisions;
+
+    public function __construct(ItemRevisionService $revisions)
+    {
+        $this->revisions = $revisions;
+    }
 
     public function diff(Item $item, ItemRevision $revision)
     {
@@ -57,7 +65,7 @@ class ItemRevisionController extends Controller
         $languages = Language::all();
 
         if ($item->blueprint->versionable) {
-            $this->snapshot($item, $languages);
+            $this->revisions->snapshot($item, $languages, Auth::guard('marble')->id());
         }
 
         foreach ($revision->values as $fieldId => $langValues) {
@@ -75,28 +83,4 @@ class ItemRevisionController extends Controller
         return redirect()->route('marble.item.edit', $item);
     }
 
-    private function snapshot(Item $item, $languages): void
-    {
-        $allValues = $item->itemValues()->get()->keyBy(fn($iv) => $iv->blueprint_field_id . '_' . $iv->language_id);
-        $snapshot  = [];
-
-        foreach ($item->blueprint->fields as $field) {
-            $snapshot[$field->id] = [];
-            foreach ($languages as $language) {
-                $iv = $allValues->get($field->id . '_' . $language->id);
-                $snapshot[$field->id][$language->id] = $iv ? $iv->value : null;
-            }
-        }
-
-        ItemRevision::create([
-            'item_id' => $item->id,
-            'user_id' => Auth::guard('marble')->id(),
-            'values'  => $snapshot,
-        ]);
-
-        $keepIds = ItemRevision::where('item_id', $item->id)->orderByDesc('id')->limit(20)->pluck('id');
-        if ($keepIds->isNotEmpty()) {
-            ItemRevision::where('item_id', $item->id)->whereNotIn('id', $keepIds)->delete();
-        }
-    }
 }

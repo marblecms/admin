@@ -113,9 +113,10 @@ class DoctorCommand extends Command
         // Check all expected tables exist
         $tables = [
             'blueprints', 'blueprint_fields', 'field_types', 'items', 'item_values',
+            'item_url_aliases', 'item_revisions', 'item_locks',
             'users', 'user_groups', 'languages', 'sites', 'redirects', 'api_tokens',
             'notifications', 'webhooks', 'workflows', 'workflow_steps', 'workflow_transitions',
-            'item_mount_points', 'portal_users',
+            'item_mount_points', 'portal_users', 'form_submissions',
         ];
 
         $missing = [];
