@@ -6,6 +6,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Marble\Admin\Http\Requests\BlueprintRequest;
 use Marble\Admin\Models\Blueprint;
 use Marble\Admin\Models\BlueprintField;
@@ -34,7 +35,7 @@ class BlueprintController extends Controller
 
         $blueprint = Blueprint::create([
             'name'               => 'New Blueprint',
-            'identifier'         => 'new_blueprint_' . time(),
+            'identifier'         => 'new_blueprint_' . Str::random(6),
             'blueprint_group_id' => $defaultGroup->id,
         ]);
 
@@ -81,7 +82,7 @@ class BlueprintController extends Controller
     {
         $this->authorize('update', $blueprint);
 
-        $famicons = \Illuminate\Support\Facades\Cache::rememberForever('marble.famicons', function () {
+        $famicons = \Illuminate\Support\Facades\Cache::remember('marble.famicons', now()->addDay(), function () {
             return collect(glob(public_path('vendor/marble/assets/images/famicons/*.svg')))
                 ->map(fn($path) => pathinfo($path, PATHINFO_FILENAME))
                 ->sort()

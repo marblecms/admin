@@ -270,6 +270,22 @@ Recommended schedule:
 Schedule::command('marble:workflow-deadlines')->daily();
 ```
 
+### marble:clear-icon-cache
+
+Clear the cached famicon list used by the blueprint icon picker. Run this after adding new icons to the `famicons/` asset folder (cache rebuilds automatically after 24 hours otherwise):
+
+```bash
+php artisan marble:clear-icon-cache
+```
+
+### marble:doctor
+
+Health check covering database, assets, queue, sites, blueprints, items, workflows, and more:
+
+```bash
+php artisan marble:doctor
+```
+
 ## Revision History
 
 When **Versionable** is enabled on a blueprint, a full snapshot is saved on every save. In the item edit view, the **Versions** sidebar shows the revision list. Each revision can be:

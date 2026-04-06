@@ -114,7 +114,7 @@ class DoctorCommand extends Command
         $tables = [
             'blueprints', 'blueprint_fields', 'field_types', 'items', 'item_values',
             'users', 'user_groups', 'languages', 'sites', 'redirects', 'api_tokens',
-            'notifications', 'workflows', 'workflow_steps', 'workflow_transitions',
+            'notifications', 'webhooks', 'workflows', 'workflow_steps', 'workflow_transitions',
             'item_mount_points', 'portal_users',
         ];
 

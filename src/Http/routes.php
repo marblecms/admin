@@ -15,20 +15,20 @@ Route::prefix('item')->as('item.')->group(function () {
     Route::post('create', [\Marble\Admin\Http\Controllers\ItemController::class, 'create'])->name('create');
     Route::delete('delete/{item}', [\Marble\Admin\Http\Controllers\ItemController::class, 'delete'])->name('delete');
     Route::post('duplicate/{item}', [\Marble\Admin\Http\Controllers\ItemController::class, 'duplicate'])->name('duplicate');
-    Route::get('move/{item}', [\Marble\Admin\Http\Controllers\ItemController::class, 'moveForm'])->name('move-form');
-    Route::post('move/{item}', [\Marble\Admin\Http\Controllers\ItemController::class, 'move'])->name('move');
+    Route::get('move/{item}', [\Marble\Admin\Http\Controllers\ItemMoveController::class, 'form'])->name('move-form');
+    Route::post('move/{item}', [\Marble\Admin\Http\Controllers\ItemMoveController::class, 'move'])->name('move');
     Route::post('toggle-status/{item}', [\Marble\Admin\Http\Controllers\ItemController::class, 'toggleStatus'])->name('toggle-status');
     Route::post('toggle-nav/{item}', [\Marble\Admin\Http\Controllers\ItemController::class, 'toggleNav'])->name('toggle-nav');
-    Route::post('revert/{item}/{revision}', [\Marble\Admin\Http\Controllers\ItemController::class, 'revert'])->name('revert');
-    Route::get('diff/{item}/{revision}', [\Marble\Admin\Http\Controllers\ItemController::class, 'diff'])->name('diff');
-    Route::post('sort', [\Marble\Admin\Http\Controllers\ItemController::class, 'sort'])->name('sort');
+    Route::post('revert/{item}/{revision}', [\Marble\Admin\Http\Controllers\ItemRevisionController::class, 'revert'])->name('revert');
+    Route::get('diff/{item}/{revision}', [\Marble\Admin\Http\Controllers\ItemRevisionController::class, 'diff'])->name('diff');
+    Route::post('sort', [\Marble\Admin\Http\Controllers\ItemSortController::class, 'sort'])->name('sort');
     Route::get('search.json', [\Marble\Admin\Http\Controllers\ItemController::class, 'searchJson'])->name('search');
     Route::post('ajax-field/{itemValue}/{language}', [\Marble\Admin\Http\Controllers\ItemController::class, 'ajaxField'])->name('ajax-field');
     // URL Aliases
-    Route::post('aliases/{item}', [\Marble\Admin\Http\Controllers\ItemController::class, 'saveAliases'])->name('aliases.save');
+    Route::post('aliases/{item}', [\Marble\Admin\Http\Controllers\ItemAliasController::class, 'save'])->name('aliases.save');
     // Content locking
-    Route::post('lock/{item}', [\Marble\Admin\Http\Controllers\ItemController::class, 'acquireLock'])->name('lock');
-    Route::delete('lock/{item}', [\Marble\Admin\Http\Controllers\ItemController::class, 'releaseLock'])->name('unlock');
+    Route::post('lock/{item}', [\Marble\Admin\Http\Controllers\ItemLockController::class, 'acquire'])->name('lock');
+    Route::delete('lock/{item}', [\Marble\Admin\Http\Controllers\ItemLockController::class, 'release'])->name('unlock');
     // Import / Export
     Route::get('export/{item}', [\Marble\Admin\Http\Controllers\ImportExportController::class, 'export'])->name('export');
     Route::get('import', [\Marble\Admin\Http\Controllers\ImportExportController::class, 'importForm'])->name('import-form');

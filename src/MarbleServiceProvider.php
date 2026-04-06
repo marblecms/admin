@@ -260,6 +260,7 @@ class MarbleServiceProvider extends ServiceProvider
                 \Marble\Admin\Console\MakeBlueprintCommand::class,
                 \Marble\Admin\Console\DoctorCommand::class,
                 \Marble\Admin\Console\PruneCommand::class,
+                \Marble\Admin\Console\ClearIconCacheCommand::class,
             ]);
         }
     }
