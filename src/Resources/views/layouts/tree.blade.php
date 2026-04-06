@@ -1,13 +1,15 @@
 @php
 $prefix = config('marble.route_prefix', 'admin');
-$adminTheme = Auth::guard('marble')->user()?->theme ?? 'xp';
-$iconMinus = $adminTheme === '98'
-    ? asset('vendor/marble/assets/images/win98icons/minus.png')
-    : asset('vendor/marble/assets/images/elbow-minus-nl.gif');
-$iconPlus = $adminTheme === '98'
-    ? asset('vendor/marble/assets/images/win98icons/plus.png')
-    : asset('vendor/marble/assets/images/elbow-plus-nl.gif');
-$iconSize = $adminTheme === '98' ? 10 : 20;
+if (!isset($iconMinus)) {
+    $adminTheme = Auth::guard('marble')->user()?->theme ?? 'xp';
+    $iconMinus = $adminTheme === '98'
+        ? asset('vendor/marble/assets/images/win98icons/minus.png')
+        : asset('vendor/marble/assets/images/elbow-minus-nl.gif');
+    $iconPlus = $adminTheme === '98'
+        ? asset('vendor/marble/assets/images/win98icons/plus.png')
+        : asset('vendor/marble/assets/images/elbow-plus-nl.gif');
+    $iconSize = $adminTheme === '98' ? 10 : 20;
+}
 @endphp
 
 @if($isRoot)
@@ -34,7 +36,7 @@ $iconSize = $adminTheme === '98' ? 10 : 20;
                     <img src="{{ $iconPlus }}" width="{{ $iconSize }}" height="{{ $iconSize }}" alt="" class="marble-invisible">
                 @endif
                 @if($node->blueprint)
-                    <img src="{{ asset('vendor/marble/assets/images/famicons/' . $node->blueprint->effectiveIcon() . '.svg') }}" width="16" height="16" alt="" class="marble-vmid marble-mr-xs">
+                    @include('marble::components.famicon', ['name' => $node->blueprint->effectiveIcon()])
                 @endif
                 <span>{{ $node->name() }}</span>
                 @if(!empty($node->_is_mount))
@@ -42,7 +44,15 @@ $iconSize = $adminTheme === '98' ? 10 : 20;
                 @endif
             </a>
 
-            @include('marble::layouts.tree', ['nodes' => $node->tree_children, 'isRoot' => false, 'isModal' => $isModal, 'selectedItem' => $selectedItem ?? null])
+            @include('marble::layouts.tree', [
+                'nodes'        => $node->tree_children,
+                'isRoot'       => false,
+                'isModal'      => $isModal,
+                'selectedItem' => $selectedItem ?? null,
+                'iconMinus'    => $iconMinus,
+                'iconPlus'     => $iconPlus,
+                'iconSize'     => $iconSize,
+            ])
         </li>
     @endforeach
 

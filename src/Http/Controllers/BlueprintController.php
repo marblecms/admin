@@ -95,6 +95,8 @@ class BlueprintController extends Controller
             'allBlueprints'   => Blueprint::with('group')->orderBy('name')->get()->groupBy(fn($b) => $b->group?->name ?? trans('marble::admin.no_group')),
             'famicons'        => $famicons,
             'workflows'       => Workflow::orderBy('name')->get(),
+            'adminTheme'      => auth()->guard('marble')->user()?->theme ?? 'xp',
+            'win98map'        => \Marble\Admin\Support\Win98Icons::map(),
         ]);
     }
 

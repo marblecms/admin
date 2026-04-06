@@ -238,6 +238,38 @@ Add to `routes/console.php`:
 Schedule::command('marble:publish-scheduled')->everyMinute();
 ```
 
+## Maintenance Commands
+
+### marble:prune
+
+Prune old activity log entries and read notifications to keep the database lean:
+
+```bash
+php artisan marble:prune
+php artisan marble:prune --activity-days=90 --notifications-days=30
+php artisan marble:prune --dry-run   # preview counts without deleting
+```
+
+Recommended schedule in `routes/console.php`:
+
+```php
+Schedule::command('marble:prune')->weekly();
+```
+
+### marble:workflow-deadlines
+
+Scan all items with an active workflow step that has a `deadline_days` configured. Items past their deadline trigger notifications to the step's configured notifiables (or all admins as fallback):
+
+```bash
+php artisan marble:workflow-deadlines
+```
+
+Recommended schedule:
+
+```php
+Schedule::command('marble:workflow-deadlines')->daily();
+```
+
 ## Revision History
 
 When **Versionable** is enabled on a blueprint, a full snapshot is saved on every save. In the item edit view, the **Versions** sidebar shows the revision list. Each revision can be:

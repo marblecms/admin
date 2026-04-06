@@ -71,7 +71,7 @@
                                     <ul id="icon-suggestions" class="marble-icon-suggestions marble-hidden"></ul>
                                 </div>
                                 <img id="icon-preview"
-                                     src="{{ asset('vendor/marble/assets/images/famicons/' . ($blueprint->icon ?: 'page') . '.svg') }}"
+                                     src="{{ \Marble\Admin\Support\Win98Icons::url($blueprint->icon ?: 'page', $adminTheme) }}"
                                      width="28" height="28" alt=""
                                      class="marble-icon-preview {{ $blueprint->icon ? '' : 'marble-icon-preview-empty' }}">
                             </div>
@@ -259,12 +259,22 @@
 
         // Icon search/autocomplete
         (function() {
-            var icons    = @json($famicons);
-            var baseUrl  = '{{ asset('vendor/marble/assets/images/famicons/') }}/';
-            var $input   = $('#icon-search');
-            var $hidden  = $('#icon-value');
-            var $preview = $('#icon-preview');
-            var $list    = $('#icon-suggestions');
+            var icons       = @json($famicons);
+            var baseUrl     = '{{ asset('vendor/marble/assets/images/famicons/') }}/';
+            var adminTheme  = '{{ $adminTheme }}';
+            var win98map    = @json($win98map);
+            var win98Base   = '{{ asset('vendor/marble/assets/images/win98icons/') }}/';
+            var $input      = $('#icon-search');
+            var $hidden     = $('#icon-value');
+            var $preview    = $('#icon-preview');
+            var $list       = $('#icon-suggestions');
+
+            function iconUrl(icon) {
+                if (adminTheme === '98' && win98map[icon]) {
+                    return win98Base + win98map[icon];
+                }
+                return baseUrl + icon + '.svg';
+            }
 
             function showSuggestions(query) {
                 var q = query.toLowerCase().replace(/\s+/g, '_');
@@ -280,7 +290,7 @@
                         e.preventDefault();
                         selectIcon(icon);
                     });
-                    $li.append($('<img class="marble-icon-suggestion-thumb">').attr('src', baseUrl + icon + '.svg'));
+                    $li.append($('<img class="marble-icon-suggestion-thumb">').attr('src', iconUrl(icon)));
                     $li.append($('<span>').text(icon));
                     $list.append($li);
                 });
@@ -290,7 +300,7 @@
             function selectIcon(icon) {
                 $hidden.val(icon);
                 $input.val(icon);
-                $preview.attr('src', baseUrl + icon + '.svg').removeClass('marble-icon-preview-empty');
+                $preview.attr('src', iconUrl(icon)).removeClass('marble-icon-preview-empty');
                 $list.hide();
             }
 

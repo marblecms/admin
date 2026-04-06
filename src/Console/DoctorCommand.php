@@ -25,6 +25,8 @@ class DoctorCommand extends Command
         $this->newLine();
 
         $this->checkDatabase();
+        $this->checkAssets();
+        $this->checkQueue();
         $this->checkSites();
         $this->checkBlueprints();
         $this->checkItems();
@@ -53,6 +55,48 @@ class DoctorCommand extends Command
     }
 
     // ─── Checks ──────────────────────────────────────────────────────────────
+
+    private function checkAssets(): void
+    {
+        $this->section('Assets');
+
+        $assetsPath = public_path('vendor/marble/assets');
+        if (!is_dir($assetsPath)) {
+            $this->error_row('Admin assets not published', 'Run: php artisan vendor:publish --tag=marble-assets');
+            return;
+        }
+        $this->pass('Admin assets published');
+
+        foreach (['xp', '98'] as $theme) {
+            $file = $assetsPath . '/css/admin-theme-' . $theme . '.css';
+            if (!file_exists($file)) {
+                $this->warn("Theme file admin-theme-{$theme}.css missing", 'Run: php artisan vendor:publish --tag=marble-assets --force');
+            }
+        }
+    }
+
+    private function checkQueue(): void
+    {
+        $this->section('Queue');
+
+        $driver = config('queue.default');
+        if ($driver === 'sync') {
+            $hasWebhooks = DB::table('webhooks')->where('active', true)->exists();
+            if ($hasWebhooks) {
+                $this->warn('Queue driver is "sync" but active webhooks exist', 'Webhook jobs run synchronously — configure a real queue driver for production');
+            } else {
+                $this->info_row('Queue driver is "sync" (no active webhooks configured)');
+            }
+        } else {
+            $this->pass("Queue driver: {$driver}");
+            try {
+                \Illuminate\Support\Facades\Queue::size();
+                $this->pass('Queue connection reachable');
+            } catch (\Exception $e) {
+                $this->warn('Queue connection failed: ' . $e->getMessage());
+            }
+        }
+    }
 
     private function checkDatabase(): void
     {
