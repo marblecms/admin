@@ -28,9 +28,16 @@
     </div>
     @endif
 
-    <input type="file"
-           name="file_{{ $field->id }}_{{ $languageId }}"
-           class="form-control" />
+    <div class="marble-flex-center marble-mt-xs">
+        <input type="file"
+               name="file_{{ $field->id }}_{{ $languageId }}"
+               class="form-control marble-flex-1" />
+        <button type="button" class="btn btn-default btn-sm marble-file-library-picker"
+                data-field="{{ $field->id }}" data-lang="{{ $languageId }}">
+            @include('marble::components.famicon', ['name' => 'folder'])
+            {{ trans('marble::admin.from_library') }}
+        </button>
+    </div>
 
     @php
         $allowedFiletypes = trim($field->configuration['allowed_filetypes'] ?? '');
@@ -39,3 +46,29 @@
         <small class="text-muted">{{ trans('marble::admin.allowed_filetypes') }}: {{ $allowedFiletypes }}</small>
     @endif
 </div>
+
+<script>
+    $('body').on('click', '.marble-file-library-picker[data-field="{{ $field->id }}"][data-lang="{{ $languageId }}"]', function () {
+        MarbleMedia.open(function (media) {
+            var $container = $('#attribute-file-{{ $field->id }}-{{ $languageId }}');
+            $container.find('.attribute-file-input').val('library:' + media.id);
+
+            // Show selected file
+            $container.find('.attribute-file-current').remove();
+            var icon = media.thumbnail
+                ? '<img src="' + media.thumbnail + '" style="height:20px;vertical-align:middle;margin-right:4px" />'
+                : '';
+            $container.prepend(
+                '<div class="attribute-file-current marble-file-current">' +
+                icon +
+                '<span class="attribute-file-name">' + media.original_filename + '</span>' +
+                '<button type="button" class="btn btn-default btn-xs attribute-file-remove marble-ml-auto" onclick="' +
+                    'document.querySelector(\'#attribute-file-{{ $field->id }}-{{ $languageId }} .attribute-file-input\').value = \'remove\';' +
+                    'this.closest(\'.attribute-file-current\').remove();">' +
+                    '✕ {{ trans('marble::admin.remove') }}' +
+                '</button>' +
+                '</div>'
+            );
+        });
+    });
+</script>

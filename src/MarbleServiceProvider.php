@@ -125,6 +125,7 @@ class MarbleServiceProvider extends ServiceProvider
             FieldTypes\Repeater::class,
             FieldTypes\File::class,
             FieldTypes\Files::class,
+            FieldTypes\MediaFolder::class,
         ];
 
         foreach ($builtInTypes as $typeClass) {

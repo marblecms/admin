@@ -18,6 +18,8 @@ class MarbleManager
     protected ?int $currentLanguageId = null;
     protected ?int $primaryLanguageId = null;
     protected bool $translationFallback = false;
+    protected ?int $activeVariantId = null;
+    protected ?int $activeVariantItemId = null;
 
     public function __construct(FieldTypeRegistry $registry)
     {
@@ -111,6 +113,22 @@ class MarbleManager
     public function translationFallbackEnabled(): bool
     {
         return $this->translationFallback;
+    }
+
+    public function setActiveVariantId(int $variantId, int $itemId): void
+    {
+        $this->activeVariantId     = $variantId;
+        $this->activeVariantItemId = $itemId;
+    }
+
+    public function activeVariantId(): ?int
+    {
+        return $this->activeVariantId;
+    }
+
+    public function activeVariantItemId(): ?int
+    {
+        return $this->activeVariantItemId;
     }
 
     // -------------------------------------------------------------------------

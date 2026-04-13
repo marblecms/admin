@@ -25,7 +25,7 @@
             <table class="table table-striped" id="sortable-children">
                 <tbody>
                     @foreach($childItems as $child)
-                        <tr data-node-id="{{ $child->id }}" onclick="window.location='{{ route('marble.item.edit', $child) }}'" >
+                        <tr data-node-id="{{ $child->id }}" data-href="{{ route('marble.item.edit', $child) }}" class="marble-row-link">
                             <td>
                                 @if($child->blueprint->icon)
                                     @include('marble::components.famicon', ['name' => $child->blueprint->icon])
@@ -58,20 +58,31 @@
             </table>
 
             <script>
-                $("#sortable-children tbody").sortable({
-                    revert: true,
-                    stop: function() {
-                        var items = {};
-                        $("#sortable-children tbody > tr").each(function(i) {
-                            items[$(this).data("node-id")] = i;
-                        });
-                        $.post("{{ route('marble.item.sort') }}", { items: items, _token: $('meta[name="csrf-token"]').attr('content') });
-                    }
-                });
+                (function() {
+                    var dragging = false;
+
+                    $("#sortable-children tbody").sortable({
+                        revert: true,
+                        start: function() { dragging = true; },
+                        stop: function() {
+                            var items = {};
+                            $("#sortable-children tbody > tr").each(function(i) {
+                                items[$(this).data("node-id")] = i;
+                            });
+                            $.post("{{ route('marble.item.sort') }}", { items: items, _token: $('meta[name="csrf-token"]').attr('content') });
+                            setTimeout(function() { dragging = false; }, 0);
+                        }
+                    });
+
+                    $("#sortable-children").on("click", "tr.marble-row-link", function(e) {
+                        if (dragging) return;
+                        window.location = $(this).data("href");
+                    });
+                })();
             </script>
         </div>
         @else
-            <p class="text-muted text-center marble-mb-0 marble-mt-xs marble-mb-xs">{{ trans('marble::admin.no_children') }}</p>
+            <p class="text-muted text-center marble-no-children-hint">{{ trans('marble::admin.no_children') }}</p>
         @endif
     </div>
 </div>

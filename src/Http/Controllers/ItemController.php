@@ -22,6 +22,7 @@ use Marble\Admin\Models\Language;
 use Marble\Admin\Models\Redirect;
 use Marble\Admin\Services\ActivityLogService;
 use Marble\Admin\Services\ItemRevisionService;
+use Marble\Admin\Services\NotificationService;
 use Marble\Admin\Services\WebhookService;
 
 class ItemController extends Controller
@@ -31,12 +32,14 @@ class ItemController extends Controller
     private ActivityLogService $activityLog;
     private WebhookService $webhooks;
     private ItemRevisionService $revisions;
+    private NotificationService $notifications;
 
-    public function __construct(ActivityLogService $activityLog, WebhookService $webhooks, ItemRevisionService $revisions)
+    public function __construct(ActivityLogService $activityLog, WebhookService $webhooks, ItemRevisionService $revisions, NotificationService $notifications)
     {
-        $this->activityLog = $activityLog;
-        $this->webhooks    = $webhooks;
-        $this->revisions   = $revisions;
+        $this->activityLog   = $activityLog;
+        $this->webhooks      = $webhooks;
+        $this->revisions     = $revisions;
+        $this->notifications = $notifications;
     }
 
     public function edit(Item $item)
@@ -47,8 +50,8 @@ class ItemController extends Controller
         $groupedFields = $item->blueprint->groupedFields();
 
         $childItems = null;
-        if ($item->blueprint->list_children) {
-            $childItems = $item->children()->orderBy('sort_order')->get();
+        if ($item->blueprint->list_children || $item->blueprint->inline_children) {
+            $childItems = $item->children()->with('blueprint')->orderBy('sort_order')->get();
         }
 
         $revisions = ItemRevision::where('item_id', $item->id)
@@ -83,6 +86,9 @@ class ItemController extends Controller
             })
             ->get();
 
+        $isWatching = \Marble\Admin\Models\ItemSubscription::where('user_id', $currentUser->id)
+            ->where('item_id', $item->id)->exists();
+
         return view('marble::item.edit', [
             'item'             => $item,
             'languages'        => $languages,
@@ -98,6 +104,7 @@ class ItemController extends Controller
             'aliases'          => \Marble\Admin\Models\ItemUrlAlias::where('item_id', $item->id)->with('language')->get(),
             'mountPoints'      => $item->mountPoints()->with('mountParent.blueprint')->get(),
             'inboundRedirects' => $inboundRedirects,
+            'isWatching'       => $isWatching,
         ]);
     }
 
@@ -160,6 +167,13 @@ class ItemController extends Controller
         $item->touch();
         $this->activityLog->log('item.saved', $item);
         $this->webhooks->fire('item.saved', $item, $changedFields);
+        $this->notifySubscribers($item, 'item.saved', Auth::guard('marble')->id());
+
+        if ($parentId = $request->input('_inline_parent_id')) {
+            return redirect()->route('marble.item.edit', $parentId)
+                ->withFragment('child-' . $item->id)
+                ->with('success', trans('marble::admin.item_saved'));
+        }
 
         return redirect()->route('marble.item.edit', $item)
             ->with('success', trans('marble::admin.item_saved'));
@@ -228,6 +242,11 @@ class ItemController extends Controller
         }
 
         $this->activityLog->log('item.created', $item);
+
+        if ($request->input('_inline_parent_id')) {
+            return redirect()->route('marble.item.edit', $request->input('parent_id'))
+                ->withFragment('child-' . $item->id);
+        }
 
         return redirect()->route('marble.item.edit', $item);
     }
@@ -310,6 +329,7 @@ class ItemController extends Controller
         $action = $item->status === 'published' ? 'item.published' : 'item.draft';
         $this->activityLog->log($action, $item);
         $this->webhooks->fire($action, $item);
+        $this->notifySubscribers($item, $action, Auth::guard('marble')->id());
 
         return back();
     }
@@ -382,6 +402,23 @@ class ItemController extends Controller
             ->map(fn($iv) => $iv->item)
             ->unique('id')
             ->values();
+    }
+
+    private function notifySubscribers(Item $item, string $action, int $actorUserId): void
+    {
+        $subscribers = \Marble\Admin\Models\User::whereIn('id', $item->subscriberIds())
+            ->where('id', '!=', $actorUserId)
+            ->get();
+
+        $title = match ($action) {
+            'item.published' => trans('marble::admin.subscription_notify_published', ['name' => $item->name()]),
+            'item.draft'     => trans('marble::admin.subscription_notify_draft',     ['name' => $item->name()]),
+            default          => trans('marble::admin.subscription_notify_saved',     ['name' => $item->name()]),
+        };
+
+        foreach ($subscribers as $user) {
+            $this->notifications->create($user, $action, $title, '', $item);
+        }
     }
 
     private function handleRelationsOnDelete(\Illuminate\Support\Collection $deletingIds): void

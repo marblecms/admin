@@ -174,4 +174,255 @@
             </form>
         </div>
     </div>
+
+    {{-- Media Blueprints --}}
+    <div class="main-box">
+        <header class="main-box-header clearfix">
+            <h2>@include('marble::components.famicon', ['name' => 'pictures']) {{ trans('marble::admin.media_blueprints') }}</h2>
+        </header>
+        <div class="main-box-body clearfix">
+            <p class="text-muted marble-hint">{{ trans('marble::admin.media_blueprints_hint') }}</p>
+            <form method="POST" action="{{ route('marble.configuration.media-blueprints.save') }}" id="media-blueprints-form">
+                @csrf
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>{{ trans('marble::admin.mime_pattern') }}</th>
+                            <th>{{ trans('marble::admin.blueprint') }}</th>
+                            <th class="marble-col-xs"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="media-blueprint-rules-body">
+                        @foreach($mediaBlueprintRules as $i => $rule)
+                            <tr>
+                                <td>
+                                    <input type="text" name="rules[{{ $i }}][mime_pattern]"
+                                           value="{{ $rule->mime_pattern }}"
+                                           class="form-control input-sm"
+                                           placeholder="image/*, application/pdf, video/mp4" />
+                                </td>
+                                <td>
+                                    <select name="rules[{{ $i }}][blueprint_id]" class="form-control input-sm">
+                                        @foreach($blueprints as $bp)
+                                            <option value="{{ $bp->id }}" {{ $rule->blueprint_id == $bp->id ? 'selected' : '' }}>{{ $bp->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-danger btn-xs marble-remove-rule">
+                                        @include('marble::components.famicon', ['name' => 'bin'])
+                                    </button>
+                                </td>
+                            </tr>
+                        @endforeach
+                        {{-- Add new rule inline --}}
+                        <tr class="marble-row-new" id="media-rule-new-row">
+                            <td>
+                                <input type="text" id="new-rule-mime" class="form-control input-sm" placeholder="image/*, application/pdf, video/mp4" />
+                            </td>
+                            <td>
+                                <select id="new-rule-blueprint" class="form-control input-sm">
+                                    @foreach($blueprints as $bp)
+                                        <option value="{{ $bp->id }}">{{ $bp->name }}</option>
+                                    @endforeach
+                                </select>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-success btn-xs" id="marble-add-rule">
+                                    @include('marble::components.famicon', ['name' => 'add'])
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="form-group marble-mt-sm">
+                    <label><strong>{{ trans('marble::admin.default_blueprint') }}</strong></label>
+                    <p class="text-muted marble-hint">{{ trans('marble::admin.default_blueprint_hint') }}</p>
+                    <select name="media_default_blueprint_id" class="form-control input-sm marble-input-md-w">
+                        <option value="">— {{ trans('marble::admin.none') }} —</option>
+                        @foreach($blueprints as $bp)
+                            <option value="{{ $bp->id }}"
+                                {{ ($settings['media_default_blueprint_id'] ?? '') == $bp->id ? 'selected' : '' }}>
+                                {{ $bp->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="form-group pull-right">
+                    <button type="submit" class="btn btn-success">
+                        @include('marble::components.famicon', ['name' => 'disk']) {{ trans('marble::admin.save') }}
+                    </button>
+                </div>
+                <div class="clearfix"></div>
+            </form>
+        </div>
+    </div>
+    {{-- Smart Crops --}}
+    <div class="main-box">
+        <header class="main-box-header clearfix">
+            <h2>@include('marble::components.famicon', ['name' => 'pictures']) {{ trans('marble::admin.smart_crops') }}</h2>
+        </header>
+        <div class="main-box-body clearfix">
+            <p class="text-muted marble-hint">{{ trans('marble::admin.smart_crops_hint') }}</p>
+            <form method="POST" action="{{ route('marble.configuration.crop-presets.save') }}" id="crop-presets-form">
+                @csrf
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>{{ trans('marble::admin.crop_name') }}</th>
+                            <th>{{ trans('marble::admin.crop_label') }}</th>
+                            <th class="marble-col-sm">{{ trans('marble::admin.crop_width') }}</th>
+                            <th class="marble-col-sm">{{ trans('marble::admin.crop_height') }}</th>
+                            <th class="marble-col-xs"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="crop-presets-body">
+                        @foreach($cropPresets as $i => $preset)
+                            <tr>
+                                <td>
+                                    <input type="text" name="presets[{{ $i }}][name]"
+                                           value="{{ $preset->name }}"
+                                           class="form-control input-sm"
+                                           placeholder="hero" />
+                                </td>
+                                <td>
+                                    <input type="text" name="presets[{{ $i }}][label]"
+                                           value="{{ $preset->label }}"
+                                           class="form-control input-sm"
+                                           placeholder="Hero 16:9" />
+                                </td>
+                                <td>
+                                    <input type="number" name="presets[{{ $i }}][width]"
+                                           value="{{ $preset->width }}"
+                                           class="form-control input-sm marble-input-num-sm"
+                                           min="1" max="8000" />
+                                </td>
+                                <td>
+                                    <input type="number" name="presets[{{ $i }}][height]"
+                                           value="{{ $preset->height }}"
+                                           class="form-control input-sm marble-input-num-sm"
+                                           min="1" max="8000" />
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-danger btn-xs marble-remove-crop">
+                                        @include('marble::components.famicon', ['name' => 'bin'])
+                                    </button>
+                                </td>
+                            </tr>
+                        @endforeach
+                        {{-- Add new crop inline --}}
+                        <tr class="marble-row-new" id="crop-new-row">
+                            <td><input type="text" id="new-crop-name"   class="form-control input-sm" placeholder="hero" /></td>
+                            <td><input type="text" id="new-crop-label"  class="form-control input-sm" placeholder="Hero 16:9" /></td>
+                            <td><input type="number" id="new-crop-width"  class="form-control input-sm marble-input-num-sm" min="1" max="8000" placeholder="1920" /></td>
+                            <td><input type="number" id="new-crop-height" class="form-control input-sm marble-input-num-sm" min="1" max="8000" placeholder="1080" /></td>
+                            <td>
+                                <button type="button" class="btn btn-success btn-xs" id="marble-add-crop">
+                                    @include('marble::components.famicon', ['name' => 'add'])
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="form-group pull-right">
+                    <button type="submit" class="btn btn-success">
+                        @include('marble::components.famicon', ['name' => 'disk']) {{ trans('marble::admin.save') }}
+                    </button>
+                </div>
+                <div class="clearfix"></div>
+            </form>
+        </div>
+    </div>
+@endsection
+
+@section('javascript')
+<script>
+(function () {
+    function reindex() {
+        $('#media-blueprint-rules-body tr:not(#media-rule-new-row)').each(function(i) {
+            $(this).find('input[type=text]').attr('name', 'rules[' + i + '][mime_pattern]');
+            $(this).find('select').attr('name', 'rules[' + i + '][blueprint_id]');
+        });
+    }
+
+    $('#marble-add-rule').on('click', function () {
+        var mime = $('#new-rule-mime').val().trim();
+        var bpId = $('#new-rule-blueprint').val();
+        if (!mime) { $('#new-rule-mime').focus(); return; }
+
+        var i = $('#media-blueprint-rules-body tr:not(#media-rule-new-row)').length;
+        // Clone the select from the new-row to get a properly populated copy
+        var $newSelect = $('#new-rule-blueprint').clone()
+            .attr('name', 'rules[' + i + '][blueprint_id]')
+            .val(bpId);
+        var row = $('<tr></tr>');
+        row.append($('<td></td>').append(
+            $('<input type="text" class="form-control input-sm">').attr('name', 'rules[' + i + '][mime_pattern]').attr('placeholder', 'image/*, application/pdf, video/mp4').val(mime)
+        ));
+        row.append($('<td></td>').append($newSelect));
+        row.append('<td><button type="button" class="btn btn-danger btn-xs marble-remove-rule">&times;</button></td>');
+        $('#media-rule-new-row').before(row);
+
+        $('#new-rule-mime').val('');
+        $('#new-rule-blueprint').prop('selectedIndex', 0);
+    });
+
+    $(document).on('click', '.marble-remove-rule', function () {
+        $(this).closest('tr').remove();
+        reindex();
+    });
+})();
+
+(function () {
+    function reindexCrops() {
+        $('#crop-presets-body tr:not(#crop-new-row)').each(function(i) {
+            $(this).find('input[name*="[name]"]').attr('name',   'presets[' + i + '][name]');
+            $(this).find('input[name*="[label]"]').attr('name',  'presets[' + i + '][label]');
+            $(this).find('input[name*="[width]"]').attr('name',  'presets[' + i + '][width]');
+            $(this).find('input[name*="[height]"]').attr('name', 'presets[' + i + '][height]');
+        });
+    }
+
+    $('#marble-add-crop').on('click', function () {
+        var name   = $('#new-crop-name').val().trim();
+        var label  = $('#new-crop-label').val().trim();
+        var width  = $('#new-crop-width').val().trim();
+        var height = $('#new-crop-height').val().trim();
+
+        if (!name)   { $('#new-crop-name').focus(); return; }
+        if (!label)  { $('#new-crop-label').focus(); return; }
+        if (!width)  { $('#new-crop-width').focus(); return; }
+        if (!height) { $('#new-crop-height').focus(); return; }
+
+        var i = $('#crop-presets-body tr:not(#crop-new-row)').length;
+        var row = $('<tr></tr>');
+        row.append($('<td></td>').append(
+            $('<input type="text" class="form-control input-sm">').attr('name', 'presets[' + i + '][name]').val(name)
+        ));
+        row.append($('<td></td>').append(
+            $('<input type="text" class="form-control input-sm">').attr('name', 'presets[' + i + '][label]').val(label)
+        ));
+        row.append($('<td></td>').append(
+            $('<input type="number" class="form-control input-sm marble-input-num-sm" min="1" max="8000">').attr('name', 'presets[' + i + '][width]').val(width)
+        ));
+        row.append($('<td></td>').append(
+            $('<input type="number" class="form-control input-sm marble-input-num-sm" min="1" max="8000">').attr('name', 'presets[' + i + '][height]').val(height)
+        ));
+        row.append('<td><button type="button" class="btn btn-danger btn-xs marble-remove-crop">&times;</button></td>');
+        $('#crop-new-row').before(row);
+
+        $('#new-crop-name').val('');
+        $('#new-crop-label').val('');
+        $('#new-crop-width').val('');
+        $('#new-crop-height').val('');
+    });
+
+    $(document).on('click', '.marble-remove-crop', function () {
+        $(this).closest('tr').remove();
+        reindexCrops();
+    });
+})();
+</script>
 @endsection

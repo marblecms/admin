@@ -106,7 +106,7 @@
                     </button>
                 </div>
 
-                {{-- Reject modal --}}
+            @push('modals')
                 <div class="modal fade" id="reject-modal-{{ $item->id }}" tabindex="-1">
                     <div class="modal-dialog">
                         <div class="modal-content">
@@ -131,6 +131,7 @@
                         </div>
                     </div>
                 </div>
+            @endpush
             @endif
 
             {{-- Transition log --}}

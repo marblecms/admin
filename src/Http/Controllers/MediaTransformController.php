@@ -18,8 +18,11 @@ class MediaTransformController extends Controller
 {
     public function __invoke(Request $request, Media $media)
     {
-        $w = (int) $request->query('w', 0);
-        $h = (int) $request->query('h', 0);
+        $w    = (int) $request->query('w', 0);
+        $h    = (int) $request->query('h', 0);
+        $crop = (bool) $request->query('crop', false);
+        $fx   = max(0, min(100, (int) $request->query('fx', $media->focal_x ?? 50)));
+        $fy   = max(0, min(100, (int) $request->query('fy', $media->focal_y ?? 50)));
 
         if (!$w && !$h) {
             return redirect($media->url());
@@ -31,20 +34,20 @@ class MediaTransformController extends Controller
             abort(404);
         }
 
-        // Determine output mime type
         $mime = $media->mime_type ?? mime_content_type($sourcePath);
         [$origW, $origH] = getimagesize($sourcePath);
 
-        // Calculate target dimensions
+        // Calculate target dimensions for proportional resize
         if ($w && !$h) {
             $h = (int) round($origH * $w / $origW);
         } elseif ($h && !$w) {
             $w = (int) round($origW * $h / $origH);
         }
 
-        // Cache key
+        // Cache key includes crop parameters
         $cacheDir  = storage_path('app/public/marble-transforms');
-        $cacheFile = $cacheDir . '/' . pathinfo($media->filename, PATHINFO_FILENAME) . "_{$w}x{$h}." . pathinfo($media->filename, PATHINFO_EXTENSION);
+        $suffix    = $crop ? "_{$w}x{$h}_crop{$fx}x{$fy}" : "_{$w}x{$h}";
+        $cacheFile = $cacheDir . '/' . pathinfo($media->filename, PATHINFO_FILENAME) . $suffix . '.' . pathinfo($media->filename, PATHINFO_EXTENSION);
 
         if (!is_dir($cacheDir)) {
             mkdir($cacheDir, 0755, true);
@@ -68,7 +71,41 @@ class MediaTransformController extends Controller
                 imagefilledrectangle($dst, 0, 0, $w, $h, $transparent);
             }
 
-            imagecopyresampled($dst, $src, 0, 0, 0, 0, $w, $h, $origW, $origH);
+            if ($crop && $w && $h) {
+                // Focal-point-aware cover crop:
+                // 1. Scale so the image covers the target box (cover, not contain).
+                // 2. Translate so the focal point lands at the center of the crop box.
+                $scaleW = $w / $origW;
+                $scaleH = $h / $origH;
+                $scale  = max($scaleW, $scaleH);
+
+                $scaledW = (int) round($origW * $scale);
+                $scaledH = (int) round($origH * $scale);
+
+                // Focal point in scaled pixels
+                $focalPxX = (int) round($fx / 100 * $scaledW);
+                $focalPxY = (int) round($fy / 100 * $scaledH);
+
+                // Crop origin: center crop box on focal point, clamped to image bounds
+                $srcX = max(0, min($scaledW - $w, $focalPxX - (int) round($w / 2)));
+                $srcY = max(0, min($scaledH - $h, $focalPxY - (int) round($h / 2)));
+
+                // Intermediate scaled canvas
+                $scaled = imagecreatetruecolor($scaledW, $scaledH);
+                if (str_contains($mime, 'png') || str_contains($mime, 'gif')) {
+                    imagealphablending($scaled, false);
+                    imagesavealpha($scaled, true);
+                    $t = imagecolorallocatealpha($scaled, 0, 0, 0, 127);
+                    imagefilledrectangle($scaled, 0, 0, $scaledW, $scaledH, $t);
+                }
+                imagecopyresampled($scaled, $src, 0, 0, 0, 0, $scaledW, $scaledH, $origW, $origH);
+
+                // Copy cropped region into destination
+                imagecopy($dst, $scaled, 0, 0, $srcX, $srcY, $w, $h);
+                imagedestroy($scaled);
+            } else {
+                imagecopyresampled($dst, $src, 0, 0, 0, 0, $w, $h, $origW, $origH);
+            }
 
             match (true) {
                 str_contains($mime, 'png')  => imagepng($dst, $cacheFile),

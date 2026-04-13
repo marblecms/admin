@@ -41,9 +41,18 @@
         @endif
     </div>
 
-    <input type="file"
-           name="file_{{ $field->id }}_{{ $languageId }}"
-           class="form-control" />
+    <div class="marble-flex-center marble-mt-xs">
+        <input type="file"
+               name="file_{{ $field->id }}_{{ $languageId }}"
+               class="form-control marble-flex-1" />
+        <button type="button" class="btn btn-default btn-sm marble-files-library-picker"
+                data-field="{{ $field->id }}" data-lang="{{ $languageId }}">
+            @include('marble::components.famicon', ['name' => 'folder'])
+            {{ trans('marble::admin.from_library') }}
+        </button>
+    </div>
+    <input type="hidden" name="library_add[{{ $field->id }}][{{ $languageId }}]"
+           id="marble-files-library-input-{{ $field->id }}-{{ $languageId }}" value="" />
 
     @php
         $allowedFiletypes = trim($field->configuration['allowed_filetypes'] ?? '');
@@ -52,6 +61,28 @@
         <small class="text-muted">{{ trans('marble::admin.allowed_filetypes') }}: {{ $allowedFiletypes }}</small>
     @endif
 </div>
+<script>
+    $('body').on('click', '.marble-files-library-picker[data-field="{{ $field->id }}"][data-lang="{{ $languageId }}"]', function () {
+        MarbleMedia.open(function (media) {
+            var fieldId = '{{ $field->id }}';
+            var langId  = '{{ $languageId }}';
+            var $input  = $('#marble-files-library-input-' + fieldId + '-' + langId);
+            var $list   = $('#attribute-files-' + fieldId + '-' + langId + ' .attribute-files-list');
+
+            // Append to comma-separated list
+            var current = $input.val();
+            $input.val(current ? current + ',' + media.id : String(media.id));
+
+            // Add visual row to list (pending, no remove button needed as it won't be saved until submit)
+            $list.append(
+                '<div class="attribute-files-item marble-file-item marble-files-library-pending">' +
+                    '<span>📄 ' + media.original_filename + '</span>' +
+                    '<small class="text-muted marble-ml-xs">(from library)</small>' +
+                '</div>'
+            );
+        });
+    });
+</script>
 <script>
 function marbleFilesRemove(btn, fieldId, langId, index) {
     var container = document.getElementById('attribute-files-' + fieldId + '-' + langId);

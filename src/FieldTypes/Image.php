@@ -30,8 +30,7 @@ class Image extends BaseFieldType
     }
 
     /**
-     * Return a URL for the stored image.
-     * Supports both new format {"media_id":5} and legacy {"filename":"..."}.
+     * Return an array with url, thumbnail, and any blueprint field values.
      */
     public function process(mixed $raw, int $languageId): mixed
     {
@@ -39,18 +38,33 @@ class Image extends BaseFieldType
             return null;
         }
 
-        // New format: media_id reference
+        $media = null;
+
         if (isset($raw['media_id'])) {
             $media = Media::find($raw['media_id']);
-            return $media ? url('/image/' . $media->filename) : null;
+        } elseif (!empty($raw['filename'])) {
+            // Legacy inline upload — find by filename
+            $media = Media::where('filename', $raw['filename'])->first();
         }
 
-        // Legacy format: inline filename
-        if (!empty($raw['filename'])) {
-            return url('/image/' . $raw['filename']);
+        if (!$media) return null;
+
+        $result = [
+            'url'       => url('/image/' . $media->filename),
+            'thumbnail' => url('/image/200/150/' . $media->filename),
+            'filename'  => $media->filename,
+            'width'     => $media->width,
+            'height'    => $media->height,
+            'mime_type' => $media->mime_type,
+            'size'      => $media->size,
+        ];
+
+        // Merge blueprint field values
+        if ($media->blueprint_id) {
+            $result = array_merge($result, $media->loadValuesForLanguage($languageId));
         }
 
-        return null;
+        return $result;
     }
 
     public function processInput(mixed $oldValue, mixed $newValue, Request $request, int $blueprintFieldId, int $languageId): mixed

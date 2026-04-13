@@ -89,6 +89,26 @@ class Item extends Model
         return $this->hasMany(ItemMountPoint::class, 'mount_parent_id')->orderBy('sort_order');
     }
 
+    public function subscriptions(): HasMany
+    {
+        return $this->hasMany(ItemSubscription::class);
+    }
+
+    public function variants(): HasMany
+    {
+        return $this->hasMany(ItemVariant::class);
+    }
+
+    public function activeVariant(): ?ItemVariant
+    {
+        return $this->variants()->where('is_active', true)->first();
+    }
+
+    public function subscriberIds(): array
+    {
+        return $this->subscriptions()->pluck('user_id')->all();
+    }
+
     public function nextWorkflowStep(): ?WorkflowStep
     {
         $workflow = $this->blueprint?->workflow;
@@ -252,6 +272,24 @@ class Item extends Model
         $field = $this->resolveField($fieldIdentifier);
         if (!$field) {
             return null;
+        }
+
+        // A/B variant overlay: only apply when this item owns the active variant
+        $activeVariantId     = Marble::activeVariantId();
+        $activeVariantItemId = Marble::activeVariantItemId();
+        if ($activeVariantId && $activeVariantItemId === $this->id) {
+            $variantValue = ItemVariantValue::where('variant_id', $activeVariantId)
+                ->where('blueprint_field_id', $field->id)
+                ->where('language_id', $languageId)
+                ->value('value');
+
+            if ($variantValue !== null && $variantValue !== '') {
+                $fieldType = $field->fieldTypeInstance();
+                if ($fieldType->isStructured()) {
+                    return $fieldType->deserialize($variantValue);
+                }
+                return $variantValue;
+            }
         }
 
         $itemValue = $this->valueCache[$languageId][$field->id] ?? null;

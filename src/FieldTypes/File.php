@@ -5,6 +5,7 @@ namespace Marble\Admin\FieldTypes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Marble\Admin\Models\BlueprintField;
+use Marble\Admin\Models\Media;
 
 class File extends BaseFieldType
 {
@@ -67,10 +68,26 @@ class File extends BaseFieldType
     public function processInput(mixed $oldValue, mixed $newValue, Request $request, int $blueprintFieldId, int $languageId): mixed
     {
         if ($newValue === 'remove') {
-            if ($oldValue && isset($oldValue['filename'])) {
+            if ($oldValue && isset($oldValue['filename']) && empty($oldValue['media_id'])) {
                 Storage::delete($oldValue['filename']);
             }
             return null;
+        }
+
+        // Select from media library: value is "library:{media_id}"
+        if (is_string($newValue) && str_starts_with($newValue, 'library:')) {
+            $mediaId = (int) substr($newValue, 8);
+            $media   = $mediaId ? Media::find($mediaId) : null;
+            if ($media) {
+                return [
+                    'media_id'          => $media->id,
+                    'filename'          => $media->filename,
+                    'original_filename' => $media->original_filename,
+                    'mime_type'         => $media->mime_type,
+                    'size'              => $media->size,
+                ];
+            }
+            return $oldValue;
         }
 
         $fileKey = "file_{$blueprintFieldId}_{$languageId}";

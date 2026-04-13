@@ -98,6 +98,35 @@
 @section('content')
     <h1>Dashboard</h1>
 
+    {{-- Watched items --}}
+    @if($watchedItems->isNotEmpty())
+    <div class="main-box">
+        <header class="main-box-header clearfix">
+            <h2>@include('marble::components.famicon', ['name' => 'bell']) {{ trans('marble::admin.subscription_watch') }}</h2>
+        </header>
+        <div class="main-box-body clearfix">
+            <table class="table table-hover marble-table-flush">
+                @foreach($watchedItems as $watched)
+                <tr onclick="window.location='{{ route('marble.item.edit', $watched) }}'" class="marble-clickable-row">
+                    <td>
+                        <span class="label {{ $watched->status === 'published' ? 'label-success' : ($watched->status === 'draft' ? 'label-default' : 'label-warning') }} marble-mr-xs">
+                            {{ $watched->status }}
+                        </span>
+                        {{ $watched->name() ?: '—' }}
+                        @if($watched->blueprint)
+                            <br><small class="text-muted">{{ $watched->blueprint->name }}</small>
+                        @endif
+                    </td>
+                    <td class="text-right text-muted marble-text-sm marble-td-meta">
+                        {{ $watched->updated_at->diffForHumans() }}
+                    </td>
+                </tr>
+                @endforeach
+            </table>
+        </div>
+    </div>
+    @endif
+
     {{-- Activity Feed --}}
     <div class="main-box">
         <header class="main-box-header clearfix">

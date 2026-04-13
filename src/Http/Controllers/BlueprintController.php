@@ -120,6 +120,8 @@ class BlueprintController extends Controller
         $blueprint->form_success_item_id  = $request->input('form_success_item_id') ?: null;
         $blueprint->api_public            = $request->input('api_public', 0);
         $blueprint->workflow_id           = $request->input('workflow_id') ?: null;
+        $blueprint->inline_children       = $request->input('inline_children', 0);
+        $blueprint->tab_groups            = $request->input('tab_groups', 0);
         $blueprint->save();
 
         // Sync allowed child blueprints

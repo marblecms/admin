@@ -37,6 +37,8 @@
     @include('marble::item.partials.sidebar-scheduling')
     @include('marble::item.partials.sidebar-meta')
     @include('marble::item.partials.sidebar-mount-points')
+    @include('marble::item.partials.sidebar-ab-test')
+    @include('marble::item.partials.sidebar-bundles')
     @include('marble::item.partials.sidebar-used-by')
     @include('marble::item.partials.sidebar-revisions')
 
@@ -90,24 +92,54 @@
         <form id="marble-edit-form" action="{{ route('marble.item.save', $item) }}" enctype="multipart/form-data" method="post">
             @csrf
 
-            @foreach($groupedFields as $group)
+            @if($item->blueprint->tab_groups && count($groupedFields) > 1)
+                {{-- Tab layout --}}
+                @php $firstGroup = true; @endphp
                 <div class="main-box">
-                    @if($group['group'])
-                        <header class="main-box-header clearfix">
-                            <h2><b>{{ $group['group']->name }}</b></h2>
-                        </header>
-                    @else
-                        <br />
-                    @endif
+                    <div class="marble-group-tab-container">
+                        <div class="marble-group-tab-switcher">
+                            @foreach($groupedFields as $group)
+                                <div class="marble-group-tab {{ $loop->first ? 'active' : '' }}"
+                                     data-group="{{ $loop->index }}">
+                                    {{ $group['group'] ? $group['group']->name : trans('marble::admin.general') }}
+                                </div>
+                            @endforeach
+                        </div>
 
-                    <div class="main-box-body clearfix">
-                        @foreach($group['fields'] as $field)
-                            @continue($field->locked)
-                            @include('marble::item.edit_field', ['field' => $field, 'item' => $item, 'languages' => $languages])
+                        @foreach($groupedFields as $group)
+                            <div class="marble-group-panel {{ $loop->first ? 'active' : '' }}"
+                                 data-group="{{ $loop->index }}">
+                                <div class="main-box-body clearfix">
+                                    @foreach($group['fields'] as $field)
+                                        @continue($field->locked)
+                                        @include('marble::item.edit_field', ['field' => $field, 'item' => $item, 'languages' => $languages])
+                                    @endforeach
+                                </div>
+                            </div>
                         @endforeach
                     </div>
                 </div>
-            @endforeach
+            @else
+                {{-- Stacked boxes layout (default) --}}
+                @foreach($groupedFields as $group)
+                    <div class="main-box">
+                        @if($group['group'])
+                            <header class="main-box-header clearfix">
+                                <h2><b>{{ $group['group']->name }}</b></h2>
+                            </header>
+                        @else
+                            <br />
+                        @endif
+
+                        <div class="main-box-body clearfix">
+                            @foreach($group['fields'] as $field)
+                                @continue($field->locked)
+                                @include('marble::item.edit_field', ['field' => $field, 'item' => $item, 'languages' => $languages])
+                            @endforeach
+                        </div>
+                    </div>
+                @endforeach
+            @endif
 
             <div class="form-group pull-right">
                 <button type="submit" class="btn btn-success marble-save-btn">@include('marble::components.famicon', ['name' => 'disk']) {{ trans('marble::admin.save') }}</button>
@@ -118,7 +150,9 @@
 
     @endif
 
-    @if($item->blueprint->list_children && $childItems)
+    @if($item->blueprint->inline_children && $childItems !== null)
+        @include('marble::item.children-inline', ['item' => $item, 'childItems' => $childItems, 'languages' => $languages])
+    @elseif($item->blueprint->list_children && $childItems)
         @include('marble::item.children', ['item' => $item, 'childItems' => $childItems])
     @endif
 

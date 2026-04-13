@@ -115,35 +115,6 @@
         </div>
     </div>
 
-    {{-- Focal Point Modal --}}
-    <div class="modal fade" id="focal-point-modal">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">{{ trans('marble::admin.set_focal_point') }}</h4>
-                </div>
-                <div class="modal-body marble-focal-body">
-                    <div id="focal-point-container" class="marble-focal-wrap">
-                        <img id="focal-point-image" src="" class="marble-focal-img" />
-                        <div id="focal-point-crosshair" class="marble-focal-crosshair">
-                            <div class="marble-focal-ch-h"></div>
-                            <div class="marble-focal-ch-v"></div>
-                            <div class="marble-focal-dot"></div>
-                        </div>
-                    </div>
-                    <p class="marble-focal-hint">{{ trans('marble::admin.focal_point_hint') }}</p>
-                </div>
-                <div class="modal-footer">
-                    <span id="focal-point-coords" class="marble-focal-coords"></span>
-                    <button type="button" class="btn btn-default" data-dismiss="modal">{{ trans('marble::admin.cancel') }}</button>
-                    <button type="button" class="btn btn-success" id="focal-point-save">
-                        @include('marble::components.famicon', ['name' => 'disk']) {{ trans('marble::admin.save') }}
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
 
     {{-- Files --}}
     <div class="main-box">
@@ -207,6 +178,12 @@
                                 <a href="{{ $item->isImage() ? url('/image/' . $item->filename) : url('/file/' . $item->filename) }}" target="_blank" class="btn btn-xs btn-default">
                                     @include('marble::components.famicon', ['name' => 'zoom'])
                                 </a>
+                                @if($item->blueprint_id)
+                                <a href="{{ route('marble.media.fields.edit', $item) }}" class="btn btn-xs btn-default"
+                                   title="{{ trans('marble::admin.edit_fields') }}">
+                                    @include('marble::components.famicon', ['name' => 'pencil'])
+                                </a>
+                                @endif
                                 @if($item->isImage())
                                 <button type="button" class="btn btn-xs btn-default"
                                     title="{{ trans('marble::admin.set_focal_point') }}"
@@ -271,30 +248,23 @@ function marblePlaceCrosshair(px, py) {
     document.getElementById('focal-point-coords').textContent = px + '% / ' + py + '%';
 }
 
-var _fpContainer = document.getElementById('focal-point-container');
-var _fpSaveBtn   = document.getElementById('focal-point-save');
+$(document).on('click', '#focal-point-container', function(e) {
+    var img  = document.getElementById('focal-point-image');
+    var rect = img.getBoundingClientRect();
+    _focalX  = Math.max(0, Math.min(100, Math.round((e.clientX - rect.left) / img.offsetWidth  * 100)));
+    _focalY  = Math.max(0, Math.min(100, Math.round((e.clientY - rect.top)  / img.offsetHeight * 100)));
+    marblePlaceCrosshair(_focalX, _focalY);
+});
 
-if (_fpContainer) {
-    _fpContainer.addEventListener('click', function(e) {
-        var img  = document.getElementById('focal-point-image');
-        var rect = img.getBoundingClientRect();
-        _focalX  = Math.max(0, Math.min(100, Math.round((e.clientX - rect.left) / img.offsetWidth  * 100)));
-        _focalY  = Math.max(0, Math.min(100, Math.round((e.clientY - rect.top)  / img.offsetHeight * 100)));
-        marblePlaceCrosshair(_focalX, _focalY);
+$(document).on('click', '#focal-point-save', function() {
+    $.post(_focalSaveUrl, {
+        _token: $('meta[name="csrf-token"]').attr('content'),
+        focal_x: _focalX, focal_y: _focalY
+    }).done(function() {
+        $('#focal-point-modal').modal('hide');
+        window.location.reload();
     });
-}
-
-if (_fpSaveBtn) {
-    _fpSaveBtn.addEventListener('click', function() {
-        $.post(_focalSaveUrl, {
-            _token: $('meta[name="csrf-token"]').attr('content'),
-            focal_x: _focalX, focal_y: _focalY
-        }).done(function() {
-            $('#focal-point-modal').modal('hide');
-            window.location.reload();
-        });
-    });
-}
+});
 
 function marbleRenameFolder(id, currentName, url) {
     document.getElementById('rename-folder-input').value = currentName;
@@ -350,3 +320,34 @@ function marbleRenameFolder(id, currentName, url) {
 })();
 </script>
 @endsection
+
+@push('modals')
+    <div class="modal fade" id="focal-point-modal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">{{ trans('marble::admin.set_focal_point') }}</h4>
+                </div>
+                <div class="modal-body marble-focal-body">
+                    <div id="focal-point-container" class="marble-focal-wrap">
+                        <img id="focal-point-image" src="" class="marble-focal-img" />
+                        <div id="focal-point-crosshair" class="marble-focal-crosshair">
+                            <div class="marble-focal-ch-h"></div>
+                            <div class="marble-focal-ch-v"></div>
+                            <div class="marble-focal-dot"></div>
+                        </div>
+                    </div>
+                    <p class="marble-focal-hint">{{ trans('marble::admin.focal_point_hint') }}</p>
+                </div>
+                <div class="modal-footer">
+                    <span id="focal-point-coords" class="marble-focal-coords"></span>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">{{ trans('marble::admin.cancel') }}</button>
+                    <button type="button" class="btn btn-success" id="focal-point-save">
+                        @include('marble::components.famicon', ['name' => 'disk']) {{ trans('marble::admin.save') }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+@endpush

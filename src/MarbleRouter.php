@@ -2,11 +2,13 @@
 
 namespace Marble\Admin;
 
+use Illuminate\Support\Facades\Cookie;
 use Marble\Admin\Facades\Marble;
 use Marble\Admin\MarbleDebugbarContext;
 use Marble\Admin\Models\Item;
 use Marble\Admin\Models\ItemMountPoint;
 use Marble\Admin\Models\ItemUrlAlias;
+use Marble\Admin\Models\ItemVariant;
 use Marble\Admin\Models\Language;
 use Marble\Admin\Models\Site;
 
@@ -45,7 +47,10 @@ class MarbleRouter
             $site = Site::current();
             if ($site?->root_item_id) {
                 $root = $site->rootItem()->with('blueprint')->first();
-                return $root?->isPublished() ? $root : null;
+                if ($root?->isPublished()) {
+                    static::assignAbVariant($root);
+                    return $root;
+                }
             }
             return null;
         }
@@ -105,6 +110,7 @@ class MarbleRouter
                 if ($compareSlug === $path) {
                     Marble::setLanguageById($languageId);
                     static::populateDebugbarContext($item, $languageId, $site);
+                    static::assignAbVariant($item);
                     return $item;
                 }
             }
@@ -144,6 +150,7 @@ class MarbleRouter
                 if ($compareMountSlug === $path) {
                     Marble::setLanguageById($languageId);
                     static::populateDebugbarContext($mountedItem, $languageId, $site);
+                    static::assignAbVariant($mountedItem);
                     return $mountedItem;
                 }
             }
@@ -164,10 +171,42 @@ class MarbleRouter
             }
             Marble::setLanguageById($alias->language_id);
             static::populateDebugbarContext($alias->item, $alias->language_id, $site);
+            static::assignAbVariant($alias->item);
             return $alias->item;
         }
 
         return null;
+    }
+
+    /**
+     * If the item has an active A/B variant, assign the visitor to A or B using a cookie,
+     * increment impression counters, and store the variant ID in MarbleManager.
+     */
+    private static function assignAbVariant(Item $item): void
+    {
+        $variant = $item->activeVariant();
+        if (!$variant) {
+            return;
+        }
+
+        $cookieName = 'marble_ab_' . $item->id;
+        $bucket     = request()->cookie($cookieName);
+
+        $isNewAssignment = !in_array($bucket, ['a', 'b'], true);
+        if ($isNewAssignment) {
+            // Random assignment weighted by traffic_split (% going to B)
+            $bucket = (random_int(1, 100) <= $variant->traffic_split) ? 'b' : 'a';
+            Cookie::queue(Cookie::make($cookieName, $bucket, 60 * 24 * 30, '/', null, false, false));
+        }
+
+        if ($bucket === 'b') {
+            if ($isNewAssignment) {
+                ItemVariant::where('id', $variant->id)->increment('impressions_b');
+            }
+            Marble::setActiveVariantId($variant->id, $item->id);
+        } elseif ($isNewAssignment) {
+            ItemVariant::where('id', $variant->id)->increment('impressions_a');
+        }
     }
 
     private static function populateDebugbarContext(Item $item, int $languageId, ?Site $site): void

@@ -115,7 +115,23 @@
                                 <input type="checkbox" name="list_children" value="1" {{ $blueprint->list_children ? 'checked' : '' }}>
                                 List Children
                             </label>
-                            <small class="text-muted marble-block marble-mt-xs">Show child items in the admin sidebar.</small>
+                            <small class="text-muted marble-block marble-mt-xs">Show child items as a sortable table in the item editor.</small>
+                        </div>
+                        <div class="form-group">
+                            <label class="checkbox-inline marble-check-label">
+                                <input type="hidden" name="inline_children" value="0">
+                                <input type="checkbox" name="inline_children" value="1" id="inline_children_check" {{ $blueprint->inline_children ? 'checked' : '' }}>
+                                Inline Children
+                            </label>
+                            <small class="text-muted marble-block marble-mt-xs">Edit child items inline in the parent item editor (accordion panels).</small>
+                        </div>
+                        <div class="form-group">
+                            <label class="checkbox-inline marble-check-label">
+                                <input type="hidden" name="tab_groups" value="0">
+                                <input type="checkbox" name="tab_groups" value="1" {{ $blueprint->tab_groups ? 'checked' : '' }}>
+                                Tab Groups
+                            </label>
+                            <small class="text-muted marble-block marble-mt-xs">Show field groups as tab switcher instead of stacked boxes.</small>
                         </div>
                         <div class="form-group">
                             <label class="checkbox-inline marble-check-label">
@@ -255,6 +271,13 @@
     <script>
         document.getElementById('is_form_checkbox').addEventListener('change', function(){
             document.getElementById('form-builder-options').classList.toggle('marble-hidden', !this.checked);
+        });
+
+        document.getElementById('inline_children_check').addEventListener('change', function(){
+            if (this.checked) {
+                var allowCheck = document.querySelector('input[name="allow_children"][type="checkbox"]');
+                if (allowCheck) allowCheck.checked = true;
+            }
         });
 
         // Icon search/autocomplete

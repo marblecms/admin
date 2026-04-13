@@ -26,6 +26,7 @@ class FieldTypeSeeder extends Seeder
             ['name' => 'Repeater', 'identifier' => 'repeater', 'class' => \Marble\Admin\FieldTypes\Repeater::class],
             ['name' => 'File', 'identifier' => 'file', 'class' => \Marble\Admin\FieldTypes\File::class],
             ['name' => 'Files', 'identifier' => 'files', 'class' => \Marble\Admin\FieldTypes\Files::class],
+            ['name' => 'Media Folder', 'identifier' => 'media_folder', 'class' => \Marble\Admin\FieldTypes\MediaFolder::class],
         ];
 
         foreach ($types as $type) {

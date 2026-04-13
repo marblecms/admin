@@ -8,6 +8,7 @@ use Marble\Admin\Models\ActivityLog;
 use Marble\Admin\Models\Blueprint;
 use Marble\Admin\Models\FormSubmission;
 use Marble\Admin\Models\Item;
+use Marble\Admin\Models\ItemSubscription;
 use Marble\Admin\Models\Media;
 use Marble\Admin\Models\User;
 
@@ -65,6 +66,15 @@ class DashboardController extends Controller
             ->values()
             ->take(15);
 
+        $watchedItems = $user
+            ? ItemSubscription::where('user_id', $user->id)
+                ->with(['item.blueprint'])
+                ->orderByDesc('created_at')
+                ->get()
+                ->pluck('item')
+                ->filter()
+            : collect();
+
         return view('marble::dashboard.view', [
             'blueprints'        => Blueprint::all(),
             'users'             => User::all(),
@@ -75,6 +85,7 @@ class DashboardController extends Controller
             'upcomingItems'     => $upcomingItems,
             'unreadSubmissions' => $unreadSubmissions,
             'deadlineItems'     => $deadlineItems,
+            'watchedItems'      => $watchedItems,
         ]);
     }
 }

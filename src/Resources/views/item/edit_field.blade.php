@@ -8,7 +8,21 @@
 @endforeach
 
 <div class="form-group" data-field-identifier="{{ $field->identifier }}">
-    <label>{{ $field->name }}</label>
+    <label>
+        {{ $field->name }}
+        @if(isset($item) && $item->blueprint->versionable)
+            <button type="button"
+                class="marble-field-history-btn"
+                data-field-id="{{ $field->id }}"
+                data-item-id="{{ $item->id }}"
+                data-field-name="{{ $field->name }}"
+                data-history-url="{{ route('marble.item.field-history', [$item, $field]) }}"
+                data-restore-url="{{ route('marble.item.field-restore', [$item, $field]) }}"
+                title="{{ trans('marble::admin.field_history') }}">
+                @include('marble::components.famicon', ['name' => 'time'])
+            </button>
+        @endif
+    </label>
 
     @if($field->translatable)
         <div class="lang-container">

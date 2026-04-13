@@ -13,6 +13,9 @@ use Illuminate\Support\Facades\Facade;
  * @method static void setLanguageById(int $languageId)
  * @method static void setLocale(string $code)
  * @method static int primaryLanguageId()
+ * @method static void setActiveVariantId(int $variantId, int $itemId)
+ * @method static int|null activeVariantId()
+ * @method static int|null activeVariantItemId()
  *
  * @method static \Marble\Admin\Models\Site|null currentSite()
  * @method static \Marble\Admin\Models\Item|null settings()

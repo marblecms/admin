@@ -6,6 +6,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Marble\Admin\Models\Media;
+use Marble\Admin\Models\MediaBlueprintRule;
 use Marble\Admin\Models\MediaFolder;
 
 class MediaController extends Controller
@@ -74,6 +75,8 @@ class MediaController extends Controller
             }
         }
 
+        $blueprint = MediaBlueprintRule::resolveForMime($file->getMimeType());
+
         $media = Media::create([
             'filename'          => $filename,
             'original_filename' => $file->getClientOriginalName(),
@@ -83,10 +86,16 @@ class MediaController extends Controller
             'width'             => $width,
             'height'            => $height,
             'media_folder_id'   => $request->input('folder_id') ?: null,
+            'blueprint_id'      => $blueprint?->id,
         ]);
 
         if ($request->wantsJson()) {
             return response()->json($media);
+        }
+
+        // If a blueprint was assigned, redirect to the field editor
+        if ($blueprint) {
+            return redirect()->route('marble.media.fields.edit', $media);
         }
 
         return redirect()->route('marble.media.index');
@@ -114,6 +123,65 @@ class MediaController extends Controller
                 'thumbnail'         => $m->isImage() ? url('/image/120/90/' . $m->filename) : null,
             ])
         );
+    }
+
+    public function pickerJson(Request $request)
+    {
+        $folderId = $request->query('folder') ? (int) $request->query('folder') : null;
+        $q        = trim($request->query('q', ''));
+        $type     = $request->query('type', 'all'); // 'image' or 'all'
+
+        // Folders (only shown when not searching)
+        $folders = [];
+        if (!$q) {
+            $folders = MediaFolder::where('parent_id', $folderId)->orderBy('name')->get()
+                ->map(fn($f) => ['id' => $f->id, 'name' => $f->name])
+                ->values();
+        }
+
+        $mediaQuery = Media::query();
+
+        if ($q) {
+            $mediaQuery->where('original_filename', 'like', '%' . addcslashes($q, '%_\\') . '%');
+        } else {
+            $mediaQuery->where('media_folder_id', $folderId);
+        }
+
+        if ($type === 'image') {
+            $mediaQuery->where('mime_type', 'like', 'image/%');
+        }
+
+        $media = $mediaQuery->orderByDesc('created_at')->limit(80)->get()
+            ->map(fn($m) => [
+                'id'                => $m->id,
+                'original_filename' => $m->original_filename,
+                'mime_type'         => $m->mime_type,
+                'size'              => $m->size,
+                'url'               => $m->isImage() ? url('/image/' . $m->filename) : url('/file/' . $m->filename),
+                'thumbnail'         => $m->isImage() ? url('/image/120/90/' . $m->filename) : null,
+                'filename'          => $m->filename,
+            ]);
+
+        $breadcrumb     = [];
+        $parentFolderId = null;
+        if ($folderId) {
+            $currentFolder = MediaFolder::find($folderId);
+            if ($currentFolder) {
+                $parentFolderId = $currentFolder->parent_id ?? 'root';
+                foreach ($currentFolder->ancestors() as $ancestor) {
+                    $breadcrumb[] = ['id' => $ancestor->id, 'name' => $ancestor->name];
+                }
+                $breadcrumb[] = ['id' => $currentFolder->id, 'name' => $currentFolder->name];
+            }
+        }
+
+        return response()->json([
+            'folders'           => $folders,
+            'media'             => $media,
+            'current_folder_id' => $folderId,
+            'parent_folder_id'  => $parentFolderId,
+            'breadcrumb'        => $breadcrumb,
+        ]);
     }
 
     public function ckeditorUpload(Request $request)

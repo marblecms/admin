@@ -21,6 +21,10 @@
                                 @method('DELETE')
                                 <button type="submit" class="btn pull-right btn-danger btn-xs">@include('marble::components.famicon', ['name' => 'bin'])</button>
                             </form>
+                            <button type="button" class="btn pull-right btn-default btn-xs marble-mr-xs"
+                                onclick="$('#rename-group-id').val('{{ $group->id }}');$('#rename-group-name').val('{{ addslashes($group->name) }}');$('#rename-field-group-modal').modal('show')">
+                                @include('marble::components.famicon', ['name' => 'pencil'])
+                            </button>
                             <div class="clearfix"></div>
                         </li>
                     @endforeach
@@ -67,31 +71,6 @@
         </div>
         <div class="clearfix"></div>
     </h1>
-
-    {{-- Add Field Group Modal --}}
-    <div class="modal fade" id="add-field-group-modal">
-        <form action="{{ url("{$prefix}/blueprint/{$blueprint->id}/field-group/add") }}" method="post">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
-                        <h4 class="modal-title">{{ trans('marble::admin.add_group') }}</h4>
-                    </div>
-                    <div class="modal-body">
-                        @csrf
-                        <div class="form-group">
-                            <label>{{ trans('marble::admin.name') }}</label>
-                            <input type="text" class="form-control" name="name" />
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-danger" data-dismiss="modal">@include('marble::components.famicon', ['name' => 'cancel']) {{ trans('marble::admin.cancel') }}</button>
-                        <button type="submit" class="btn btn-success">@include('marble::components.famicon', ['name' => 'disk']) {{ trans('marble::admin.save') }}</button>
-                    </div>
-                </div>
-            </div>
-        </form>
-    </div>
 
     <form action="{{ url("{$prefix}/blueprint/{$blueprint->id}/field/save") }}" method="post" id="class-attributes">
         @csrf
@@ -214,3 +193,56 @@
         }
     </script>
 @endsection
+
+@push('modals')
+    {{-- Rename Field Group Modal --}}
+    <div class="modal fade" id="rename-field-group-modal">
+        <form action="{{ url("{$prefix}/blueprint/{$blueprint->id}/field-group/save") }}" method="post">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                        <h4 class="modal-title">{{ trans('marble::admin.rename_group') }}</h4>
+                    </div>
+                    <div class="modal-body">
+                        @csrf
+                        <input type="hidden" name="id" id="rename-group-id" value="" />
+                        <div class="form-group">
+                            <label>{{ trans('marble::admin.name') }}</label>
+                            <input type="text" class="form-control" name="name" id="rename-group-name" />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">{{ trans('marble::admin.cancel') }}</button>
+                        <button type="submit" class="btn btn-success">@include('marble::components.famicon', ['name' => 'disk']) {{ trans('marble::admin.save') }}</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    {{-- Add Field Group Modal --}}
+    <div class="modal fade" id="add-field-group-modal">
+        <form action="{{ url("{$prefix}/blueprint/{$blueprint->id}/field-group/add") }}" method="post">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                        <h4 class="modal-title">{{ trans('marble::admin.add_group') }}</h4>
+                    </div>
+                    <div class="modal-body">
+                        @csrf
+                        <div class="form-group">
+                            <label>{{ trans('marble::admin.name') }}</label>
+                            <input type="text" class="form-control" name="name" />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">{{ trans('marble::admin.cancel') }}</button>
+                        <button type="submit" class="btn btn-success">@include('marble::components.famicon', ['name' => 'disk']) {{ trans('marble::admin.save') }}</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+@endpush

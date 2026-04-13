@@ -17,6 +17,8 @@ class Blueprint extends Model
         'parent_blueprint_id',
         'allow_children',
         'list_children',
+        'inline_children',
+        'tab_groups',
         'show_in_tree',
         'locked',
         'versionable',
@@ -30,9 +32,11 @@ class Blueprint extends Model
     ];
 
     protected $casts = [
-        'allow_children' => 'boolean',
-        'list_children'  => 'boolean',
-        'show_in_tree'   => 'boolean',
+        'allow_children'   => 'boolean',
+        'list_children'    => 'boolean',
+        'inline_children'  => 'boolean',
+        'tab_groups'       => 'boolean',
+        'show_in_tree'     => 'boolean',
         'locked'         => 'boolean',
         'versionable'    => 'boolean',
         'schedulable'    => 'boolean',

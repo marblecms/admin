@@ -100,6 +100,24 @@
                     </a>
                 </li>
 
+                {{-- Watch / Unwatch --}}
+                <li>
+                    <form method="POST" action="{{ route('marble.item.subscribe', $item) }}" class="marble-inline-form">
+                        @csrf
+                        <button type="submit" class="{{ $isWatching ? 'marble-watching' : '' }}">
+                            @include('marble::components.famicon', ['name' => $isWatching ? 'bell' : 'bell'])
+                            {{ $isWatching ? trans('marble::admin.subscription_unwatch') : trans('marble::admin.subscription_watch') }}
+                        </button>
+                    </form>
+                </li>
+
+                {{-- Relations graph --}}
+                <li>
+                    <a href="{{ route('marble.item.graph', $item) }}" class="clearfix">
+                        @include('marble::components.famicon', ['name' => 'chart_bar']) {{ trans('marble::admin.relations_graph') }}
+                    </a>
+                </li>
+
                 {{-- Delete --}}
                 @if($item->parent_id)
                     <li>

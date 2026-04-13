@@ -44,6 +44,41 @@ Route::prefix('item')->as('item.')->group(function () {
     Route::post('workflow/advance/{item}', [\Marble\Admin\Http\Controllers\ItemWorkflowController::class, 'advance'])->name('workflow.advance');
     Route::post('workflow/retreat/{item}', [\Marble\Admin\Http\Controllers\ItemWorkflowController::class, 'retreat'])->name('workflow.retreat');
     Route::post('workflow/reject/{item}', [\Marble\Admin\Http\Controllers\ItemWorkflowController::class, 'reject'])->name('workflow.reject');
+    // Subscriptions
+    Route::post('subscribe/{item}', [\Marble\Admin\Http\Controllers\ItemSubscriptionController::class, 'toggle'])->name('subscribe');
+    // Relations graph
+    Route::get('graph/{item}', [\Marble\Admin\Http\Controllers\ItemRelationsController::class, 'show'])->name('graph');
+    Route::get('graph-data/{item}', [\Marble\Admin\Http\Controllers\ItemRelationsController::class, 'data'])->name('graph-data');
+    // Field history
+    Route::get('field-history/{item}/{field}', [\Marble\Admin\Http\Controllers\FieldHistoryController::class, 'history'])->name('field-history');
+    Route::post('field-restore/{item}/{field}', [\Marble\Admin\Http\Controllers\FieldHistoryController::class, 'restore'])->name('field-restore');
+    // A/B Variants
+    Route::post('variant/create/{item}',                  [\Marble\Admin\Http\Controllers\ItemVariantController::class, 'create'])->name('variant.create');
+    Route::get('variant/edit/{item}/{variant}',           [\Marble\Admin\Http\Controllers\ItemVariantController::class, 'edit'])->name('variant.edit');
+    Route::post('variant/save/{item}/{variant}',          [\Marble\Admin\Http\Controllers\ItemVariantController::class, 'save'])->name('variant.save');
+    Route::post('variant/toggle/{item}/{variant}',        [\Marble\Admin\Http\Controllers\ItemVariantController::class, 'toggle'])->name('variant.toggle');
+    Route::post('variant/split/{item}/{variant}',         [\Marble\Admin\Http\Controllers\ItemVariantController::class, 'updateSplit'])->name('variant.split');
+    Route::delete('variant/delete/{item}/{variant}',      [\Marble\Admin\Http\Controllers\ItemVariantController::class, 'destroy'])->name('variant.delete');
+});
+
+// Content Bundles
+Route::prefix('bundle')->as('bundle.')->group(function () {
+    Route::get('/',                          [\Marble\Admin\Http\Controllers\ContentBundleController::class, 'index'])->name('index');
+    Route::get('create',                     [\Marble\Admin\Http\Controllers\ContentBundleController::class, 'create'])->name('create');
+    Route::post('store',                     [\Marble\Admin\Http\Controllers\ContentBundleController::class, 'store'])->name('store');
+    Route::get('{bundle}',                   [\Marble\Admin\Http\Controllers\ContentBundleController::class, 'show'])->name('show');
+    Route::post('{bundle}/add-item',         [\Marble\Admin\Http\Controllers\ContentBundleController::class, 'addItem'])->name('add-item');
+    Route::delete('{bundle}/item/{item}',    [\Marble\Admin\Http\Controllers\ContentBundleController::class, 'removeItem'])->name('remove-item');
+    Route::post('{bundle}/publish',          [\Marble\Admin\Http\Controllers\ContentBundleController::class, 'publish'])->name('publish');
+    Route::post('{bundle}/rollback',         [\Marble\Admin\Http\Controllers\ContentBundleController::class, 'rollback'])->name('rollback');
+    Route::delete('{bundle}',                [\Marble\Admin\Http\Controllers\ContentBundleController::class, 'destroy'])->name('destroy');
+});
+
+// Calendar
+Route::prefix('calendar')->as('calendar.')->group(function () {
+    Route::get('/',                  [\Marble\Admin\Http\Controllers\CalendarController::class, 'index'])->name('index');
+    Route::get('events',             [\Marble\Admin\Http\Controllers\CalendarController::class, 'events'])->name('events');
+    Route::post('reschedule/{item}', [\Marble\Admin\Http\Controllers\CalendarController::class, 'reschedule'])->name('reschedule');
 });
 
 // Trash
@@ -151,6 +186,7 @@ Route::prefix('media')->as('media.')->group(function () {
     Route::delete('folder/{folder}', [\Marble\Admin\Http\Controllers\MediaController::class, 'deleteFolder'])->name('folder.delete');
     Route::delete('{media}', [\Marble\Admin\Http\Controllers\MediaController::class, 'delete'])->name('delete');
     Route::get('json', [\Marble\Admin\Http\Controllers\MediaController::class, 'json'])->name('json');
+    Route::get('picker-json', [\Marble\Admin\Http\Controllers\MediaController::class, 'pickerJson'])->name('picker-json');
     Route::get('transform/{media}', \Marble\Admin\Http\Controllers\MediaTransformController::class)->name('transform');
     Route::post('{media}/focal-point', [\Marble\Admin\Http\Controllers\MediaController::class, 'saveFocalPoint'])->name('focal-point');
     Route::post('ckeditor-upload', [\Marble\Admin\Http\Controllers\MediaController::class, 'ckeditorUpload'])->name('ckeditor-upload');
@@ -196,6 +232,14 @@ Route::prefix('configuration')->as('configuration.')->group(function () {
     Route::post('languages', [\Marble\Admin\Http\Controllers\ConfigurationController::class, 'saveLanguages'])->name('languages.save');
     Route::post('languages/add', [\Marble\Admin\Http\Controllers\ConfigurationController::class, 'addLanguage'])->name('languages.add');
     Route::delete('languages/{language}', [\Marble\Admin\Http\Controllers\ConfigurationController::class, 'deleteLanguage'])->name('languages.delete');
+    Route::post('media-blueprints', [\Marble\Admin\Http\Controllers\MediaBlueprintController::class, 'saveRules'])->name('media-blueprints.save');
+    Route::post('crop-presets', [\Marble\Admin\Http\Controllers\ConfigurationController::class, 'saveCropPresets'])->name('crop-presets.save');
+});
+
+// Media field values
+Route::prefix('media')->as('media.')->group(function () {
+    Route::get('{media}/fields', [\Marble\Admin\Http\Controllers\MediaFieldController::class, 'edit'])->name('fields.edit');
+    Route::post('{media}/fields', [\Marble\Admin\Http\Controllers\MediaFieldController::class, 'save'])->name('fields.save');
 });
 
 // Portal Users (admin management)

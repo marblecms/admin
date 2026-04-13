@@ -5,6 +5,7 @@ namespace Marble\Admin\FieldTypes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Marble\Admin\Models\BlueprintField;
+use Marble\Admin\Models\Media;
 
 class Files extends BaseFieldType
 {
@@ -97,6 +98,24 @@ class Files extends BaseFieldType
                 unset($files[$key]);
             }
             $files = array_values($files);
+        }
+
+        // Handle library additions (comma-separated media IDs)
+        $libraryIds = $request->input("library_add.{$blueprintFieldId}.{$languageId}", '');
+        if ($libraryIds) {
+            foreach (explode(',', $libraryIds) as $mediaId) {
+                $mediaId = (int) trim($mediaId);
+                $media   = $mediaId ? Media::find($mediaId) : null;
+                if ($media) {
+                    $files[] = [
+                        'media_id'          => $media->id,
+                        'filename'          => $media->filename,
+                        'original_filename' => $media->original_filename,
+                        'mime_type'         => $media->mime_type,
+                        'size'              => $media->size,
+                    ];
+                }
+            }
         }
 
         // Handle new upload

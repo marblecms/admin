@@ -4,19 +4,25 @@ namespace Marble\Admin\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Marble\Admin\Models\Blueprint;
+use Marble\Admin\Models\CropPreset;
 use Marble\Admin\Models\ItemValue;
 use Marble\Admin\Models\Language;
 use Marble\Admin\Models\MarbleSetting;
+use Marble\Admin\Models\MediaBlueprintRule;
 use Illuminate\Support\Facades\DB;
 
 class ConfigurationController extends Controller
 {
     public function index()
     {
-        $languages = Language::all();
-        $settings  = MarbleSetting::allKeyed();
+        $languages           = Language::all();
+        $settings            = MarbleSetting::allKeyed();
+        $blueprints          = Blueprint::orderBy('name')->get();
+        $mediaBlueprintRules = MediaBlueprintRule::with('blueprint')->orderBy('sort_order')->get();
+        $cropPresets         = CropPreset::orderBy('name')->get();
 
-        return view('marble::configuration.index', compact('languages', 'settings'));
+        return view('marble::configuration.index', compact('languages', 'settings', 'blueprints', 'mediaBlueprintRules', 'cropPresets'));
     }
 
     public function saveSettings(Request $request)
@@ -89,5 +95,30 @@ class ConfigurationController extends Controller
         });
 
         return redirect()->route('marble.configuration.index')->with('success', trans('marble::admin.language_deleted'));
+    }
+
+    public function saveCropPresets(Request $request)
+    {
+        $request->validate([
+            'presets.*.name'   => 'required|string|max:64|regex:/^[a-z0-9_\-]+$/',
+            'presets.*.label'  => 'required|string|max:128',
+            'presets.*.width'  => 'required|integer|min:1|max:8000',
+            'presets.*.height' => 'required|integer|min:1|max:8000',
+        ]);
+
+        DB::transaction(function () use ($request) {
+            CropPreset::truncate();
+
+            foreach ($request->input('presets', []) as $row) {
+                CropPreset::create([
+                    'name'   => $row['name'],
+                    'label'  => $row['label'],
+                    'width'  => (int) $row['width'],
+                    'height' => (int) $row['height'],
+                ]);
+            }
+        });
+
+        return redirect()->route('marble.configuration.index')->with('success', trans('marble::admin.crop_saved'));
     }
 }

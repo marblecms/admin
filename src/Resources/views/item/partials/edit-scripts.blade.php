@@ -130,7 +130,7 @@
 
     // ── Collapsible sidebar boxes ─────────────────────────────────────────────
     (function () {
-        var STORAGE_PREFIX = 'marble_sidebar.{{ $item->id }}.';
+        var STORAGE_PREFIX = 'marble_sidebar.';
 
         function isCollapsed(key) {
             try { return localStorage.getItem(STORAGE_PREFIX + key) === '1'; } catch(e) { return false; }
@@ -163,11 +163,145 @@
                 applyState($content[0], $toggle[0], isCollapsed(key));
 
                 $header.on('click', function () {
-                    var collapsed = $content.is(':visible');
+                    var collapsed = !isCollapsed(key);
                     setCollapsed(key, collapsed);
                     applyState($content[0], $toggle[0], collapsed);
                 });
             });
+        });
+    })();
+
+    // ── Field History Timeline ────────────────────────────────────────────────
+    (function () {
+        var csrfToken = $('meta[name="csrf-token"]').attr('content');
+        var modalBuilt = false;
+        var $modal, $slider, $display, $restoreBtn, $title, $counter;
+        var currentHistory = [], currentLanguageId = null, currentRestoreUrl = null;
+
+        function buildModal() {
+            if (modalBuilt) return;
+            modalBuilt = true;
+
+            var html = [
+                '<div id="field-history-modal">',
+                '  <div class="fh-backdrop" id="fh-backdrop"></div>',
+                '  <div class="fh-card">',
+                '    <div class="fh-card-head">',
+                '      <div class="fh-card-head-icon">&#x1F552;</div>',
+                '      <div class="fh-card-head-text">',
+                '        <h5 id="fh-title">{{ trans('marble::admin.field_history') }}</h5>',
+                '        <p>{{ trans('marble::admin.field_history_hint') }}</p>',
+                '      </div>',
+                '      <button class="fh-close" id="fh-close-btn" title="Close">&times;</button>',
+                '    </div>',
+                '    <div class="fh-card-body">',
+                '      <input type="range" id="fh-slider" class="marble-fh-slider" min="0" value="0" step="1" />',
+                '      <div id="fh-meta" class="marble-fh-meta"></div>',
+                '      <div id="fh-display" class="marble-fh-display"></div>',
+                '      <p id="fh-counter" class="fh-counter"></p>',
+                '    </div>',
+                '    <div class="fh-card-foot">',
+                '      <button type="button" class="btn btn-default" id="fh-cancel-btn">{{ trans('marble::admin.cancel') }}</button>',
+                '      <button type="button" class="btn btn-primary" id="fh-restore-btn">&#x21BA; {{ trans('marble::admin.field_history_restore') }}</button>',
+                '    </div>',
+                '  </div>',
+                '</div>',
+            ].join('');
+
+            $('body').append(html);
+            $modal      = $('#field-history-modal');
+            $slider     = $('#fh-slider');
+            $display    = $('#fh-display');
+            $restoreBtn = $('#fh-restore-btn');
+            $title      = $('#fh-title');
+            $counter    = $('#fh-counter');
+
+            $slider.on('input', function () { renderEntry(parseInt(this.value)); });
+
+            $('#fh-close-btn, #fh-cancel-btn, #fh-backdrop').on('click', closeModal);
+
+            $restoreBtn.on('click', function () {
+                if (!currentRestoreUrl || !currentHistory.length) return;
+                var entry = currentHistory[parseInt($slider.val())];
+                if (entry.revision_id === null) { closeModal(); return; }
+
+                $restoreBtn.prop('disabled', true).text('Restoring…');
+                $.post(currentRestoreUrl, {
+                    _token: csrfToken,
+                    language_id: currentLanguageId,
+                    value: entry.value,
+                }).done(function () {
+                    closeModal();
+                    window.location.reload();
+                }).fail(function () {
+                    $restoreBtn.prop('disabled', false).html('&#x21BA; {{ trans('marble::admin.field_history_restore') }}');
+                    alert('Could not restore value.');
+                });
+            });
+        }
+
+        function openModal()  { buildModal(); $modal.addClass('fh-open'); $('body').addClass('marble-fh-noscroll'); }
+        function closeModal() { $modal.removeClass('fh-open'); $('body').removeClass('marble-fh-noscroll'); }
+
+        function renderEntry(idx) {
+            var entry = currentHistory[idx];
+            if (!entry) return;
+
+            // Meta line: dot + date + user
+            var metaHtml = '<span class="fh-meta-dot"></span>'
+                + '<span class="fh-meta-date">' + $('<span>').text(entry.label).html() + '</span>';
+            if (entry.user) {
+                metaHtml += '<span class="fh-meta-sep">·</span>'
+                    + '<span class="fh-meta-user">' + $('<span>').text(entry.user).html() + '</span>';
+            }
+            $('#fh-meta').html(metaHtml);
+
+            // Value display
+            var val = entry.value || '';
+            var plain = $('<div>').html(val).text().trim();
+            if (plain) {
+                $display.text(plain).removeClass('fh-empty');
+            } else {
+                $display.text('—').addClass('fh-empty');
+            }
+
+            $counter.text((idx + 1) + ' / ' + currentHistory.length);
+            $restoreBtn.prop('disabled', entry.revision_id === null);
+        }
+
+        $(document).on('click', '.marble-field-history-btn', function () {
+            var $btn = $(this);
+            var url  = $btn.data('history-url');
+            currentRestoreUrl = $btn.data('restore-url');
+
+            var $langSwitch = $btn.closest('.form-group').find('.lang-switch.active');
+            currentLanguageId = $langSwitch.length ? $langSwitch.data('lang') : null;
+
+            buildModal();
+            $title.text('{{ trans('marble::admin.field_history') }}: ' + $btn.data('field-name'));
+            $display.text('…').removeClass('fh-empty');
+            $('#fh-meta').html('');
+            $counter.text('');
+            $slider.hide();
+            $restoreBtn.hide().prop('disabled', false).html('&#x21BA; {{ trans('marble::admin.field_history_restore') }}');
+            openModal();
+
+            $.get(url, currentLanguageId ? { language_id: currentLanguageId } : {}, function (data) {
+                currentHistory    = data.history;
+                currentLanguageId = data.language;
+                if (!currentHistory.length) {
+                    $display.text('{{ trans('marble::admin.field_history_no_history') }}').addClass('fh-empty');
+                    return;
+                }
+                $slider.show().attr('max', currentHistory.length - 1).val(0);
+                $restoreBtn.show();
+                renderEntry(0);
+            });
+        });
+
+        // Close on Escape key
+        $(document).on('keydown', function (e) {
+            if (e.key === 'Escape' && $modal && $modal.hasClass('fh-open')) closeModal();
         });
     })();
 </script>

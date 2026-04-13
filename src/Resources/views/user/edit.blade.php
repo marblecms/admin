@@ -74,7 +74,7 @@
         </div>
 
         <div class="form-group pull-right">
-            <a href="{{ url("{$prefix}/user/all") }}" class="btn btn-primary">@include('marble::components.famicon', ['name' => 'cancel']) {{ trans('marble::admin.cancel') }}</a>
+            <a href="{{ url("{$prefix}/user/all") }}" class="btn btn-default">@include('marble::components.famicon', ['name' => 'cancel']) {{ trans('marble::admin.cancel') }}</a>
             <button type="submit" class="btn btn-success">@include('marble::components.famicon', ['name' => 'disk']) {{ trans('marble::admin.save') }}</button>
         </div>
         <div class="clearfix"></div>

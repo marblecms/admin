@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="{{ asset('vendor/marble/assets/css/morris.css') }}"/>
     <link rel="stylesheet" href="{{ asset('vendor/marble/assets/css/jquery-ui.css') }}"/>
     <link rel="stylesheet" href="{{ asset('vendor/marble/assets/css/cropper.css') }}"/>
-    <link rel="stylesheet" href="{{ asset('vendor/marble/assets/css/custom.css') }}"/>
+    <link rel="stylesheet" href="{{ asset('vendor/marble/assets/css/custom.css') }}?v=3"/>
     <link rel="stylesheet" href="{{ asset('vendor/marble/assets/css/admin-theme-' . $adminTheme . '.css') }}"/>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <script type="text/javascript" src="{{ asset('vendor/marble/assets/javascript/jquery.js') }}"></script>
@@ -20,11 +20,14 @@
     <script type="text/javascript" src="{{ asset('vendor/marble/assets/js/cropper.js') }}"></script>
     <script type="text/javascript" src="{{ asset('vendor/marble/assets/js/image-editor.js') }}"></script>
     <script type="text/javascript" src="{{ asset('vendor/marble/assets/ckeditor/ckeditor.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('vendor/marble/assets/js/marble-media-picker.js') }}?v=3"></script>
+    <script type="text/javascript" src="{{ asset('vendor/marble/assets/js/marble-media-folder-picker.js') }}"></script>
     @yield('javascript-head')
     <script>
         $.ajaxSetup({
             headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
         });
+        var marbleMediaPickerJsonUrl = '{{ route('marble.media.picker-json') }}';
     </script>
 </head>
 <body class="x-theme-blue">
@@ -43,7 +46,7 @@
             </a>
             <div class="clearfix">
                 @php
-                    $isContent   = request()->routeIs('marble.media.*', 'marble.trash.*', 'marble.redirect.*', 'marble.item.import*', 'marble.package.*');
+                    $isContent   = request()->routeIs('marble.media.*', 'marble.trash.*', 'marble.redirect.*', 'marble.item.import*', 'marble.package.*', 'marble.calendar.*', 'marble.bundle.*');
                     $isStructure = request()->routeIs('marble.blueprint.*', 'marble.site.*', 'marble.workflow.*');
                     $isUsers     = request()->routeIs('marble.user.*', 'marble.user-group.*', 'marble.portal-user.*');
                     $isSystem    = request()->routeIs('marble.activity-log.*', 'marble.webhook.*', 'marble.api-token.*', 'marble.configuration.*');
@@ -67,6 +70,8 @@
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a href="{{ route('marble.media.index') }}">@include('marble::components.famicon', ['name' => 'pictures']) {{ trans('marble::admin.media_library') }}</a></li>
+                                <li><a href="{{ route('marble.calendar.index') }}">@include('marble::components.famicon', ['name' => 'date']) {{ trans('marble::admin.calendar') }}</a></li>
+                                <li><a href="{{ route('marble.bundle.index') }}">@include('marble::components.famicon', ['name' => 'package']) {{ trans('marble::admin.bundles') }}</a></li>
                                 <li><a href="{{ route('marble.trash.index') }}">@include('marble::components.famicon', ['name' => 'bin']) {{ trans('marble::admin.trash') }}</a></li>
                                 <li><a href="{{ route('marble.redirect.index') }}">@include('marble::components.famicon', ['name' => 'arrow_right']) {{ trans('marble::admin.redirects') }}</a></li>
                                 <li role="separator" class="divider"></li>
@@ -256,28 +261,6 @@
         </div>
     </div>
 
-    {{-- Media Browser Modal --}}
-    <div class="modal fade" id="media-browser-modal">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">{{ trans('marble::admin.select_from_library') }}</h4>
-                </div>
-                <div class="modal-body">
-                    <div id="media-browser-grid" class="media-library-grid marble-browser-grid">
-                        <p class="text-muted text-center marble-browser-loading">Loading...</p>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" data-dismiss="modal">
-                        @include('marble::components.famicon', ['name' => 'cancel']) {{ trans('marble::admin.cancel') }}
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <script type="text/javascript" src="{{ asset('vendor/marble/assets/js/bootstrap.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('vendor/marble/assets/js/bootstrap.datepicker.js') }}"></script>
     <script type="text/javascript" src="{{ asset('vendor/marble/assets/js/scripts.js') }}"></script>
@@ -288,36 +271,6 @@
         ObjectBrowser.init();
         ImageEditor.init();
 
-        // Media library browser
-        var MarbleMedia = {
-            _callback: null,
-            open: function(callback) {
-                this._callback = callback;
-                var $grid = $('#media-browser-grid');
-                $grid.html('<p class="text-muted text-center marble-browser-loading">Loading...</p>');
-                $.getJSON('{{ route('marble.media.json') }}', function(items) {
-                    $grid.html('');
-                    if (!items.length) {
-                        $grid.html('<p class="text-muted text-center marble-browser-loading">{{ trans('marble::admin.no_media') }}</p>');
-                        return;
-                    }
-                    $.each(items, function(i, media) {
-                        var $item = $('<div class="media-library-item media-browser-selectable" ></div>');
-                        $item.append('<div class="media-library-thumb"><img src="' + media.thumbnail + '" loading="lazy" /></div>');
-                        $item.append('<div class="media-library-info"><div class="media-library-name" title="' + media.original_filename + '">' + media.original_filename + '</div></div>');
-                        $item.data('media', media);
-                        $grid.append($item);
-                    });
-                });
-                $('#media-browser-modal').modal('show');
-            }
-        };
-
-        $(document).on('click', '.media-browser-selectable', function() {
-            var media = $(this).data('media');
-            if (MarbleMedia._callback) MarbleMedia._callback(media);
-            $('#media-browser-modal').modal('hide');
-        });
         $(".datepicker").datepicker();
 
         // Notification bell polling
@@ -424,5 +377,6 @@
         });
     </script>
     @endif
+    @stack('modals')
 </body>
 </html>
