@@ -25,7 +25,7 @@ return new class extends Migration
             $table->foreignId('blueprint_field_id')->constrained('blueprint_fields')->cascadeOnDelete();
             $table->foreignId('language_id')->constrained('languages')->cascadeOnDelete();
             $table->longText('value')->nullable();
-            $table->unique(['variant_id', 'blueprint_field_id', 'language_id']);
+            $table->unique(['variant_id', 'blueprint_field_id', 'language_id'], 'ivv_variant_field_lang_unique');
         });
     }
 
