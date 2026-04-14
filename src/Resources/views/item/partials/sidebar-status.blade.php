@@ -118,6 +118,15 @@
                     </a>
                 </li>
 
+                {{-- Traffic --}}
+                @if(config('marble.traffic_tracking', false))
+                <li>
+                    <a href="{{ route('marble.item.traffic', $item) }}" class="clearfix">
+                        @include('marble::components.famicon', ['name' => 'chart_bar']) {{ trans('marble::admin.traffic') }}
+                    </a>
+                </li>
+                @endif
+
                 {{-- Delete --}}
                 @if($item->parent_id)
                     <li>

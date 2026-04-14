@@ -3,51 +3,6 @@
 @section('content_class', 'col-lg-12')
 
 @section('content')
-    {{-- New Folder Modal --}}
-    <div class="modal fade" id="new-folder-modal">
-        <form action="{{ route('marble.media.folder.create') }}" method="POST">
-            @csrf
-            <input type="hidden" name="parent_id" value="{{ $currentFolder?->id }}">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal">&times;</button>
-                        <h4 class="modal-title">{{ trans('marble::admin.new_folder') }}</h4>
-                    </div>
-                    <div class="modal-body">
-                        <input type="text" name="name" class="form-control" autofocus placeholder="{{ trans('marble::admin.name') }}" />
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">{{ trans('marble::admin.cancel') }}</button>
-                        <button type="submit" class="btn btn-success">{{ trans('marble::admin.save') }}</button>
-                    </div>
-                </div>
-            </div>
-        </form>
-    </div>
-
-    {{-- Rename Folder Modal --}}
-    <div class="modal fade" id="rename-folder-modal">
-        <form id="rename-folder-form" method="POST">
-            @csrf @method('PATCH')
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal">&times;</button>
-                        <h4 class="modal-title">Rename Folder</h4>
-                    </div>
-                    <div class="modal-body">
-                        <input type="text" name="name" id="rename-folder-input" class="form-control" />
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">{{ trans('marble::admin.cancel') }}</button>
-                        <button type="submit" class="btn btn-success">{{ trans('marble::admin.save') }}</button>
-                    </div>
-                </div>
-            </div>
-        </form>
-    </div>
-
     <h1>
         {{ trans('marble::admin.media_library') }}
         @if($currentFolder)
@@ -322,6 +277,51 @@ function marbleRenameFolder(id, currentName, url) {
 @endsection
 
 @push('modals')
+    {{-- New Folder Modal --}}
+    <div class="modal fade" id="new-folder-modal">
+        <form action="{{ route('marble.media.folder.create') }}" method="POST">
+            @csrf
+            <input type="hidden" name="parent_id" value="{{ $currentFolder?->id }}">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">{{ trans('marble::admin.new_folder') }}</h4>
+                    </div>
+                    <div class="modal-body">
+                        <input type="text" name="name" class="form-control" autofocus placeholder="{{ trans('marble::admin.name') }}" />
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">{{ trans('marble::admin.cancel') }}</button>
+                        <button type="submit" class="btn btn-success">{{ trans('marble::admin.save') }}</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    {{-- Rename Folder Modal --}}
+    <div class="modal fade" id="rename-folder-modal">
+        <form id="rename-folder-form" method="POST">
+            @csrf @method('PATCH')
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Rename Folder</h4>
+                    </div>
+                    <div class="modal-body">
+                        <input type="text" name="name" id="rename-folder-input" class="form-control" />
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">{{ trans('marble::admin.cancel') }}</button>
+                        <button type="submit" class="btn btn-success">{{ trans('marble::admin.save') }}</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
     <div class="modal fade" id="focal-point-modal">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">

@@ -131,6 +131,27 @@ class MarbleManager
         return $this->activeVariantItemId;
     }
 
+    /**
+     * Record a conversion for the A/B variant the current visitor is assigned to.
+     * Call this from your own controller after the desired goal action completes
+     * (e.g. after a purchase, newsletter signup, etc.).
+     *
+     * Usage:
+     *   Marble::recordAbConversion($item);
+     */
+    public function recordAbConversion(\Marble\Admin\Models\Item $item): void
+    {
+        $variant = $item->activeVariant();
+        if (!$variant) return;
+
+        $bucket = request()->cookie('marble_ab_' . $item->id);
+        if ($bucket === 'a') {
+            \Marble\Admin\Models\ItemVariant::where('id', $variant->id)->increment('conversions_a');
+        } elseif ($bucket === 'b') {
+            \Marble\Admin\Models\ItemVariant::where('id', $variant->id)->increment('conversions_b');
+        }
+    }
+
     // -------------------------------------------------------------------------
     // Item API (convenience, cached)
     // -------------------------------------------------------------------------

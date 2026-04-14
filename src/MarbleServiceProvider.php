@@ -63,6 +63,7 @@ class MarbleServiceProvider extends ServiceProvider
         $this->app['router']->pushMiddlewareToGroup('web', \Marble\Admin\Http\Middleware\DetectMarbleSite::class);
         $this->app['router']->pushMiddlewareToGroup('web', \Marble\Admin\Http\Middleware\HandleMarbleRedirects::class);
         $this->app['router']->pushMiddlewareToGroup('web', \Marble\Admin\Http\Middleware\InjectMarbleDebugbar::class);
+        $this->app['router']->pushMiddlewareToGroup('web', \Marble\Admin\Http\Middleware\InjectMarbleTracking::class);
 
         // Flush request-scoped caches after each request (Octane compatibility)
         $this->app->terminating(function () {
@@ -166,6 +167,12 @@ class MarbleServiceProvider extends ServiceProvider
         Route::middleware(['web'])
             ->post('/marble-form/{item}', [\Marble\Admin\Http\Controllers\FormController::class, 'submit'])
             ->name('marble.form.submit');
+
+        // Traffic tracking beacon (public, no auth)
+        $trackPath = '/' . trim($prefix, '/') . '-track';
+        Route::middleware(['web'])
+            ->post($trackPath, [\Marble\Admin\Http\Controllers\PageviewTrackingController::class, 'store'])
+            ->name('marble.track');
 
         // Draft preview (public, token-gated)
         Route::middleware(['web'])

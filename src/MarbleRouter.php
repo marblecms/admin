@@ -5,6 +5,7 @@ namespace Marble\Admin;
 use Illuminate\Support\Facades\Cookie;
 use Marble\Admin\Facades\Marble;
 use Marble\Admin\MarbleDebugbarContext;
+use Marble\Admin\MarbleTrackingContext;
 use Marble\Admin\Models\Item;
 use Marble\Admin\Models\ItemMountPoint;
 use Marble\Admin\Models\ItemUrlAlias;
@@ -49,6 +50,7 @@ class MarbleRouter
                 $root = $site->rootItem()->with('blueprint')->first();
                 if ($root?->isPublished()) {
                     static::assignAbVariant($root);
+                    static::populateTrackingContext($root, Marble::primaryLanguageId(), $site);
                     return $root;
                 }
             }
@@ -85,32 +87,21 @@ class MarbleRouter
         $candidates = $query->get();
 
         foreach ($languageScope as $languageId) {
-            $rootSlug = '';
-            if ($site?->root_item_id) {
-                $rootSlug = $site->rootItem?->rawValue('slug', $languageId) ?? '';
-                if ($rootSlug) {
-                    $rootSlug = '/' . ltrim($rootSlug, '/');
-                }
-            }
-
             foreach ($candidates as $item) {
-                $absoluteSlug = $item->slug($languageId);
-                if (!$absoluteSlug) {
+                $itemSlug = $item->slug($languageId);
+                if (!$itemSlug) {
                     continue;
                 }
 
-                if ($strippedLocalePrefix && str_starts_with($absoluteSlug, $strippedLocalePrefix)) {
-                    $absoluteSlug = substr($absoluteSlug, strlen($strippedLocalePrefix)) ?: '/';
+                if ($strippedLocalePrefix && str_starts_with($itemSlug, $strippedLocalePrefix)) {
+                    $itemSlug = substr($itemSlug, strlen($strippedLocalePrefix)) ?: '/';
                 }
 
-                $compareSlug = ($rootSlug && str_starts_with($absoluteSlug, $rootSlug))
-                    ? substr($absoluteSlug, strlen($rootSlug))
-                    : $absoluteSlug;
-
-                if ($compareSlug === $path) {
+                if ($itemSlug === $path) {
                     Marble::setLanguageById($languageId);
                     static::populateDebugbarContext($item, $languageId, $site);
                     static::assignAbVariant($item);
+                    static::populateTrackingContext($item, $languageId, $site);
                     return $item;
                 }
             }
@@ -120,14 +111,6 @@ class MarbleRouter
         $mountPoints = ItemMountPoint::with(['item.blueprint', 'mountParent'])->get();
 
         foreach ($languageScope as $languageId) {
-            $rootSlug = '';
-            if ($site?->root_item_id) {
-                $rootSlug = $site->rootItem?->rawValue('slug', $languageId) ?? '';
-                if ($rootSlug) {
-                    $rootSlug = '/' . ltrim($rootSlug, '/');
-                }
-            }
-
             foreach ($mountPoints as $mount) {
                 $mountedItem = $mount->item;
                 if (!$mountedItem || !$mountedItem->isPublished()) {
@@ -143,14 +126,11 @@ class MarbleRouter
                     $mountSlug = substr($mountSlug, strlen($strippedLocalePrefix)) ?: '/';
                 }
 
-                $compareMountSlug = ($rootSlug && str_starts_with($mountSlug, $rootSlug))
-                    ? substr($mountSlug, strlen($rootSlug))
-                    : $mountSlug;
-
-                if ($compareMountSlug === $path) {
+                if ($mountSlug === $path) {
                     Marble::setLanguageById($languageId);
                     static::populateDebugbarContext($mountedItem, $languageId, $site);
                     static::assignAbVariant($mountedItem);
+                    static::populateTrackingContext($mountedItem, $languageId, $site);
                     return $mountedItem;
                 }
             }
@@ -172,6 +152,7 @@ class MarbleRouter
             Marble::setLanguageById($alias->language_id);
             static::populateDebugbarContext($alias->item, $alias->language_id, $site);
             static::assignAbVariant($alias->item);
+            static::populateTrackingContext($alias->item, $alias->language_id, $site);
             return $alias->item;
         }
 
@@ -209,6 +190,14 @@ class MarbleRouter
         }
     }
 
+    private static function populateTrackingContext(Item $item, int $languageId, ?Site $site): void
+    {
+        if (!config('marble.traffic_tracking', false)) {
+            return;
+        }
+        MarbleTrackingContext::set($item, $languageId, $site?->id);
+    }
+
     private static function populateDebugbarContext(Item $item, int $languageId, ?Site $site): void
     {
         if (!config('marble.debugbar', false)) {
@@ -234,6 +223,10 @@ class MarbleRouter
      * Usage:
      *   MarbleRouter::urlFor($item)
      *   MarbleRouter::urlFor($item, 'de')
+     */
+    /**
+     * Strip the site root item's slug from the beginning of a full slug path,
+     * so the result matches what the router expects as a public URL.
      */
     public static function urlFor(Item $item, string|int|null $locale = null): string
     {

@@ -11,11 +11,6 @@
   <td width="33%"><img src="Screenshot5.png" alt="Tree navigation"></td>
   <td width="33%"><img src="Screenshot6.png" alt="Field types"></td>
 </tr>
-<tr>
-  <td width="33%"><img src="Screenshot7.png" alt="Site settings"></td>
-  <td width="33%"><img src="Screenshot8.png" alt="Dashboard activity"></td>
-  <td width="33%"><img src="Screenshot9.png" alt="Multi-language item editor"></td>
-</tr>
 </table>
 
 A Laravel CMS package built around a flexible Blueprint + Field Type system. Define your content types visually, manage a hierarchical content tree, and deliver content via Blade templates or a headless JSON API.

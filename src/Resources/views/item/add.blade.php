@@ -22,7 +22,7 @@
                     <label>Blueprint</label>
                     <select name="blueprint_id" class="form-control">
                         @foreach($allowedBlueprints as $blueprint)
-                            <option value="{{ $blueprint->id }}">{{ $blueprint->name }}</option>
+                            <option value="{{ $blueprint->id }}" {{ $blueprint->id === $preselectedBlueprint ? 'selected' : '' }}>{{ $blueprint->name }}</option>
                         @endforeach
                     </select>
                 </div>

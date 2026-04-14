@@ -123,6 +123,16 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Traffic Tracking
+    |--------------------------------------------------------------------------
+    | When enabled, Marble records a pageview in marble_pageviews for every
+    | frontend page resolved by MarbleRouter. Data is viewable per-item via
+    | the Traffic tab in the admin.
+    */
+    'traffic_tracking' => env('MARBLE_TRAFFIC_TRACKING', false),
+
+    /*
+    |--------------------------------------------------------------------------
     | Portal Users
     |--------------------------------------------------------------------------
     | portal_registration: allow visitors to self-register via /portal/register

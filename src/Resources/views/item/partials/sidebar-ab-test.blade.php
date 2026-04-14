@@ -5,6 +5,22 @@
     $pctB = $totalImpressions ? round($variant->impressions_b / $totalImpressions * 100) : 0;
     $splitA = $variant ? (100 - $variant->traffic_split) : 50;
     $splitB = $variant ? $variant->traffic_split : 50;
+
+    // Conversion rate stats
+    $minSampleSize = 30; // per bucket before showing results
+    $cvrA = ($variant && $variant->impressions_a > 0)
+        ? round($variant->conversions_a / $variant->impressions_a * 100, 1) : null;
+    $cvrB = ($variant && $variant->impressions_b > 0)
+        ? round($variant->conversions_b / $variant->impressions_b * 100, 1) : null;
+    $hasEnoughData = $variant
+        && $variant->impressions_a >= $minSampleSize
+        && $variant->impressions_b >= $minSampleSize;
+    $totalConversions = $variant ? ($variant->conversions_a + $variant->conversions_b) : 0;
+    // Determine winner (only when enough data and both have impressions)
+    $winner = null;
+    if ($hasEnoughData && $cvrA !== null && $cvrB !== null && $cvrA !== $cvrB) {
+        $winner = $cvrB > $cvrA ? 'b' : 'a';
+    }
 @endphp
 
 <div class="main-box clearfix profile-box-menu">
@@ -61,31 +77,66 @@
                     </form>
                 </div>
 
-                {{-- Impression stats --}}
+                {{-- Stats --}}
                 <div class="ab-section ab-stats-section">
                     <div class="ab-section-label">{{ trans('marble::admin.ab_results') }}</div>
                     @if($totalImpressions > 0)
                         <div class="ab-stats-row">
-                            <div class="ab-stat ab-stat-a">
-                                <div class="ab-stat-label">A</div>
+                            <div class="ab-stat ab-stat-a {{ $winner === 'a' ? 'ab-stat-winner' : '' }}">
+                                <div class="ab-stat-label">
+                                    A @if($winner === 'a') <span class="ab-winner-badge">✓</span> @endif
+                                </div>
                                 <div class="ab-stat-pct">{{ $pctA }}%</div>
-                                <div class="ab-stat-count">{{ number_format($variant->impressions_a) }}</div>
+                                <div class="ab-stat-count">{{ number_format($variant->impressions_a) }} imp.</div>
+                                @if($totalConversions > 0)
+                                    <div class="ab-stat-cvr">
+                                        @if($hasEnoughData)
+                                            {{ $cvrA }}% CVR
+                                            <span class="ab-stat-cvr-abs">({{ number_format($variant->conversions_a) }})</span>
+                                        @else
+                                            <span class="text-muted">{{ number_format($variant->conversions_a) }} conv.</span>
+                                        @endif
+                                    </div>
+                                @endif
                                 <div class="ab-stat-bar">
                                     <div class="ab-stat-bar-fill ab-stat-bar-a" data-pct="{{ $pctA }}"></div>
                                 </div>
                             </div>
-                            <div class="ab-stat ab-stat-b">
-                                <div class="ab-stat-label">B</div>
+                            <div class="ab-stat ab-stat-b {{ $winner === 'b' ? 'ab-stat-winner' : '' }}">
+                                <div class="ab-stat-label">
+                                    B @if($winner === 'b') <span class="ab-winner-badge">✓</span> @endif
+                                </div>
                                 <div class="ab-stat-pct">{{ $pctB }}%</div>
-                                <div class="ab-stat-count">{{ number_format($variant->impressions_b) }}</div>
+                                <div class="ab-stat-count">{{ number_format($variant->impressions_b) }} imp.</div>
+                                @if($totalConversions > 0)
+                                    <div class="ab-stat-cvr">
+                                        @if($hasEnoughData)
+                                            {{ $cvrB }}% CVR
+                                            <span class="ab-stat-cvr-abs">({{ number_format($variant->conversions_b) }})</span>
+                                        @else
+                                            <span class="text-muted">{{ number_format($variant->conversions_b) }} conv.</span>
+                                        @endif
+                                    </div>
+                                @endif
                                 <div class="ab-stat-bar">
                                     <div class="ab-stat-bar-fill ab-stat-bar-b" data-pct="{{ $pctB }}"></div>
                                 </div>
                             </div>
                         </div>
-                        <div class="ab-total-label">{{ number_format($totalImpressions) }} total impressions</div>
+                        <div class="ab-total-label">
+                            {{ number_format($totalImpressions) }} impressions
+                            @if($totalConversions > 0)
+                                · {{ number_format($totalConversions) }} conversions
+                            @endif
+                        </div>
+                        @if($totalConversions > 0 && !$hasEnoughData)
+                            <div class="ab-not-enough">
+                                @include('marble::components.famicon', ['name' => 'clock'])
+                                {{ trans('marble::admin.ab_not_enough_data', ['min' => $minSampleSize]) }}
+                            </div>
+                        @endif
                     @else
-                        <p class="text-muted marble-text-sm ab-no-data">No impressions yet.</p>
+                        <p class="text-muted marble-text-sm ab-no-data">{{ trans('marble::admin.ab_no_impressions') }}</p>
                     @endif
                 </div>
 

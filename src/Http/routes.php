@@ -59,7 +59,20 @@ Route::prefix('item')->as('item.')->group(function () {
     Route::post('variant/toggle/{item}/{variant}',        [\Marble\Admin\Http\Controllers\ItemVariantController::class, 'toggle'])->name('variant.toggle');
     Route::post('variant/split/{item}/{variant}',         [\Marble\Admin\Http\Controllers\ItemVariantController::class, 'updateSplit'])->name('variant.split');
     Route::delete('variant/delete/{item}/{variant}',      [\Marble\Admin\Http\Controllers\ItemVariantController::class, 'destroy'])->name('variant.delete');
+    // Collaboration — Comments
+    Route::post('comment/{item}',                         [\Marble\Admin\Http\Controllers\ItemCommentController::class, 'store'])->name('comment.store');
+    Route::delete('comment/{comment}',                    [\Marble\Admin\Http\Controllers\ItemCommentController::class, 'destroy'])->name('comment.destroy');
+    // Collaboration — Tasks
+    Route::post('task/{item}',                            [\Marble\Admin\Http\Controllers\ItemTaskController::class, 'store'])->name('task.store');
+    Route::post('task/{task}/toggle',                     [\Marble\Admin\Http\Controllers\ItemTaskController::class, 'toggle'])->name('task.toggle');
+    Route::delete('task/{task}',                          [\Marble\Admin\Http\Controllers\ItemTaskController::class, 'destroy'])->name('task.destroy');
+    // Traffic
+    Route::get('traffic/{item}',                          [\Marble\Admin\Http\Controllers\ItemTrafficController::class, 'show'])->name('traffic');
+    Route::get('traffic-data/{item}',                     [\Marble\Admin\Http\Controllers\ItemTrafficController::class, 'data'])->name('traffic-data');
 });
+
+// Traffic: site-wide overview
+Route::get('traffic', [\Marble\Admin\Http\Controllers\ItemTrafficController::class, 'siteData'])->name('traffic.site-data');
 
 // Content Bundles
 Route::prefix('bundle')->as('bundle.')->group(function () {

@@ -8,13 +8,15 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ItemVariant extends Model
 {
-    protected $fillable = ['item_id', 'name', 'traffic_split', 'is_active', 'impressions_a', 'impressions_b'];
+    protected $fillable = ['item_id', 'name', 'traffic_split', 'is_active', 'impressions_a', 'impressions_b', 'conversions_a', 'conversions_b'];
 
     protected $casts = [
         'is_active'     => 'boolean',
         'traffic_split' => 'integer',
         'impressions_a' => 'integer',
         'impressions_b' => 'integer',
+        'conversions_a' => 'integer',
+        'conversions_b' => 'integer',
     ];
 
     public function item(): BelongsTo

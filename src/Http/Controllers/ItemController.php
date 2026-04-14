@@ -19,7 +19,10 @@ use Marble\Admin\Models\ItemRevision;
 use Marble\Admin\Models\ItemValue;
 use Marble\Admin\Models\FormSubmission;
 use Marble\Admin\Models\Language;
+use Marble\Admin\Models\ItemComment;
+use Marble\Admin\Models\ItemTask;
 use Marble\Admin\Models\Redirect;
+use Marble\Admin\Models\User;
 use Marble\Admin\Services\ActivityLogService;
 use Marble\Admin\Services\ItemRevisionService;
 use Marble\Admin\Services\NotificationService;
@@ -89,22 +92,37 @@ class ItemController extends Controller
         $isWatching = \Marble\Admin\Models\ItemSubscription::where('user_id', $currentUser->id)
             ->where('item_id', $item->id)->exists();
 
+        $collaborationComments = ItemComment::where('item_id', $item->id)
+            ->with('user')
+            ->orderBy('created_at')
+            ->get();
+
+        $collaborationTasks = ItemTask::where('item_id', $item->id)
+            ->with('assignee')
+            ->orderBy('done')
+            ->orderBy('due_date')
+            ->orderBy('id')
+            ->get();
+
         return view('marble::item.edit', [
-            'item'             => $item,
-            'languages'        => $languages,
-            'groupedFields'    => $groupedFields,
-            'childItems'       => $childItems,
-            'currentUser'      => $currentUser,
-            'revisions'        => $revisions,
-            'lockedByOther'    => $lockedByOther,
-            'lockUser'         => $lockedByOther ? $activeLock->user : null,
-            'usedBy'           => $item->usedBy(),
-            'submissions'      => $submissions,
-            'breadcrumb'       => Marble::breadcrumb($item),
-            'aliases'          => \Marble\Admin\Models\ItemUrlAlias::where('item_id', $item->id)->with('language')->get(),
-            'mountPoints'      => $item->mountPoints()->with('mountParent.blueprint')->get(),
-            'inboundRedirects' => $inboundRedirects,
-            'isWatching'       => $isWatching,
+            'item'                   => $item,
+            'languages'              => $languages,
+            'groupedFields'          => $groupedFields,
+            'childItems'             => $childItems,
+            'currentUser'            => $currentUser,
+            'revisions'              => $revisions,
+            'lockedByOther'          => $lockedByOther,
+            'lockUser'               => $lockedByOther ? $activeLock->user : null,
+            'usedBy'                 => $item->usedBy(),
+            'submissions'            => $submissions,
+            'breadcrumb'             => Marble::breadcrumb($item),
+            'aliases'                => \Marble\Admin\Models\ItemUrlAlias::where('item_id', $item->id)->with('language')->get(),
+            'mountPoints'            => $item->mountPoints()->with('mountParent.blueprint')->get(),
+            'inboundRedirects'       => $inboundRedirects,
+            'isWatching'             => $isWatching,
+            'collaborationComments'  => $collaborationComments,
+            'collaborationTasks'     => $collaborationTasks,
+            'collaborationUsers'     => User::orderBy('name')->get(),
         ]);
     }
 
@@ -203,8 +221,9 @@ class ItemController extends Controller
         $allowedBlueprints = $allowedBlueprints->filter(fn($bp) => $user->canDoWithBlueprint($bp->id, 'create'));
 
         return view('marble::item.add', [
-            'parentItem'        => $parentItem,
-            'allowedBlueprints' => $allowedBlueprints,
+            'parentItem'          => $parentItem,
+            'allowedBlueprints'   => $allowedBlueprints,
+            'preselectedBlueprint' => (int) request()->query('blueprint'),
         ]);
     }
 

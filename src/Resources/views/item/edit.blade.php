@@ -156,6 +156,8 @@
         @include('marble::item.children', ['item' => $item, 'childItems' => $childItems])
     @endif
 
+    @include('marble::item.partials.collaboration')
+
     @if(config('marble.autosave', false))
         <div id="marble-autosave-toast" class="toast-success"></div>
     @endif

@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Marble\Admin\Facades\Marble;
+use Marble\Admin\Models\Site;
 use Marble\Admin\Traits\HasPath;
 
 class Item extends Model
@@ -384,6 +385,19 @@ class Item extends Model
                 $slug = '/' . $parentSlug . $slug;
             }
             $parent = $parent->parent;
+        }
+
+        // Strip the site root item's slug so the returned path is the public URL
+        $site = Site::where('active', true)->where('is_default', true)->first()
+            ?? Site::where('active', true)->first();
+        if ($site?->root_item_id && $site->root_item_id !== $this->id) {
+            $rootSlug = $site->rootItem?->rawValue('slug', $languageId);
+            if ($rootSlug) {
+                $prefix = '/' . ltrim($rootSlug, '/');
+                if (str_starts_with($slug, $prefix . '/')) {
+                    $slug = substr($slug, strlen($prefix));
+                }
+            }
         }
 
         // Prepend locale prefix if configured
