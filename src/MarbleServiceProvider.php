@@ -17,6 +17,7 @@ use Marble\Admin\Policies\BlueprintPolicy;
 use Marble\Admin\Policies\ItemPolicy;
 use Marble\Admin\Policies\UserGroupPolicy;
 use Marble\Admin\Policies\UserPolicy;
+use Marble\Admin\Support\MarblePluginRegistry;
 
 class MarbleServiceProvider extends ServiceProvider
 {
@@ -33,6 +34,11 @@ class MarbleServiceProvider extends ServiceProvider
         // Register the MarbleManager as singleton
         $this->app->singleton('marble', function ($app) {
             return new MarbleManager($app->make(FieldTypeRegistry::class));
+        });
+
+        // Register the plugin registry as singleton
+        $this->app->singleton('marble.admin', function () {
+            return new MarblePluginRegistry();
         });
 
         // Register the portal auth guard

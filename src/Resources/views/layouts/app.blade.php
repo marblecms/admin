@@ -13,6 +13,9 @@
     <link rel="stylesheet" href="{{ asset('vendor/marble/assets/css/cropper.css') }}"/>
     <link rel="stylesheet" href="{{ asset('vendor/marble/assets/css/custom.css') }}?v=3"/>
     <link rel="stylesheet" href="{{ asset('vendor/marble/assets/css/admin-theme-' . $adminTheme . '.css') }}"/>
+    @foreach(app('marble.admin')->getAssets('css') as $pluginCss)
+    <link rel="stylesheet" href="{{ $pluginCss }}"/>
+    @endforeach
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <script type="text/javascript" src="{{ asset('vendor/marble/assets/javascript/jquery.js') }}"></script>
     <script type="text/javascript" src="{{ asset('vendor/marble/assets/js/jquery-ui.js') }}"></script>
@@ -35,6 +38,7 @@
         $prefix = config('marble.route_prefix', 'admin');
         $entryItemId = config('marble.entry_item_id', 1);
         $currentUser = Auth::guard('marble')->user();
+        $pluginRegistry = app('marble.admin');
     @endphp
 
 
@@ -46,11 +50,12 @@
             </a>
             <div class="clearfix">
                 @php
-                    $isContent   = request()->routeIs('marble.media.*', 'marble.trash.*', 'marble.redirect.*', 'marble.item.import*', 'marble.package.*', 'marble.calendar.*', 'marble.bundle.*');
-                    $isStructure = request()->routeIs('marble.blueprint.*', 'marble.site.*', 'marble.workflow.*');
-                    $isUsers     = request()->routeIs('marble.user.*', 'marble.user-group.*', 'marble.portal-user.*');
-                    $isSystem    = request()->routeIs('marble.activity-log.*', 'marble.webhook.*', 'marble.api-token.*', 'marble.configuration.*');
-                    $isDashboard = request()->routeIs('marble.dashboard');
+                    $isContent      = request()->routeIs('marble.media.*', 'marble.trash.*', 'marble.redirect.*', 'marble.item.import*', 'marble.calendar.*', 'marble.bundle.*', ...$pluginRegistry->getNavActivePatterns('content'));
+                    $isStructure    = request()->routeIs('marble.blueprint.*', 'marble.site.*', 'marble.workflow.*', ...$pluginRegistry->getNavActivePatterns('structure'));
+                    $isUsers        = request()->routeIs('marble.user.*', 'marble.user-group.*', 'marble.portal-user.*', ...$pluginRegistry->getNavActivePatterns('users'));
+                    $isSystem       = request()->routeIs('marble.activity-log.*', 'marble.webhook.*', 'marble.api-token.*', 'marble.configuration.*', 'marble.plugin.*', 'marble.package.*', ...$pluginRegistry->getNavActivePatterns('system'));
+                    $isDashboard    = request()->routeIs('marble.dashboard');
+                    $topNavSections = $pluginRegistry->getTopNavSections();
                 @endphp
                 <div class="nav-no-collapse navbar-left pull-left hidden-sm hidden-xs">
                     <ul class="nav navbar-nav pull-left">
@@ -76,7 +81,10 @@
                                 <li><a href="{{ route('marble.redirect.index') }}">@include('marble::components.famicon', ['name' => 'arrow_right']) {{ trans('marble::admin.redirects') }}</a></li>
                                 <li role="separator" class="divider"></li>
                                 <li><a href="{{ route('marble.item.import-form') }}">@include('marble::components.famicon', ['name' => 'page_white_paste']) {{ trans('marble::admin.import') }}</a></li>
-                                <li><a href="{{ route('marble.package.import') }}">@include('marble::components.famicon', ['name' => 'box']) {{ trans('marble::admin.packages') }}</a></li>
+                                @foreach($pluginRegistry->getNavItems('content') as $pluginNav)
+                                <li role="separator" class="divider"></li>
+                                <li><a href="{{ route($pluginNav['route']) }}">@include('marble::components.famicon', ['name' => $pluginNav['icon']]) {{ $pluginNav['label'] }}</a></li>
+                                @endforeach
                             </ul>
                         </li>
 
@@ -91,6 +99,10 @@
                                 <li><a href="{{ route('marble.blueprint.index') }}">@include('marble::components.famicon', ['name' => 'brick']) {{ trans('marble::admin.classes') }}</a></li>
                                 <li><a href="{{ route('marble.workflow.index') }}">@include('marble::components.famicon', ['name' => 'chart_bar']) {{ trans('marble::admin.workflows') }}</a></li>
                                 <li><a href="{{ route('marble.site.index') }}">@include('marble::components.famicon', ['name' => 'application_xp']) {{ trans('marble::admin.sites') }}</a></li>
+                                @foreach($pluginRegistry->getNavItems('structure') as $pluginNav)
+                                <li role="separator" class="divider"></li>
+                                <li><a href="{{ route($pluginNav['route']) }}">@include('marble::components.famicon', ['name' => $pluginNav['icon']]) {{ $pluginNav['label'] }}</a></li>
+                                @endforeach
                             </ul>
                         </li>
 
@@ -105,6 +117,10 @@
                                 <li><a href="{{ route('marble.user.index') }}">@include('marble::components.famicon', ['name' => 'status_online']) {{ trans('marble::admin.users') }}</a></li>
                                 <li><a href="{{ route('marble.user-group.index') }}">@include('marble::components.famicon', ['name' => 'group']) {{ trans('marble::admin.usergroups') }}</a></li>
                                 <li><a href="{{ route('marble.portal-user.index') }}">@include('marble::components.famicon', ['name' => 'user']) {{ trans('marble::admin.portal_users') }}</a></li>
+                                @foreach($pluginRegistry->getNavItems('users') as $pluginNav)
+                                <li role="separator" class="divider"></li>
+                                <li><a href="{{ route($pluginNav['route']) }}">@include('marble::components.famicon', ['name' => $pluginNav['icon']]) {{ $pluginNav['label'] }}</a></li>
+                                @endforeach
                             </ul>
                         </li>
 
@@ -117,13 +133,35 @@
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a href="{{ route('marble.configuration.index') }}">@include('marble::components.famicon', ['name' => 'wrench']) {{ trans('marble::admin.configuration') }}</a></li>
+                                <li><a href="{{ route('marble.plugin.index') }}">@include('marble::components.famicon', ['name' => 'plugin']) {{ trans('marble::admin.plugins') }}</a></li>
                                 <li role="separator" class="divider"></li>
                                 <li><a href="{{ route('marble.activity-log.index') }}">@include('marble::components.famicon', ['name' => 'time']) {{ trans('marble::admin.activity_log') }}</a></li>
                                 <li><a href="{{ route('marble.webhook.index') }}">@include('marble::components.famicon', ['name' => 'connect']) {{ trans('marble::admin.webhooks') }}</a></li>
                                 <li><a href="{{ route('marble.api-token.index') }}">@include('marble::components.famicon', ['name' => 'key']) API Tokens</a></li>
-                                <li><a href="{{ route('marble.package.export') }}">@include('marble::components.famicon', ['name' => 'box']) {{ trans('marble::admin.packages') }}</a></li>
+                                <li><a href="{{ route('marble.package.index') }}">@include('marble::components.famicon', ['name' => 'box']) {{ trans('marble::admin.packages') }}</a></li>
+                                @foreach($pluginRegistry->getNavItems('system') as $pluginNav)
+                                <li role="separator" class="divider"></li>
+                                <li><a href="{{ route($pluginNav['route']) }}">@include('marble::components.famicon', ['name' => $pluginNav['icon']]) {{ $pluginNav['label'] }}</a></li>
+                                @endforeach
                             </ul>
                         </li>
+
+                        {{-- Plugin top-level nav sections (e.g. Shop) --}}
+                        @foreach($topNavSections as $topSection)
+                        @php $isTopSection = request()->routeIs(...$topSection['patterns']); @endphp
+                        <li class="dropdown {{ $isTopSection ? 'active' : '' }}">
+                            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                                @include('marble::components.famicon', ['name' => $topSection['icon']])
+                                <span>{{ $topSection['label'] }}</span>
+                                <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                @foreach($topSection['items'] as $topItem)
+                                <li><a href="{{ route($topItem['route']) }}">@include('marble::components.famicon', ['name' => $topItem['icon']]) {{ $topItem['label'] }}</a></li>
+                                @endforeach
+                            </ul>
+                        </li>
+                        @endforeach
                     </ul>
                 </div>
                 <div class="nav-no-collapse pull-right" id="header-nav">
@@ -183,7 +221,12 @@
                             <ul class="dropdown-menu dropdown-menu-right">
                                 <li><a href="{{ url("{$prefix}/user/edit/{$currentUser->id}") }}">@include('marble::components.famicon', ['name' => 'user_edit']) {{ trans('marble::admin.profile') }}</a></li>
                                 <li role="separator" class="divider"></li>
-                                <li><a href="{{ url("{$prefix}/logout") }}">@include('marble::components.famicon', ['name' => 'disconnect']) {{ trans('marble::admin.logout') }}</a></li>
+                                <li>
+                                    <form method="POST" action="{{ route('marble.logout') }}" style="margin:0">
+                                        @csrf
+                                        <button type="submit" class="marble-logout-btn">@include('marble::components.famicon', ['name' => 'disconnect']) {{ trans('marble::admin.logout') }}</button>
+                                    </form>
+                                </li>
                             </ul>
                         </li>
                     </ul>
@@ -264,6 +307,9 @@
     <script type="text/javascript" src="{{ asset('vendor/marble/assets/js/bootstrap.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('vendor/marble/assets/js/bootstrap.datepicker.js') }}"></script>
     <script type="text/javascript" src="{{ asset('vendor/marble/assets/js/scripts.js') }}"></script>
+    @foreach(app('marble.admin')->getAssets('js') as $pluginJs)
+    <script type="text/javascript" src="{{ $pluginJs }}"></script>
+    @endforeach
 
     @yield('javascript')
 
@@ -336,29 +382,175 @@
             setInterval(pollCount, 30000);
         })();
 
+        window.MarbleFamiconUrl = '{{ asset('vendor/marble/assets/images/famicons') }}';
         CKEDITOR.plugins.addExternal('marblelink', '{{ asset('vendor/marble/assets/ckeditor/plugins/marblelink/') }}/', 'plugin.js');
+        CKEDITOR.plugins.addExternal('marbleai',   '{{ asset('vendor/marble/assets/ckeditor/plugins/marbleai/') }}/',   'plugin.js');
+        @foreach(app('marble.admin')->getCkEditorPlugins() as $ckPlugin)
+        CKEDITOR.plugins.addExternal('{{ $ckPlugin['name'] }}', '{{ $ckPlugin['url'] }}', 'plugin.js');
+        @endforeach
 
         CKEDITOR.replaceAll(function(textarea, config) {
             if (!$(textarea).hasClass("rich-text-editor")) {
                 return false;
             }
             var rows = $(textarea).attr('rows') || 10;
-            
-            // Höhe berechnen: Zeilenanzahl * Pixel pro Zeile (ca. 20-25px ist ein guter Richtwert)
+
             config.height = (rows * 20) + "px";
-            
-            config.extraPlugins = 'marblelink';
+
+            var extraPlugins = 'marblelink,marbleai';
+            @foreach(app('marble.admin')->getCkEditorPlugins() as $ckPlugin)
+            extraPlugins += ',{{ $ckPlugin['name'] }}';
+            @endforeach
+            config.extraPlugins = extraPlugins;
+
             config.filebrowserImageUploadUrl = '{{ route('marble.media.ckeditor-upload') }}?_token={{ csrf_token() }}';
+
+            var marbleToolbarItems = ['MarbleAI'];
+            @foreach(app('marble.admin')->getCkEditorPlugins() as $ckPlugin)
+            @if(!empty($ckPlugin['buttons']))
+            @foreach($ckPlugin['buttons'] as $btn)
+            marbleToolbarItems.push('{{ $btn }}');
+            @endforeach
+            @endif
+            @endforeach
+
             config.toolbar = [
-                { name: 'clipboard', items: ['Undo', 'Redo'] },
-                { name: 'styles', items: ['Styles', 'Format'] },
+                { name: 'clipboard',   items: ['Undo', 'Redo'] },
+                { name: 'styles',      items: ['Styles', 'Format'] },
                 { name: 'basicstyles', items: ['Bold', 'Italic', 'Strike', '-', 'RemoveFormat'] },
-                { name: 'paragraph', items: ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote'] },
-                { name: 'links', items: ['Link', 'Unlink', 'MarbleLink'] },
-                { name: 'insert', items: ['Image', 'Table'] },
-                { name: 'tools', items: ['Maximize'] },
+                { name: 'paragraph',   items: ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote'] },
+                { name: 'links',       items: ['Link', 'Unlink', 'MarbleLink'] },
+                { name: 'insert',      items: ['Image', 'Table'] },
+                { name: 'marble',      items: marbleToolbarItems },
+                { name: 'tools',       items: ['Maximize'] },
             ];
         });
+
+        /* ── Marble AI Assistant ──────────────────────────────────────────── */
+        window.MarbleAI = (function () {
+            var $overlay, $prompt, $result, $resultWrap, $insertBtn, $spinner, $error;
+            var activeEditor = null;
+            var aiUrl = '{{ route('marble.ai.generate') }}';
+            var csrfToken = '{{ csrf_token() }}';
+
+            function build() {
+                if ($overlay) return;
+                $overlay = $([
+                    '<div id="marble-ai-overlay">',
+                    '  <div id="marble-ai-modal">',
+                    '    <div id="marble-ai-header">',
+                    '      <strong>&#9733; AI Assistant</strong>',
+                    '      <button id="marble-ai-close">&times;</button>',
+                    '    </div>',
+                    '    <div id="marble-ai-body">',
+                    '      <div id="marble-ai-chips">',
+                    '        <button class="marble-ai-chip" data-prompt="Improve the writing and clarity of this text">Improve writing</button>',
+                    '        <button class="marble-ai-chip" data-prompt="Make this text shorter and more concise">Make shorter</button>',
+                    '        <button class="marble-ai-chip" data-prompt="Expand this text with more detail and examples">Expand</button>',
+                    '        <button class="marble-ai-chip" data-prompt="Translate this text to German">→ German</button>',
+                    '        <button class="marble-ai-chip" data-prompt="Write a short teaser / summary for this content (2-3 sentences, plain text)">Write teaser</button>',
+                    '      </div>',
+                    '      <textarea id="marble-ai-prompt" rows="3" placeholder="What would you like to do with this content?"></textarea>',
+                    '      <div id="marble-ai-spinner" style="display:none">Generating…</div>',
+                    '      <div id="marble-ai-error"  style="display:none"></div>',
+                    '      <div id="marble-ai-result-wrap" style="display:none">',
+                    '        <label>Result</label>',
+                    '        <div id="marble-ai-result"></div>',
+                    '      </div>',
+                    '    </div>',
+                    '    <div id="marble-ai-footer">',
+                    '      <button id="marble-ai-generate" class="btn btn-success btn-sm">Generate</button>',
+                    '      <button id="marble-ai-insert"   class="btn btn-primary btn-sm" style="display:none">Insert into editor</button>',
+                    '      <button id="marble-ai-cancel"   class="btn btn-default btn-sm">Cancel</button>',
+                    '    </div>',
+                    '  </div>',
+                    '</div>',
+                ].join(''));
+
+                $('body').append($overlay);
+                $prompt     = $('#marble-ai-prompt');
+                $result     = $('#marble-ai-result');
+                $resultWrap = $('#marble-ai-result-wrap');
+                $insertBtn  = $('#marble-ai-insert');
+                $spinner    = $('#marble-ai-spinner');
+                $error      = $('#marble-ai-error');
+
+                $('#marble-ai-close, #marble-ai-cancel').on('click', close);
+                $('#marble-ai-overlay').on('click', function(e) { if (e.target === this) close(); });
+
+                $('#marble-ai-chips').on('click', '.marble-ai-chip', function() {
+                    $prompt.val($(this).data('prompt'));
+                });
+
+                $('#marble-ai-generate').on('click', generate);
+                $prompt.on('keydown', function(e) {
+                    if (e.ctrlKey && e.key === 'Enter') generate();
+                });
+
+                $insertBtn.on('click', function() {
+                    if (activeEditor && $result.html()) {
+                        activeEditor.insertHtml($result.html());
+                    }
+                    close();
+                });
+            }
+
+            function generate() {
+                var prompt = $prompt.val().trim();
+                if (!prompt) return;
+
+                var context = '';
+                if (activeEditor) {
+                    context = activeEditor.getSelection().getSelectedText() || activeEditor.getData();
+                }
+
+                $spinner.show();
+                $error.hide().text('');
+                $resultWrap.hide();
+                $insertBtn.hide();
+                $('#marble-ai-generate').prop('disabled', true);
+
+                $.ajax({
+                    url:    aiUrl,
+                    method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': csrfToken },
+                    data:   { prompt: prompt, context: context },
+                    success: function(data) {
+                        $result.html(data.result);
+                        $resultWrap.show();
+                        $insertBtn.show();
+                    },
+                    error: function(xhr) {
+                        var msg = (xhr.responseJSON && xhr.responseJSON.error) ? xhr.responseJSON.error : 'An error occurred.';
+                        $error.text(msg).show();
+                    },
+                    complete: function() {
+                        $spinner.hide();
+                        $('#marble-ai-generate').prop('disabled', false);
+                    }
+                });
+            }
+
+            function open(editor) {
+                build();
+                activeEditor = editor;
+                $prompt.val('');
+                $result.html('');
+                $resultWrap.hide();
+                $insertBtn.hide();
+                $error.hide().text('');
+                $spinner.hide();
+                $overlay.show();
+                $prompt.focus();
+            }
+
+            function close() {
+                if ($overlay) $overlay.hide();
+                activeEditor = null;
+            }
+
+            return { open: open };
+        })();
     </script>
 
     {{-- Toast notification --}}

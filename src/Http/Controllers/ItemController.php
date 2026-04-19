@@ -23,6 +23,9 @@ use Marble\Admin\Models\ItemComment;
 use Marble\Admin\Models\ItemTask;
 use Marble\Admin\Models\Redirect;
 use Marble\Admin\Models\User;
+use Marble\Admin\Events\ItemPublished;
+use Marble\Admin\Events\ItemSaved;
+use Marble\Admin\Events\ItemTrashed;
 use Marble\Admin\Services\ActivityLogService;
 use Marble\Admin\Services\ItemRevisionService;
 use Marble\Admin\Services\NotificationService;
@@ -186,6 +189,7 @@ class ItemController extends Controller
         $this->activityLog->log('item.saved', $item);
         $this->webhooks->fire('item.saved', $item, $changedFields);
         $this->notifySubscribers($item, 'item.saved', Auth::guard('marble')->id());
+        ItemSaved::dispatch($item, $changedFields, Auth::guard('marble')->id());
 
         if ($parentId = $request->input('_inline_parent_id')) {
             return redirect()->route('marble.item.edit', $parentId)
@@ -296,6 +300,7 @@ class ItemController extends Controller
         });
 
         $this->activityLog->log('item.deleted', $item, ['blueprint' => $item->blueprint->identifier]);
+        ItemTrashed::dispatch($item, Auth::guard('marble')->id());
 
         return redirect()->route('marble.item.edit', $parentId)
             ->with('success', trans('marble::admin.item_deleted'));
@@ -349,6 +354,9 @@ class ItemController extends Controller
         $this->activityLog->log($action, $item);
         $this->webhooks->fire($action, $item);
         $this->notifySubscribers($item, $action, Auth::guard('marble')->id());
+        if ($item->status === 'published') {
+            ItemPublished::dispatch($item, Auth::guard('marble')->id());
+        }
 
         return back();
     }

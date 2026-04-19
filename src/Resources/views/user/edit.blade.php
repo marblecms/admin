@@ -79,4 +79,90 @@
         </div>
         <div class="clearfix"></div>
     </form>
+
+    @if(!$isNew)
+    {{-- Two-Factor Authentication ----------------------------------------- --}}
+    <div class="main-box" style="margin-top:20px">
+        <header class="main-box-header clearfix">
+            <h2>@include('marble::components.famicon', ['name' => 'lock']) {{ trans('marble::admin.two_factor_auth') }}</h2>
+        </header>
+        <div class="main-box-body clearfix">
+
+            @if(session('two_factor_backup_codes'))
+                <div class="alert alert-success">
+                    <strong>{{ trans('marble::admin.two_factor_enabled') }}</strong><br>
+                    {{ trans('marble::admin.two_factor_backup_codes_save') }}<br><br>
+                    @foreach(session('two_factor_backup_codes') as $code)
+                        <code style="display:inline-block;margin:2px 4px">{{ $code }}</code>
+                    @endforeach
+                </div>
+            @endif
+
+            @if($user->two_factor_enabled)
+                <p>
+                    <span class="label label-success">{{ trans('marble::admin.two_factor_active') }}</span>
+                    &nbsp;{{ trans('marble::admin.two_factor_active_hint') }}
+                </p>
+                <form method="POST" action="{{ route('marble.two-factor.disable', $user) }}">
+                    @csrf
+                    <button type="submit" class="btn btn-danger btn-sm"
+                            onclick="return confirm('{{ trans('marble::admin.two_factor_disable_confirm') }}')">
+                        @include('marble::components.famicon', ['name' => 'lock_open']) {{ trans('marble::admin.two_factor_disable') }}
+                    </button>
+                </form>
+            @else
+                <p class="text-muted">{{ trans('marble::admin.two_factor_setup_hint') }}</p>
+
+                <div id="marble-2fa-setup" style="display:none">
+                    <div id="marble-2fa-qr-wrap" style="margin-bottom:12px">
+                        <img id="marble-2fa-qr" src="" alt="QR Code" style="display:block;width:180px;height:180px;border:1px solid #ddd">
+                        <p class="text-muted" style="font-size:12px;margin-top:6px">
+                            {{ trans('marble::admin.two_factor_manual_key') }}:
+                            <strong id="marble-2fa-secret" style="font-family:monospace;letter-spacing:.1em"></strong>
+                        </p>
+                    </div>
+                    <form method="POST" action="{{ route('marble.two-factor.enable', $user) }}">
+                        @csrf
+                        @error('code')<div class="alert alert-danger">{{ $message }}</div>@enderror
+                        <div class="form-group">
+                            <label>{{ trans('marble::admin.two_factor_enter_code') }}</label>
+                            <input type="text" name="code" class="form-control input-sm"
+                                   style="width:140px;letter-spacing:.15em;font-size:1.1em"
+                                   autocomplete="one-time-code" inputmode="numeric"
+                                   maxlength="6" placeholder="000000" autofocus />
+                        </div>
+                        <button type="submit" class="btn btn-success btn-sm">
+                            @include('marble::components.famicon', ['name' => 'tick']) {{ trans('marble::admin.two_factor_confirm_enable') }}
+                        </button>
+                    </form>
+                </div>
+
+                <button id="marble-2fa-start" class="btn btn-default btn-sm">
+                    @include('marble::components.famicon', ['name' => 'lock']) {{ trans('marble::admin.two_factor_setup') }}
+                </button>
+            @endif
+        </div>
+    </div>
+    @endif
 @endsection
+
+@if(!$isNew && !$user->two_factor_enabled)
+@section('javascript')
+<script>
+$('#marble-2fa-start').on('click', function() {
+    var $btn = $(this);
+    $btn.prop('disabled', true).text('Loading…');
+
+    $.getJSON('{{ route('marble.two-factor.generate-secret', $user) }}', function(data) {
+        $('#marble-2fa-qr').attr('src', data.qr_url);
+        $('#marble-2fa-secret').text(data.secret);
+        $('#marble-2fa-setup').show();
+        $btn.hide();
+    }).fail(function() {
+        $btn.prop('disabled', false).text('{{ trans('marble::admin.two_factor_setup') }}');
+        alert('Could not generate secret. Please try again.');
+    });
+});
+</script>
+@endsection
+@endif

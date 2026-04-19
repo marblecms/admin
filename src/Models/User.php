@@ -21,11 +21,16 @@ class User extends Authenticatable
         'language',
         'theme',
         'root_item_id',
+        'two_factor_enabled',
+        'two_factor_secret',
+        'two_factor_backup_codes',
     ];
 
     protected $casts = [
-        'active'        => 'boolean',
-        'last_login_at' => 'datetime',
+        'active'                  => 'boolean',
+        'last_login_at'           => 'datetime',
+        'two_factor_enabled'      => 'boolean',
+        'two_factor_backup_codes' => 'array',
     ];
 
     protected $hidden = [

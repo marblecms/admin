@@ -344,6 +344,58 @@ Register webhooks under **System → Webhooks**. Marble fires HTTP POST requests
 
 Payload includes: item ID/name, blueprint, workflow step, parent ID, all slugs, and changed field values. Optionally set a **Secret** for HMAC SHA256 signatures via `X-Marble-Signature`.
 
+## Plugin API
+
+Marble has a first-class plugin system. Plugins are standard Laravel packages (`"type": "marble-plugin"`) that integrate via the `MarbleAdmin` facade — no core files are modified.
+
+```php
+use Marble\Admin\Facades\MarbleAdmin;
+
+// Add item to an existing admin dropdown (content/structure/users/system)
+MarbleAdmin::addNavItem('content', 'Orders', 'marble.shop.orders', 'cart', ['marble.shop.*']);
+
+// Add a new top-level nav dropdown
+MarbleAdmin::addTopNavSection('shop', [
+    'label'    => 'Shop',
+    'icon'     => 'cart',
+    'patterns' => ['marble.shop.*'],
+    'items'    => [
+        ['label' => 'Overview', 'route' => 'marble.shop.index',  'icon' => 'chart_bar'],
+        ['label' => 'Orders',   'route' => 'marble.shop.orders', 'icon' => 'cart'],
+    ],
+]);
+
+// Inject CSS/JS into every admin page
+MarbleAdmin::addAsset('css', asset('vendor/myplugin/plugin.css'));
+MarbleAdmin::addAsset('js',  asset('vendor/myplugin/plugin.js'));
+
+// Register a CKEditor 4 external plugin
+MarbleAdmin::addCkEditorPlugin('myplugin', asset('vendor/myplugin/ckeditor/'), ['MyButton']);
+```
+
+Installed plugins are discoverable in **System → Plugins**, which searches Packagist for `type: marble-plugin` packages.
+
+## Laravel Events
+
+Marble fires these events at key content lifecycle points:
+
+| Event | Payload | Fired when |
+|-------|---------|------------|
+| `Marble\Admin\Events\ItemSaved` | `$item`, `$changedFields`, `$userId` | Field values saved in admin |
+| `Marble\Admin\Events\ItemPublished` | `$item`, `$userId` | Item status set to published |
+| `Marble\Admin\Events\ItemTrashed` | `$item`, `$userId` | Item soft-deleted |
+| `Marble\Admin\Events\MarbleFormSubmitted` | `$submission` | Contact form submitted |
+| `Marble\Admin\Events\PortalUserRegistered` | `$user` | Portal user registers |
+| `Marble\Admin\Events\PortalUserLoggedIn` | `$user` | Portal user logs in |
+
+```php
+use Marble\Admin\Events\ItemPublished;
+
+Event::listen(ItemPublished::class, function (ItemPublished $e) {
+    dispatch(new SyncToSearchIndex($e->item->id));
+});
+```
+
 ## Redirect Manager
 
 Manage 301/302 redirects under **System → Redirects**. The `HandleMarbleRedirects` middleware intercepts 404 responses and checks the redirect table. Hit counts are tracked automatically.
@@ -380,7 +432,7 @@ Admin UI under **System → Portal Users** for creating, editing, enabling/disab
 
 ## Marble Packages
 
-Export and import complete blueprint definitions (including custom field types) as `.zip` packages via **Dashboard → Packages**. Useful for moving content schemas between projects or distributing reusable content types.
+Export and import complete blueprint definitions (including custom field types) as `.zip` packages via **System → Packages**. Useful for moving content schemas between projects or distributing reusable content types.
 
 ## User Groups & Permissions
 

@@ -30,6 +30,13 @@ class LoginController extends Controller
                 return back()->withErrors(['email' => trans('marble::admin.account_disabled')]);
             }
 
+            if ($user->two_factor_enabled) {
+                Auth::guard('marble')->logout();
+                $request->session()->put('marble_2fa_user_id', $user->id);
+                $request->session()->put('marble_2fa_remember', $request->boolean('remember'));
+                return redirect()->route('marble.two-factor');
+            }
+
             $request->session()->regenerate();
             $user->update(['last_login_at' => now()]);
 

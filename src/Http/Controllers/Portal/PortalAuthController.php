@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Marble\Admin\Events\PortalUserLoggedIn;
+use Marble\Admin\Events\PortalUserRegistered;
 use Marble\Admin\Models\PortalUser;
 
 class PortalAuthController extends Controller
@@ -34,6 +36,7 @@ class PortalAuthController extends Controller
 
         Auth::guard('portal')->login($user, $request->boolean('remember'));
         $request->session()->regenerate();
+        PortalUserLoggedIn::dispatch($user);
 
         return redirect()->intended(config('marble.portal_home', '/'));
     }
@@ -79,6 +82,7 @@ class PortalAuthController extends Controller
 
         Auth::guard('portal')->login($user);
         $request->session()->regenerate();
+        PortalUserRegistered::dispatch($user);
 
         return redirect(config('marble.portal_home', '/'));
     }

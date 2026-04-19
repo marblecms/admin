@@ -214,6 +214,7 @@ Route::prefix('api-tokens')->as('api-token.')->group(function () {
 
 // Marble Package Export/Import
 Route::prefix('package')->as('package.')->group(function () {
+    Route::get('/',      [\Marble\Admin\Http\Controllers\MarblePackageController::class, 'index'])->name('index');
     Route::get('export', [\Marble\Admin\Http\Controllers\MarblePackageController::class, 'exportForm'])->name('export');
     Route::post('export', [\Marble\Admin\Http\Controllers\MarblePackageController::class, 'export'])->name('export.do');
     Route::get('import', [\Marble\Admin\Http\Controllers\MarblePackageController::class, 'importForm'])->name('import');
@@ -239,9 +240,27 @@ Route::prefix('notifications')->as('notification.')->group(function () {
 });
 
 // Configuration
+// AI Assistant
+Route::post('ai/generate', [\Marble\Admin\Http\Controllers\AiAssistantController::class, 'generate'])
+    ->name('ai.generate');
+
+// Plugin Marketplace
+Route::prefix('plugins')->as('plugin.')->group(function () {
+    Route::get('/',                    [\Marble\Admin\Http\Controllers\PluginController::class, 'index'])->name('index');
+    Route::get('{vendor}/{package}',   [\Marble\Admin\Http\Controllers\PluginController::class, 'show'])->name('show');
+});
+
+// Two-Factor Auth setup (authenticated)
+Route::prefix('two-factor')->as('two-factor.')->group(function () {
+    Route::get('generate-secret/{user}', [\Marble\Admin\Http\Controllers\Auth\TwoFactorController::class, 'generateSecret'])->name('generate-secret');
+    Route::post('enable/{user}', [\Marble\Admin\Http\Controllers\Auth\TwoFactorController::class, 'enable'])->name('enable');
+    Route::post('disable/{user}', [\Marble\Admin\Http\Controllers\Auth\TwoFactorController::class, 'disable'])->name('disable');
+});
+
 Route::prefix('configuration')->as('configuration.')->group(function () {
     Route::get('/', [\Marble\Admin\Http\Controllers\ConfigurationController::class, 'index'])->name('index');
     Route::post('settings', [\Marble\Admin\Http\Controllers\ConfigurationController::class, 'saveSettings'])->name('settings.save');
+    Route::post('ai-settings', [\Marble\Admin\Http\Controllers\ConfigurationController::class, 'saveAiSettings'])->name('ai-settings.save');
     Route::post('languages', [\Marble\Admin\Http\Controllers\ConfigurationController::class, 'saveLanguages'])->name('languages.save');
     Route::post('languages/add', [\Marble\Admin\Http\Controllers\ConfigurationController::class, 'addLanguage'])->name('languages.add');
     Route::delete('languages/{language}', [\Marble\Admin\Http\Controllers\ConfigurationController::class, 'deleteLanguage'])->name('languages.delete');

@@ -46,6 +46,26 @@ class ConfigurationController extends Controller
         return redirect()->route('marble.configuration.index')->with('success', trans('marble::admin.configuration_saved'));
     }
 
+    public function saveAiSettings(Request $request)
+    {
+        $request->validate([
+            'ai_provider' => 'required|in:disabled,openai,anthropic',
+            'ai_api_key'  => 'nullable|string|max:255',
+            'ai_model'    => 'nullable|string|max:100',
+        ]);
+
+        MarbleSetting::set('ai_provider', $request->input('ai_provider'));
+        MarbleSetting::set('ai_model',    $request->input('ai_model', ''));
+
+        // Only overwrite the key if a new value was submitted (not the masked placeholder)
+        $key = $request->input('ai_api_key', '');
+        if ($key !== '' && $key !== '••••••••') {
+            MarbleSetting::set('ai_api_key', $key);
+        }
+
+        return redirect()->route('marble.configuration.index')->with('success', trans('marble::admin.configuration_saved'));
+    }
+
     public function saveLanguages(Request $request)
     {
         $active = $request->input('active_languages', []);

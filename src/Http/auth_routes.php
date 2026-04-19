@@ -11,3 +11,10 @@ Route::post('login', [\Marble\Admin\Http\Controllers\Auth\LoginController::class
 
 Route::post('logout', [\Marble\Admin\Http\Controllers\Auth\LoginController::class, 'logout'])
     ->name('logout');
+
+Route::get('two-factor', [\Marble\Admin\Http\Controllers\Auth\TwoFactorController::class, 'showChallenge'])
+    ->name('two-factor');
+
+Route::post('two-factor', [\Marble\Admin\Http\Controllers\Auth\TwoFactorController::class, 'verify'])
+    ->middleware('throttle:10,1')
+    ->name('two-factor.verify');

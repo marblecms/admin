@@ -335,6 +335,63 @@
             </form>
         </div>
     </div>
+
+    {{-- AI Assistant --}}
+    <div class="main-box">
+        <header class="main-box-header clearfix">
+            <h2>@include('marble::components.famicon', ['name' => 'star']) {{ trans('marble::admin.ai_settings') }}</h2>
+        </header>
+        <div class="main-box-body clearfix">
+            <p class="text-muted marble-text-sm marble-mb-sm">{{ trans('marble::admin.ai_settings_hint') }}</p>
+            <form method="POST" action="{{ route('marble.configuration.ai-settings.save') }}">
+                @csrf
+                <table class="table marble-table-flush">
+                    <tbody>
+                        <tr>
+                            <td class="marble-config-label marble-vmid">
+                                <strong>{{ trans('marble::admin.ai_provider') }}</strong>
+                            </td>
+                            <td>
+                                <select name="ai_provider" class="form-control input-sm marble-col-lg" id="ai-provider-select">
+                                    <option value="disabled" {{ ($settings['ai_provider'] ?? 'disabled') === 'disabled' ? 'selected' : '' }}>{{ trans('marble::admin.disabled') }}</option>
+                                    <option value="openai"   {{ ($settings['ai_provider'] ?? '') === 'openai'   ? 'selected' : '' }}>OpenAI</option>
+                                    <option value="anthropic"{{ ($settings['ai_provider'] ?? '') === 'anthropic'? 'selected' : '' }}>Anthropic (Claude)</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="marble-config-label marble-vmid">
+                                <strong>{{ trans('marble::admin.ai_api_key') }}</strong>
+                                <p class="text-muted marble-hint marble-mb-0">{{ trans('marble::admin.ai_api_key_hint') }}</p>
+                            </td>
+                            <td>
+                                <input type="password" name="ai_api_key" class="form-control input-sm marble-input-md-w"
+                                       value="{{ !empty($settings['ai_api_key']) ? '••••••••' : '' }}"
+                                       autocomplete="new-password"
+                                       placeholder="{{ trans('marble::admin.ai_api_key_placeholder') }}" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="marble-config-label marble-vmid">
+                                <strong>{{ trans('marble::admin.ai_model') }}</strong>
+                                <p class="text-muted marble-hint marble-mb-0">{{ trans('marble::admin.ai_model_hint') }}</p>
+                            </td>
+                            <td>
+                                <input type="text" name="ai_model" class="form-control input-sm marble-input-md-w"
+                                       value="{{ $settings['ai_model'] ?? '' }}"
+                                       placeholder="gpt-4o / claude-sonnet-4-6" />
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="marble-box-body">
+                    <button type="submit" class="btn btn-success btn-sm">
+                        @include('marble::components.famicon', ['name' => 'disk']) {{ trans('marble::admin.save') }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 @endsection
 
 @section('javascript')

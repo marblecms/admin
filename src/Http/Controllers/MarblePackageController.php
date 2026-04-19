@@ -31,6 +31,24 @@ class MarblePackageController extends Controller
         'files',
     ];
 
+    public function index()
+    {
+        $blueprints = Blueprint::orderBy('name')
+            ->get()
+            ->filter(fn ($bp) => !str_starts_with($bp->identifier, 'system_'))
+            ->values();
+
+        $allFieldTypes    = Marble::fieldTypes();
+        $customFieldTypes = array_filter(
+            $allFieldTypes,
+            fn ($ft) => !in_array($ft->identifier(), self::BUILT_IN_FIELD_TYPES, true)
+        );
+
+        $activeTab = session('import_log') ? 'import' : 'export';
+
+        return view('marble::package.index', compact('blueprints', 'customFieldTypes', 'activeTab'));
+    }
+
     public function exportForm()
     {
         $blueprints = Blueprint::orderBy('name')
@@ -89,6 +107,6 @@ class MarblePackageController extends Controller
         session()->flash('import_log', $result['log']);
         session()->flash('import_success', $result['success']);
 
-        return redirect()->route('marble.package.import');
+        return redirect()->route('marble.package.index');
     }
 }
