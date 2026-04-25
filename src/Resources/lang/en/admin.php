@@ -42,6 +42,7 @@ return [
     'no_children'         => 'No children available...',
     'delete_node'         => 'Delete',
     'delete_permanent'    => 'Delete permanently',
+    'search'              => 'Search',
     'search_placeholder'  => 'Search for contents...',
     'select_object'       => 'Select object...',
     'create_object'       => 'Create object...',
