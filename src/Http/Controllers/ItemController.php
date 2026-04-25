@@ -218,9 +218,14 @@ class ItemController extends Controller
         $this->authorize('create', Item::class);
         $user = Auth::guard('marble')->user();
 
-        $allowedBlueprints = $parentItem->blueprint->allowsAllChildren()
+        $parentBlueprint = $parentItem->blueprint;
+        $hasChildConfig  = \DB::table('blueprint_allowed_children')
+            ->where('blueprint_id', $parentBlueprint->id)
+            ->exists();
+
+        $allowedBlueprints = (!$hasChildConfig || $parentBlueprint->allowsAllChildren())
             ? Blueprint::all()
-            : $parentItem->blueprint->allowedChildBlueprints;
+            : $parentBlueprint->allowedChildBlueprints;
 
         $allowedBlueprints = $allowedBlueprints->filter(fn($bp) => $user->canDoWithBlueprint($bp->id, 'create'));
 

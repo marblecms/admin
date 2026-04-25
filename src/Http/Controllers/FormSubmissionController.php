@@ -11,6 +11,13 @@ class FormSubmissionController extends Controller
 {
     use AuthorizesRequests;
 
+    private function ensureBelongsToItem(Item $item, FormSubmission $submission): void
+    {
+        if ($submission->item_id !== $item->id) {
+            abort(404);
+        }
+    }
+
     public function index(Item $item)
     {
         $this->authorize('update', $item);
@@ -25,6 +32,7 @@ class FormSubmissionController extends Controller
     public function show(Item $item, FormSubmission $submission)
     {
         $this->authorize('update', $item);
+        $this->ensureBelongsToItem($item, $submission);
 
         $submission->update(['read' => true]);
 
@@ -34,6 +42,7 @@ class FormSubmissionController extends Controller
     public function markRead(Item $item, FormSubmission $submission)
     {
         $this->authorize('update', $item);
+        $this->ensureBelongsToItem($item, $submission);
 
         $submission->update(['read' => true]);
 
@@ -43,6 +52,7 @@ class FormSubmissionController extends Controller
     public function destroy(Item $item, FormSubmission $submission)
     {
         $this->authorize('update', $item);
+        $this->ensureBelongsToItem($item, $submission);
 
         $submission->delete();
 

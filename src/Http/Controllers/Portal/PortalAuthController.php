@@ -30,7 +30,13 @@ class PortalAuthController extends Controller
 
         $user = PortalUser::where('email', $credentials['email'])->first();
 
-        if (!$user || !$user->enabled || !Hash::check($credentials['password'], $user->password)) {
+        // Always run a hash check to prevent timing-based user enumeration.
+        // If user doesn't exist, check against a dummy hash so response time
+        // is indistinguishable from a wrong-password attempt.
+        $hash  = $user?->password ?? '$2y$10$dummyhashfortimingnormalization.......................';
+        $valid = Hash::check($credentials['password'], $hash) && $user && $user->enabled;
+
+        if (!$valid) {
             return back()->withErrors(['email' => trans('marble::portal.invalid_credentials')])->withInput();
         }
 

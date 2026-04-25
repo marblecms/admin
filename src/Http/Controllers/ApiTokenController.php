@@ -11,7 +11,11 @@ class ApiTokenController extends Controller
 {
     public function index()
     {
-        $tokens = ApiToken::with('user')->latest()->get();
+        $authUser = Auth::guard('marble')->user();
+
+        $tokens = $authUser->can('edit_users')
+            ? ApiToken::with('user')->latest()->get()
+            : ApiToken::where('user_id', $authUser->id)->latest()->get();
 
         return view('marble::api-token.index', compact('tokens'));
     }
@@ -44,6 +48,12 @@ class ApiTokenController extends Controller
 
     public function delete(ApiToken $token)
     {
+        $authUser = Auth::guard('marble')->user();
+
+        if ($token->user_id !== $authUser->id && !$authUser->can('edit_users')) {
+            abort(403);
+        }
+
         $token->delete();
 
         return redirect()->route('marble.api-token.index');

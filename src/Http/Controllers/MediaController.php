@@ -60,7 +60,13 @@ class MediaController extends Controller
             'file' => 'required|file|max:51200',
         ]);
 
-        $file     = $request->file('file');
+        $file = $request->file('file');
+
+        $dangerousExtensions = ['php', 'phtml', 'php3', 'php4', 'php5', 'php7', 'pht', 'phps', 'phar', 'exe', 'sh', 'bat', 'cmd', 'com', 'vbs'];
+        if (in_array(strtolower($file->getClientOriginalExtension()), $dangerousExtensions, true)) {
+            abort(422, 'File type not allowed.');
+        }
+
         $filename = $file->hashName();
 
         Storage::put($filename, file_get_contents($file));

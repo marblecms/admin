@@ -66,8 +66,17 @@ class TwoFactorController extends Controller
 
     // ── Setup / Disable (authenticated) ──────────────────────────────────────
 
+    private function authorizeUserAccess(User $user): void
+    {
+        $authUser = Auth::guard('marble')->user();
+        if ($authUser->id !== $user->id && !$authUser->can('edit_users')) {
+            abort(403);
+        }
+    }
+
     public function generateSecret(Request $request, User $user)
     {
+        $this->authorizeUserAccess($user);
         $secret = Totp::generateSecret();
         $request->session()->put('marble_2fa_pending_secret_' . $user->id, $secret);
 
@@ -82,6 +91,7 @@ class TwoFactorController extends Controller
 
     public function enable(Request $request, User $user)
     {
+        $this->authorizeUserAccess($user);
         $request->validate(['code' => 'required|string']);
 
         $secret = $request->session()->get('marble_2fa_pending_secret_' . $user->id);
@@ -111,6 +121,7 @@ class TwoFactorController extends Controller
 
     public function disable(Request $request, User $user)
     {
+        $this->authorizeUserAccess($user);
         $user->update([
             'two_factor_enabled'      => false,
             'two_factor_secret'       => null,

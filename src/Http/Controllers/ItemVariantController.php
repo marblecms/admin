@@ -11,6 +11,13 @@ use Marble\Admin\Models\Language;
 
 class ItemVariantController extends Controller
 {
+    private function ensureBelongsToItem(Item $item, ItemVariant $variant): void
+    {
+        if ($variant->item_id !== $item->id) {
+            abort(404);
+        }
+    }
+
     public function create(Item $item)
     {
         $variant = ItemVariant::create([
@@ -25,6 +32,7 @@ class ItemVariantController extends Controller
 
     public function edit(Item $item, ItemVariant $variant)
     {
+        $this->ensureBelongsToItem($item, $variant);
         $languages     = Language::all();
         $groupedFields = $item->blueprint->groupedFields();
 
@@ -38,6 +46,7 @@ class ItemVariantController extends Controller
 
     public function save(Request $request, Item $item, ItemVariant $variant)
     {
+        $this->ensureBelongsToItem($item, $variant);
         $request->validate([
             'traffic_split' => 'required|integer|min:1|max:99',
             'name'          => 'required|string|max:128',
@@ -78,12 +87,14 @@ class ItemVariantController extends Controller
 
     public function toggle(Item $item, ItemVariant $variant)
     {
+        $this->ensureBelongsToItem($item, $variant);
         $variant->update(['is_active' => !$variant->is_active]);
         return redirect()->route('marble.item.edit', $item);
     }
 
     public function updateSplit(Request $request, Item $item, ItemVariant $variant)
     {
+        $this->ensureBelongsToItem($item, $variant);
         $request->validate(['traffic_split' => 'required|integer|min:1|max:99']);
         $variant->update(['traffic_split' => $request->integer('traffic_split')]);
         return redirect()->route('marble.item.edit', $item);
@@ -91,6 +102,7 @@ class ItemVariantController extends Controller
 
     public function destroy(Item $item, ItemVariant $variant)
     {
+        $this->ensureBelongsToItem($item, $variant);
         $variant->delete();
         return redirect()->route('marble.item.edit', $item)
             ->with('success', trans('marble::admin.ab_variant_deleted'));
